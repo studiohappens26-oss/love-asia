@@ -95,7 +95,8 @@ button { font: inherit; color: inherit; }
 .seal--veg { background: #4f6b45; box-shadow: inset 0 0 0 2px rgba(251, 243, 234, .55), inset 0 0 0 3px #4f6b45; }
 
 /* ================================ SCENES ================================ */
-.scene { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+/* sized to the large viewport so the mobile address bar never resizes the scenes */
+.scene { position: fixed; top: 0; left: 0; right: 0; height: 100vh; height: 100lvh; z-index: 0; pointer-events: none; contain: strict; }
 .scene-pond, .scene-grove {
   position: absolute; inset: 0;
   opacity: 0;
@@ -113,6 +114,19 @@ body.mode-nonveg .scene-pond, body.mode-veg .scene-grove { opacity: 1; }
     linear-gradient(180deg, #f3f2ec 0%, #ecf0ee 55%, #e6ecea 100%);
 }
 #pond { position: absolute; inset: 0; display: block; }
+/* water shimmer: a static texture slid around by the compositor (no per-frame drawing) */
+.pond-caustics, .pond-caustics::after {
+  position: absolute;
+  inset: -320px;
+  background-image: var(--caustic, none);
+  background-size: 320px 320px;
+  opacity: .5;
+  animation: caustic 40s linear infinite;
+  will-change: transform;
+}
+.pond-caustics::after { content: ""; inset: 0; background-size: 480px 480px; opacity: .6; animation: caustic2 55s linear infinite; }
+@keyframes caustic { to { transform: translate3d(320px, 320px, 0); } }
+@keyframes caustic2 { to { transform: translate3d(-480px, 480px, 0); } }
 
 /* ---- bamboo grove: Japanese ink-wash ---- */
 .scene-grove { background: linear-gradient(180deg, #f8f4ec 0%, #f3efe6 55%, #ece7dc 100%); }
@@ -125,8 +139,7 @@ body.mode-nonveg .scene-pond, body.mode-veg .scene-grove { opacity: 1; }
   left: 0;
   height: 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, .62);
-  filter: blur(1.5px);
+  background: rgba(255, 255, 255, .55);
   animation: drift 90s linear infinite;
   will-change: transform;
 }
@@ -157,15 +170,12 @@ body.mode-nonveg .scene-pond, body.mode-veg .scene-grove { opacity: 1; }
   from { transform: rotate(calc(var(--sway, 2deg) * -1)); }
   to   { transform: rotate(var(--sway, 2deg)); }
 }
-.leaf-flutter { animation: flutter 3s ease-in-out infinite alternate; transform-origin: 0 0; }
-@keyframes flutter { from { transform: rotate(-5deg); } to { transform: rotate(6deg); } }
 .sakura {
   position: absolute;
   top: calc(var(--safe-top) + 92px);
   width: min(70vw, 360px);
   transform-origin: 100% 20%;
   animation: branch 7s ease-in-out infinite alternate;
-  filter: drop-shadow(0 6px 8px rgba(120, 80, 80, .08));
 }
 .sakura--right { right: -24px; }
 @keyframes branch { from { transform: rotate(-1.6deg); } to { transform: rotate(1.4deg); } }
@@ -228,7 +238,19 @@ body.mode-nonveg .scene-pond, body.mode-veg .scene-grove { opacity: 1; }
 }
 body.is-menu .landing { opacity: 0; transform: scale(1.04); visibility: hidden; pointer-events: none; }
 body.is-landing .landing { transition: opacity .5s var(--ease), transform .5s var(--ease); }
-body.is-revealing .landing { opacity: 1; transform: none; visibility: visible; transition: none; }
+.ink-ring {
+  position: fixed;
+  z-index: 7;
+  width: 60px; height: 60px;
+  margin: -30px 0 0 -30px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(110, 140, 152, .55);
+  pointer-events: none;
+  animation: inkring 1s cubic-bezier(.2, .7, .3, 1) forwards;
+}
+.ink-ring--veg { border-color: rgba(86, 102, 76, .5); }
+.ink-ring + .ink-ring { animation-delay: .14s; }
+@keyframes inkring { from { transform: scale(.2); opacity: 1; } to { transform: scale(14); opacity: 0; } }
 
 .landing__decor { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .decor-pad { position: absolute; animation: float 10s ease-in-out infinite alternate; }
@@ -314,10 +336,8 @@ body.is-revealing .landing { opacity: 1; transform: none; visibility: visible; t
   left: 10px; right: 10px; bottom: 10px;
   padding: 10px 12px 11px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, .82);
-  border: 1px solid rgba(255, 255, 255, .9);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, .9);
+  border: 1px solid rgba(255, 255, 255, .95);
   box-shadow: 0 10px 24px -18px rgba(60, 50, 40, .5);
 }
 .choice__label strong {
@@ -379,7 +399,7 @@ body.is-revealing .landing { opacity: 1; transform: none; visibility: visible; t
 /* ================================ MENU ================================ */
 .menu-view { position: relative; z-index: 1; min-height: 100vh; min-height: 100dvh; }
 body.is-menu .menu-view { animation: fadeUp .8s var(--ease) both; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes fadeUp { from { opacity: 0; } to { opacity: 1; } }
 
 .topbar {
   position: sticky;
@@ -391,9 +411,7 @@ body.is-menu .menu-view { animation: fadeUp .8s var(--ease) both; }
   gap: 6px;
   height: calc(var(--topbar-h) + var(--safe-top));
   padding: var(--safe-top) 8px 0;
-  background: rgba(250, 247, 241, .72);
-  -webkit-backdrop-filter: blur(12px) saturate(1.1);
-  backdrop-filter: blur(12px) saturate(1.1);
+  background: rgba(250, 247, 241, .94);
   border-bottom: 1px solid var(--hair-2);
 }
 .topbar__logo { justify-self: start; margin-left: 2px; }
@@ -445,9 +463,7 @@ body.is-menu .menu-view { animation: fadeUp .8s var(--ease) both; }
   top: calc(var(--topbar-h) + var(--safe-top));
   z-index: 9;
   padding: 8px 16px;
-  background: rgba(250, 247, 241, .72);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  background: rgba(250, 247, 241, .94);
   border-bottom: 1px solid var(--hair-2);
 }
 .search-bar input {
@@ -643,9 +659,6 @@ div.dish__head { cursor: default; }
 
 .empty { text-align: center; color: var(--muted); padding: 40px 0; font-family: var(--font-serif); font-style: italic; font-size: 1.2rem; }
 
-/* reveal on scroll */
-body.is-ready .dish, body.is-ready .cat__title { opacity: 0; transform: translateY(12px); transition: opacity .6s var(--ease), transform .6s var(--ease), background .35s var(--ease), box-shadow .35s var(--ease); }
-body.is-ready .dish.in, body.is-ready .cat__title.in { opacity: 1; transform: none; }
 
 .menu-footer {
   max-width: 640px;

@@ -231,10 +231,12 @@
       ctx.strokeStyle = "rgba(70,62,55,0.22)";
       ctx.lineWidth = 0.7;
       ctx.stroke();
-      ctx.beginPath();
-      for (let k = 1; k <= 3; k++) { ctx.moveTo(len * 0.06, 0); ctx.lineTo(len * 0.92, -wid * (0.85 - k * 0.32)); }
-      ctx.strokeStyle = "rgba(70,62,55,0.12)";
-      ctx.stroke();
+      if (this.leap) {
+        ctx.beginPath();
+        for (let k = 1; k <= 3; k++) { ctx.moveTo(len * 0.06, 0); ctx.lineTo(len * 0.92, -wid * (0.85 - k * 0.32)); }
+        ctx.strokeStyle = "rgba(70,62,55,0.12)";
+        ctx.stroke();
+      }
       ctx.restore();
     }
 
@@ -271,10 +273,12 @@
       ctx.strokeStyle = "rgba(70,62,55,0.22)";
       ctx.lineWidth = 0.7;
       ctx.stroke();
-      ctx.beginPath();
-      for (let k = -2; k <= 2; k++) { ctx.moveTo(0, 0); ctx.quadraticCurveTo(tl * 0.5, k * tl * 0.1 + bend * 0.3, tl * 0.92, k * tl * 0.2 + bend * 0.9); }
-      ctx.strokeStyle = "rgba(70,62,55,0.1)";
-      ctx.stroke();
+      if (this.leap) {
+        ctx.beginPath();
+        for (let k = -2; k <= 2; k++) { ctx.moveTo(0, 0); ctx.quadraticCurveTo(tl * 0.5, k * tl * 0.1 + bend * 0.3, tl * 0.92, k * tl * 0.2 + bend * 0.9); }
+        ctx.strokeStyle = "rgba(70,62,55,0.1)";
+        ctx.stroke();
+      }
       ctx.restore();
 
       // body
@@ -291,13 +295,17 @@
         const ang = dirAt(i), w = this.width * profile(pt.s);
         const cx = x - Math.sin(ang) * pt.lat * w, cy = y + Math.cos(ang) * pt.lat * w;
         ctx.fillStyle = pt.col;
-        for (const [bx, by, br] of pt.blobs) {
-          const ox = (Math.cos(ang) * bx - Math.sin(ang) * by) * this.width * pt.r;
-          const oy = (Math.sin(ang) * bx + Math.cos(ang) * by) * this.width * pt.r;
-          ctx.globalAlpha = 0.3;
-          ctx.beginPath(); ctx.arc(cx + ox, cy + oy, this.width * pt.r * br * 1.25, 0, TAU); ctx.fill();
-          ctx.globalAlpha = 0.88;
-          ctx.beginPath(); ctx.arc(cx + ox, cy + oy, this.width * pt.r * br, 0, TAU); ctx.fill();
+        for (const [scale, alpha] of [[1.25, 0.3], [1, 0.88]]) {
+          ctx.globalAlpha = alpha;
+          ctx.beginPath();
+          for (const [bx, by, br] of pt.blobs) {
+            const ox = (Math.cos(ang) * bx - Math.sin(ang) * by) * this.width * pt.r;
+            const oy = (Math.sin(ang) * bx + Math.cos(ang) * by) * this.width * pt.r;
+            const rr = this.width * pt.r * br * scale;
+            ctx.moveTo(cx + ox + rr, cy + oy);
+            ctx.arc(cx + ox, cy + oy, rr, 0, TAU);
+          }
+          ctx.fill();
         }
       }
       if (this.v.head) { // tancho: a red crown
@@ -344,6 +352,7 @@
       ctx.arc(ex - Math.sin(hA) * ew, ey + Math.cos(hA) * ew, this.width * 0.11, 0, TAU);
       ctx.arc(ex + Math.sin(hA) * ew, ey - Math.cos(hA) * ew, this.width * 0.11, 0, TAU);
       ctx.fill();
+      if (!this.leap) return;
       const mx = p[0].x + Math.cos(hA) * this.width * 0.6, my = p[0].y + Math.sin(hA) * this.width * 0.6;
       ctx.strokeStyle = "rgba(70,60,50,0.35)";
       ctx.lineWidth = 0.6;
@@ -358,6 +367,7 @@
   }
 
   /* ------------------- watercolour lily pads + lotus ------------------- */
+  const SPRITE_SCALE = 1.5;
   const PAD_TONES = [
     ["rgba(214,168,128,0.42)", "rgba(176,128,92,0.35)"],
     ["rgba(150,168,176,0.40)", "rgba(102,120,130,0.35)"],
@@ -393,12 +403,28 @@
       }
       ctx.closePath();
     }
+    // drawn once into a sprite; each frame is a single drawImage
     draw(ctx) {
+      if (!this.sprite) {
+        const R = this.r * 1.12, k = SPRITE_SCALE;
+        const c = document.createElement("canvas");
+        c.width = c.height = Math.ceil(R * 2 * k);
+        const g = c.getContext("2d");
+        g.scale(k, k);
+        g.translate(R, R);
+        this.paint(g);
+        this.sprite = c; this.R = R;
+      }
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.rot);
       const s = 1 + Math.sin(this.bob) * 0.012;
       ctx.scale(s, s);
+      ctx.drawImage(this.sprite, -this.R, -this.R, this.R * 2, this.R * 2);
+      ctx.restore();
+    }
+    paint(ctx) {
+      ctx.save();
       ctx.fillStyle = this.tone[0];
       this.shape(ctx, this.r * 1.04); ctx.fill();
       this.shape(ctx, this.r * 0.9); ctx.fill();
@@ -537,7 +563,7 @@
   }
 
   /* ------------------------------ Pond ------------------------------ */
-  function KoiPond(canvas) {
+  function KoiPond(canvas, causticEl) {
     const ctx = canvas.getContext("2d");
     const layer = document.createElement("canvas");
     const lctx = layer.getContext("2d");
@@ -545,12 +571,18 @@
     let W = 0, H = 0, dpr = 1, unit = 100;
     let koi = [], pads = [], petals = [], ripples = [], food = [], drops = [];
     let fly = null, nextFly = 600;
-    let pattern = null;
+    let prepared = false;
+    let prevBoxes = [];
+    let scrollBusyUntil = 0, skip = 0;
     let running = false, raf = 0, last = 0, t = 0, nextLeap = 240;
 
     function resize() {
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      W = window.innerWidth; H = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+      // size to the *large* viewport (the scene is 100lvh) so the phone's
+      // address bar showing/hiding never resizes or clears the canvas
+      W = window.innerWidth;
+      H = (canvas.parentElement && canvas.parentElement.clientHeight) || window.innerHeight;
+      prevBoxes = [];
       for (const c of [canvas, layer]) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
       canvas.style.width = W + "px"; canvas.style.height = H + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -563,6 +595,37 @@
         petals = Array.from({ length: W > 700 ? 12 : 8 }, () => new Petal(W, H));
       }
       if (!reduced) frame(performance.now(), true);
+    }
+
+    // generous bounds of a fish incl. fins, tail and shadow, clamped to the canvas
+    function fishBox(k, [L, R]) {
+      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+      for (const q of L.concat(R)) { if (q[0] < x0) x0 = q[0]; if (q[0] > x1) x1 = q[0]; if (q[1] < y0) y0 = q[1]; if (q[1] > y1) y1 = q[1]; }
+      const pad = k.len * 0.42;
+      x0 = Math.max(0, Math.floor(x0 - pad)); y0 = Math.max(0, Math.floor(y0 - pad));
+      x1 = Math.min(W, Math.ceil(x1 + pad + k.len * 0.06)); y1 = Math.min(H, Math.ceil(y1 + pad + k.len * 0.12));
+      return x1 > x0 && y1 > y0 ? { x: x0, y: y0, w: x1 - x0, h: y1 - y0 } : null;
+    }
+
+    // overlapping boxes are merged so nothing is tinted or copied twice
+    function mergeBoxes(list) {
+      let merged = true;
+      while (merged) {
+        merged = false;
+        outer: for (let i = 0; i < list.length; i++) {
+          for (let j = i + 1; j < list.length; j++) {
+            const a = list[i], b = list[j];
+            if (a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h) {
+              const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y);
+              list[i] = { x, y, w: Math.max(a.x + a.w, b.x + b.w) - x, h: Math.max(a.y + a.h, b.y + b.h) - y };
+              list.splice(j, 1);
+              merged = true;
+              break outer;
+            }
+          }
+        }
+      }
+      return list;
     }
 
     function splash(x, y, big) {
@@ -594,19 +657,10 @@
     }
 
     function frame(now, once) {
+      if (!once && now < scrollBusyUntil && (++skip & 1)) { raf = requestAnimationFrame(frame); return; }
       const dt = Math.min(3, (now - last) / 16.67 || 1);
       last = now; t += dt;
       ctx.clearRect(0, 0, W, H);
-
-      if (pattern) {
-        ctx.save();
-        ctx.globalAlpha = 0.22;
-        ctx.translate((t * 0.12) % 512, (t * 0.06) % 512);
-        ctx.scale(2, 2);
-        ctx.fillStyle = pattern;
-        ctx.fillRect(-256, -256, W / 2 + 512, H / 2 + 512);
-        ctx.restore();
-      }
 
       for (const f of food) {
         f.life -= 0.0025 * dt;
@@ -632,20 +686,23 @@
         outlines.push(k.outline());
       }
 
-      // underwater koi, washed into the water
-      lctx.clearRect(0, 0, W, H);
+      // underwater koi, washed into the water. Only the boxes around the fish are
+      // cleared, tinted and copied, instead of three full-screen passes per frame.
+      const boxes = mergeBoxes(koi.map((k, i) => (k.leap ? null : fishBox(k, outlines[i]))).filter(Boolean));
+      for (const b of prevBoxes.concat(boxes)) lctx.clearRect(b.x, b.y, b.w, b.h);
       lctx.fillStyle = "rgba(70,95,105,0.16)";
       koi.forEach((k, i) => { if (!k.leap) k.drawShadow(lctx, outlines[i][0], outlines[i][1]); });
       koi.forEach((k, i) => { if (!k.leap) k.draw(lctx, outlines[i][0], outlines[i][1]); });
       lctx.save();
       lctx.globalCompositeOperation = "source-atop";
       lctx.fillStyle = "rgba(214,228,232,0.28)";
-      lctx.fillRect(0, 0, W, H);
+      for (const b of boxes) lctx.fillRect(b.x, b.y, b.w, b.h);
       lctx.restore();
       ctx.save();
       ctx.globalAlpha = 0.8;
-      ctx.drawImage(layer, 0, 0, W, H);
+      for (const b of boxes) ctx.drawImage(layer, b.x * dpr, b.y * dpr, b.w * dpr, b.h * dpr, b.x, b.y, b.w, b.h);
       ctx.restore();
+      prevBoxes = boxes;
 
       for (const p of pads) { if (!once) p.update(dt, W, H); p.draw(ctx); }
       for (const p of petals) { if (!once) p.update(dt, W, H); p.draw(ctx); }
@@ -692,9 +749,18 @@
       if (running && !once) raf = requestAnimationFrame(frame);
     }
 
+    // heavy one-off setup; called while the guest is still on the landing page
+    function prepare() {
+      if (prepared) return;
+      prepared = true;
+      if (causticEl) {
+        try { causticEl.style.setProperty("--caustic", `url(${makeCausticTile(160).toDataURL()})`); } catch (e) { /* decorative */ }
+      }
+      resize();
+    }
+
     function start() {
-      if (!pattern) pattern = ctx.createPattern(makeCausticTile(256), "repeat");
-      if (!W) resize();
+      prepare();
       if (reduced) { frame(performance.now(), true); return; }
       if (running) return;
       running = true;
@@ -707,13 +773,19 @@
       cancelAnimationFrame(raf);
     }
 
-    window.addEventListener("resize", () => { if (running || reduced) resize(); });
+    // only real size changes (rotation, desktop resize) rebuild the canvas
+    window.addEventListener("resize", () => {
+      if (!prepared) return;
+      const h = (canvas.parentElement && canvas.parentElement.clientHeight) || window.innerHeight;
+      if (window.innerWidth !== W || Math.abs(h - H) > 120) resize();
+    });
+    window.addEventListener("scroll", () => { scrollBusyUntil = performance.now() + 200; }, { passive: true });
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) { if (running) { stop(); running = "paused"; } }
       else if (running === "paused") { running = false; start(); }
     });
 
-    return { start, stop, addRipple, resize, leap: scheduleLeap, splash: (x, y) => splash(x, y, true) };
+    return { prepare, start, stop, addRipple, resize, leap: scheduleLeap, splash: (x, y) => splash(x, y, true) };
   }
 
   window.KoiPond = KoiPond;

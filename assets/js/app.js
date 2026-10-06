@@ -16,12 +16,11 @@
   const sheet = $("#sheet");
   const sheetList = $("#sheet-list");
 
-  const pond = window.KoiPond($("#pond"));
+  const pond = window.KoiPond($("#pond"), $("#caustics"));
   const grove = window.BambooGrove($("#grove"));
 
   let mode = null;
   let spy = null;
-  let reveal = null;
   let currentCat = null;
 
   const TAG_LABELS = { spicy: "Spicy", chef: "Chef’s special", new: "New", jain: "Jain option" };
@@ -47,10 +46,10 @@
   </g>
   <path class="lg-s" pathLength="1" d="M95.5 75C94 68.5 87 66 85.2 74C83.4 82 84 96 88 108C91 117 94 126 94 138C94 150 90 158 82 164" fill="none" stroke="#231f20" stroke-width="7"/>
   <g class="lg-love" fill="#dd1b46">
-    <path d="M56.6 44h4.4v10.2H67.4V58H56.6z"/>
-    <circle cx="86.6" cy="50.9" r="7.1"/>
-    <path class="lg-heart" d="M115.3 58.2L108.6 51.2C106 48.4 107.6 44.2 111.2 44.2C113 44.2 114.4 45.3 115.3 46.8C116.2 45.3 117.6 44.2 119.4 44.2C123 44.2 124.6 48.4 122 51.2Z"/>
-    <path d="M134 44h10.8v3.8h-6.4v3.2h5.8v3.6h-5.8v3.2h6.6V58H134z"/>
+    <path d="M56 43h7v9.3h5V59H56z"/>
+    <circle cx="87.5" cy="51.3" r="8.4"/>
+    <path class="lg-heart" d="M110.5 42.8L115 47.3L119.5 42.8L125 48.3V50.1L115 59.6L105 50.1V48.3Z"/>
+    <path d="M134 43h11v4h-4v2h4v4h-4v2h4v4H134z"/>
   </g>
   <text class="lg-tm" x="161" y="81" font-size="6.5" fill="#231f20">TM</text>
 </svg>`;
@@ -166,7 +165,6 @@
     $("#mode-hint").textContent = mode === "veg" ? "You’re viewing the vegetarian menu." : "You’re viewing the full menu (veg & non-veg).";
 
     setupSpy();
-    setupReveal();
     if (searchInput.value) applySearch();
   }
 
@@ -204,28 +202,6 @@
     $$(".cat", menuEl).forEach((s) => spy.observe(s));
   }
 
-  /* ------------------------- reveal-on-scroll ------------------------- */
-  function setupReveal() {
-    if (reveal) reveal.disconnect();
-    const items = $$(".dish, .cat__title", menuEl);
-    if (reduced || !("IntersectionObserver" in window)) {
-      items.forEach((i) => i.classList.add("in"));
-      return;
-    }
-    reveal = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("in");
-            reveal.unobserve(e.target);
-          }
-        });
-      },
-      { rootMargin: "0px 0px -4% 0px" }
-    );
-    items.forEach((i) => reveal.observe(i));
-  }
-
   /* ------------------------------ search ------------------------------ */
   function applySearch() {
     const q = searchInput.value.trim().toLowerCase();
@@ -237,7 +213,7 @@
         $$(".dish", grp).forEach((it) => {
           const ok = !q || it.dataset.search.includes(q);
           it.hidden = !ok;
-          if (ok) { n++; it.classList.add("in"); }
+          if (ok) n++;
         });
         grp.hidden = n === 0;
         shown += n;
@@ -305,12 +281,19 @@
     try { history.replaceState(null, "", "#" + mode); } catch (e) { /* file:// etc. */ }
   }
 
-  function finishOpen() {
-    body.classList.remove("is-revealing");
-    landing.style.webkitMaskImage = landing.style.maskImage = "";
+  // A soft ink ripple spreads from the tapped tile while the landing page fades
+  // away; both are transform/opacity animations, so they stay smooth on phones.
+  function inkRipple(x, y, veg) {
+    for (let i = 0; i < 2; i++) {
+      const r = document.createElement("span");
+      r.className = "ink-ring" + (veg ? " ink-ring--veg" : "");
+      r.style.left = x + "px";
+      r.style.top = y + "px";
+      r.addEventListener("animationend", () => r.remove());
+      body.appendChild(r);
+    }
   }
 
-  // Opening the menu "dissolves" the landing page outward from where it was tapped
   function openMenu(next, origin) {
     setMode(next);
     menuView.hidden = false;
@@ -319,24 +302,9 @@
     landing.setAttribute("aria-hidden", "true");
     landing.inert = true;
     window.scrollTo(0, 0);
-
-    const canMask = CSS.supports("mask-image", "radial-gradient(black, black)") || CSS.supports("-webkit-mask-image", "radial-gradient(black, black)");
-    if (!origin || reduced || !canMask) return finishOpen();
-
-    body.classList.add("is-revealing");
-    const { x, y } = origin;
-    const maxR = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)) + 60;
-    const start = performance.now(), dur = 900;
-    if (next === "nonveg") { setTimeout(() => pond.splash(x, y), 120); setTimeout(() => pond.leap(), 700); }
-    (function step(now) {
-      const k = Math.min(1, (now - start) / dur);
-      const e = 1 - Math.pow(1 - k, 3);
-      const r = e * maxR;
-      const m = `radial-gradient(circle at ${x}px ${y}px, transparent ${r}px, #000 ${r + 40}px)`;
-      landing.style.webkitMaskImage = landing.style.maskImage = m;
-      if (k < 1) requestAnimationFrame(step);
-      else finishOpen();
-    })(start);
+    if (!origin || reduced) return;
+    inkRipple(origin.x, origin.y, next === "veg");
+    if (next === "nonveg") { setTimeout(() => pond.splash(origin.x, origin.y), 150); setTimeout(() => pond.leap(), 750); }
   }
 
   function showLanding() {
@@ -407,7 +375,14 @@
   } catch (e) { /* purely decorative */ }
 
   /* ------------------------------ boot ------------------------------ */
+  // Build the bamboo grove and the pond's textures/canvas in idle time on the landing
+  // page, so tapping Veg / Non-Veg doesn't have to do that work mid-transition.
+  function warmUp() {
+    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 1));
+    idle(() => { grove.build(); idle(() => pond.prepare(), { timeout: 1500 }); }, { timeout: 2500 });
+  }
   const initial = location.hash.replace("#", "");
   if (initial === "veg" || initial === "nonveg") openMenu(initial);
+  else setTimeout(warmUp, reduced ? 0 : 2200); // after the logo intro
   requestAnimationFrame(() => body.classList.add("is-ready"));
 })();

@@ -74,9 +74,7 @@
 
   function leafCluster(g, x, y, dir, scale, tone) {
     const c = el("g", { transform: `translate(${x} ${y})` });
-    const inner = el("g", { class: "leaf-flutter" });
-    inner.style.animationDelay = `${-rand(0, 4).toFixed(2)}s`;
-    inner.style.animationDuration = `${rand(2.6, 4.2).toFixed(2)}s`;
+    const inner = el("g", {});
     const count = 3 + ((Math.random() * 3) | 0);
     for (let i = 0; i < count; i++) {
       const ang = dir * rand(10, 55) + (dir < 0 ? 180 : 0) + rand(-8, 8);
@@ -193,7 +191,8 @@
     let built = false, lastW = 0;
 
     function build() {
-      const W = window.innerWidth, H = window.innerHeight;
+      // the scene is 100lvh tall, so the address bar never changes this
+      const W = window.innerWidth, H = root.clientHeight || window.innerHeight;
       if (built && Math.abs(W - lastW) < 80) return;
       lastW = W;
       root.innerHTML = backdrop();
