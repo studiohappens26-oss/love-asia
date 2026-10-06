@@ -2,11 +2,17 @@
 
 A lightweight, fully static, mobile-first animated menu for **Love Asia**.
 
-- **Landing:** guests choose **Non-Veg** or **Veg**.
-- **Non-Veg** shows the **full menu** (veg + non-veg) over an animated koi pond: shimmering water,
-  koi swimming around, lily pads, and ripples. Tapping the water drops food and the koi swim to it.
-- **Veg** shows **only vegetarian dishes** in a swaying bamboo grove with drifting leaves.
-- Guests can switch between the two menus from the top bar at any time. The menu also has category chips and search.
+- **Landing:** the Love Asia logo draws itself in. Guests then choose **Non-Veg** or **Veg**, and both choices fit on any phone screen.
+  Tapping a choice opens the menu with a ripple-out reveal.
+- **Non-Veg** shows the **full menu** (veg + non-veg) over a watercolour koi pond. The koi swim with flexible
+  wave-like strokes, and every few seconds one leaps out with a splash. Lily pads, lotus flowers, sakura petals
+  and a visiting dragonfly add life. Tapping the water drops food, and the koi swim over to it.
+- **Veg** shows **only vegetarian dishes** in a Japanese ink-wash bamboo grove with swaying bamboo, a red sun,
+  misty mountains, a pagoda, cherry blossom and falling petals.
+- Every dish is its own see-through card showing only the name and price. **Tap a dish** to expand its description,
+  price options and tags.
+- The **burger button** (bottom right) opens a section list to jump between sections. A Veg/Non-Veg switch and
+  search sit in the top bar.
 
 There are no frameworks and no build step: plain HTML, CSS and JS (~60 KB before fonts).
 Animations pause when the tab is hidden and respect the "reduce motion" setting.
