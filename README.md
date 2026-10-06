@@ -42,4 +42,8 @@ Open `index.html`, or serve the folder:
 python3 -m http.server 8000
 ```
 
-To host it, use any static host. GitHub Pages works: Settings → Pages → deploy from branch, root folder.
+Deployment is automatic: `.github/workflows/pages.yml` publishes the site to GitHub Pages on every push to `main`.
+It can also be run by hand from the Actions tab.
+One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+The live site is at https://studiohappens26-oss.github.io/love-asia/
