@@ -485,15 +485,52 @@ body.mode-veg .menu-hero__title { text-shadow: 0 2px 18px rgba(255, 255, 240, .9
 .cat__title::before, .cat__title::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .cat__title::before { flex: 0 0 18px; }
 
-.items {
-  list-style: none;
-  margin: 0;
+.cat__note { margin: -4px 0 12px; text-align: center; color: var(--muted); font-size: .86rem; font-style: italic; }
+.panel {
   padding: 4px 16px;
   border-radius: 20px;
   background: var(--panel);
   border: 1px solid var(--panel-border);
   box-shadow: 0 10px 30px rgba(0, 0, 0, .12);
 }
+.group + .group { border-top: 1px solid var(--line); margin-top: 4px; }
+.group__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 14px 0 4px;
+}
+.group__name {
+  margin: 0;
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.items { list-style: none; margin: 0; padding: 0; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
+.pills--group { margin: 0; }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  background: var(--chip);
+  border: 1px solid var(--line);
+  font-size: .8rem;
+  color: var(--chip-text);
+  white-space: nowrap;
+}
+.pill .mark { width: 12px; height: 12px; border-width: 1.4px; }
+.pill .mark::after { transform: scale(.8); }
+.pill b { color: var(--price); font-variant-numeric: tabular-nums; }
+.mark--mixed { color: #8a8a8a; }
+.mark--mixed::after { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(90deg, var(--veg) 50%, var(--nonveg) 50%); }
+.item__name small { font-weight: 600; font-size: .82em; color: var(--muted); }
 .item {
   display: flex;
   gap: 12px;
@@ -559,7 +596,7 @@ body.is-ready .item.in, body.is-ready .cat__title.in { opacity: 1; transform: no
 }
 
 /* ------------------------------ lightbox ------------------------------ */
-.lightbox { position: fixed; inset: 0; z-index: 50; background: rgba(5, 8, 10, .94); }
+.lightbox { position: fixed; inset: 0; z-index: 50; background: #050809; }
 .lightbox__close { position: absolute; top: calc(var(--safe-top) + 8px); right: 8px; z-index: 2; color: #fff; background: rgba(255, 255, 255, .1); }
 .lightbox__track {
   display: flex;

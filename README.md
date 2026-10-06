@@ -23,10 +23,10 @@ All dishes live in **`assets/js/menu-data.js`**. Each item looks like this:
 - `tags` (optional): `spicy`, `chef`, `new`, `jain`.
 - Change `currency`, `name` and `tagline` at the top of the file.
 
-> The current dishes are **sample placeholders**. Replace them with the items from the printed menu.
+> The dishes were typed up from the photos of the printed menu in `assets/menu/`.
 
 ### Printed menu photos (optional)
-Put scans in `assets/menu/` and list them in `menuPages` in `menu-data.js`.
+Photos live in `assets/menu/` and are listed in `menuPages` in `menu-data.js`.
 A "View printed menu" button then appears with a swipeable viewer.
 
 ## Direct links

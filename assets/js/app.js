@@ -30,10 +30,73 @@
   $("#brand-tag").textContent = DATA.tagline;
 
   /* ------------------------------ render ------------------------------ */
+  const isVegPrice = (p, item) => (p.veg === undefined ? (item ? item.veg : true) : p.veg);
+  const markHtml = (veg, label) =>
+    `<span class="mark ${veg ? "mark--veg" : "mark--nonveg"}"${label ? ` role="img" aria-label="${veg ? "Vegetarian" : "Non-vegetarian"}"` : ' aria-hidden="true"'}></span>`;
+
+  // Normalise a category into groups, filtered for the current mode
+  function prepare(c) {
+    const groups = (c.groups || [{ prices: c.prices, items: c.items || [] }])
+      .map((g) => {
+        const items = g.items
+          .map((i) => {
+            if (!i.variants) return mode === "nonveg" || i.veg ? i : null;
+            const variants = i.variants.filter((v) => mode === "nonveg" || isVegPrice(v, i));
+            return variants.length ? { ...i, variants } : null;
+          })
+          .filter(Boolean);
+        const prices = g.prices && g.prices.filter((p) => mode === "nonveg" || isVegPrice(p));
+        return { ...g, items, prices };
+      })
+      .filter((g) => g.items.length);
+    return { ...c, groups };
+  }
+
+  // Price pills; a single remaining price collapses to a plain price
+  function pills(list, item) {
+    return list
+      .map((p) => {
+        const veg = isVegPrice(p, item);
+        const showMark = p.veg !== undefined || (item && item.variants && item.variants.some((v) => v.veg !== undefined));
+        return `<span class="pill">${showMark ? markHtml(veg) : ""}<span>${esc(p.label)}</span><b>${price(p.price)}</b></span>`;
+      })
+      .join("");
+  }
+
+  function itemHtml(i) {
+    const v = i.variants;
+    const single = v && v.length === 1 ? v[0] : null;
+    const shownPrice = single ? single.price : i.price;
+    const vegs = v ? v.map((x) => isVegPrice(x, i)) : [i.veg];
+    const allVeg = vegs.every(Boolean), noneVeg = !vegs.some(Boolean);
+    const mark = allVeg || noneVeg ? markHtml(allVeg, true) : `<span class="mark mark--mixed" role="img" aria-label="Veg and non-veg options"></span>`;
+    return `
+            <li class="item" data-search="${esc((i.name + " " + (i.desc || "") + " " + (v ? v.map((x) => x.label).join(" ") : "")).toLowerCase())}">
+              ${mark}
+              <div class="item__main">
+                <div class="item__row">
+                  <h4 class="item__name">${esc(i.name)}${single && !(mode === "veg" && /^veg$/i.test(single.label)) ? ` <small>· ${esc(single.label)}</small>` : ""}</h4>
+                  ${shownPrice !== undefined ? `<span class="item__dots" aria-hidden="true"></span><span class="item__price">${price(shownPrice)}</span>` : ""}
+                </div>
+                ${i.desc ? `<p class="item__desc">${esc(i.desc)}</p>` : ""}
+                ${v && !single ? `<div class="pills">${pills(v, i)}</div>` : ""}
+                ${i.tags && i.tags.length ? `<p class="item__tags">${i.tags.map((t) => `<span class="tag tag--${esc(t)}">${esc(TAG_LABELS[t] || t)}</span>`).join("")}</p>` : ""}
+              </div>
+            </li>`;
+  }
+
+  function groupHtml(g) {
+    const head = g.name || (g.prices && g.prices.length)
+      ? `<div class="group__head">
+          ${g.name ? `<h3 class="group__name">${esc(g.name)}</h3>` : ""}
+          ${g.prices && g.prices.length ? `<div class="pills pills--group">${pills(g.prices)}</div>` : ""}
+        </div>`
+      : "";
+    return `<div class="group">${head}<ul class="items">${g.items.map(itemHtml).join("")}</ul></div>`;
+  }
+
   function render() {
-    const cats = DATA.categories
-      .map((c) => ({ ...c, items: c.items.filter((i) => mode === "nonveg" || i.veg) }))
-      .filter((c) => c.items.length);
+    const cats = DATA.categories.map(prepare).filter((c) => c.groups.length);
 
     catsEl.innerHTML = cats
       .map((c) => `<a class="chip" href="#cat-${esc(c.id)}" data-cat="${esc(c.id)}">${esc(c.name)}</a>`)
@@ -45,25 +108,8 @@
           (c) => `
       <section class="cat" id="cat-${esc(c.id)}" data-cat="${esc(c.id)}">
         <h2 class="cat__title"><span>${esc(c.name)}</span></h2>
-        <ul class="items">
-          ${c.items
-            .map(
-              (i) => `
-            <li class="item" data-search="${esc((i.name + " " + (i.desc || "")).toLowerCase())}">
-              <span class="mark ${i.veg ? "mark--veg" : "mark--nonveg"}" role="img" aria-label="${i.veg ? "Vegetarian" : "Non-vegetarian"}"></span>
-              <div class="item__main">
-                <div class="item__row">
-                  <h3 class="item__name">${esc(i.name)}</h3>
-                  <span class="item__dots" aria-hidden="true"></span>
-                  <span class="item__price">${price(i.price)}</span>
-                </div>
-                ${i.desc ? `<p class="item__desc">${esc(i.desc)}</p>` : ""}
-                ${i.tags && i.tags.length ? `<p class="item__tags">${i.tags.map((t) => `<span class="tag tag--${esc(t)}">${esc(TAG_LABELS[t] || t)}</span>`).join("")}</p>` : ""}
-              </div>
-            </li>`
-            )
-            .join("")}
-        </ul>
+        ${c.note ? `<p class="cat__note">${esc(c.note)}</p>` : ""}
+        <div class="panel">${c.groups.map(groupHtml).join("")}</div>
       </section>`
         )
         .join("") + `<p class="empty" id="empty" hidden>No dishes match your search.</p>`;
@@ -128,10 +174,15 @@
     let any = false;
     $$(".cat", menuEl).forEach((sec) => {
       let shown = 0;
-      $$(".item", sec).forEach((it) => {
-        const ok = !q || it.dataset.search.includes(q);
-        it.hidden = !ok;
-        if (ok) { shown++; it.classList.add("in"); }
+      $$(".group", sec).forEach((grp) => {
+        let n = 0;
+        $$(".item", grp).forEach((it) => {
+          const ok = !q || it.dataset.search.includes(q);
+          it.hidden = !ok;
+          if (ok) { n++; it.classList.add("in"); }
+        });
+        grp.hidden = n === 0;
+        shown += n;
       });
       sec.hidden = shown === 0;
       if (shown) any = true;
