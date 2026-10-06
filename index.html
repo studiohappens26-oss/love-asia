@@ -4,56 +4,89 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Love Asia — Menu</title>
-  <meta name="description" content="Love Asia — Pan-Asian kitchen. Browse our veg and non-veg menu." />
-  <meta name="theme-color" content="#0d2a33" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230d2a33'/%3E%3Cpath d='M32 50 C 14 38 10 28 16 21 c 5-6 12-4 16 2 c 4-6 11-8 16-2 c 6 7 2 17-16 29z' fill='%23e8481c'/%3E%3C/svg%3E" />
+  <meta name="description" content="Love Asia — browse our vegetarian and full menu." />
+  <meta name="theme-color" content="#f6f1e7" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23f6f1e7'/%3E%3Cpath d='M8 30 C 14 56, 50 56, 56 30' fill='none' stroke='%23d6232a' stroke-width='5'/%3E%3Cpath d='M22 12h4l11 34h-5l-8-25-6 25h-2z' fill='%231d1d1f'/%3E%3Cpath d='M41 12h4v42h-4z' fill='%231d1d1f'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&text=%E9%AF%89%E7%AB%B9&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body class="is-landing">
 
-  <!-- Reusable koi drawing for the landing tile -->
+  <!-- Shared drawings -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
+      <!-- Love Asia logo -->
+      <symbol id="logo" viewBox="24 2 194 142" overflow="visible">
+        <g fill="#d6232a">
+          <path d="M86 8h5.5v14.5h8V27H86z"/>
+          <path d="M110.5 25.5c-1.2-1-9-6.6-9-11.6 0-2.9 2.2-5 4.7-5 1.9 0 3.4 1 4.3 2.6.9-1.6 2.4-2.6 4.3-2.6 2.5 0 4.7 2.1 4.7 5 0 5-7.8 10.6-9 11.6z"/>
+          <path d="M122 8h5.8l3.7 12.2L135.2 8h5.8l-6.6 19h-5.8z"/>
+          <path d="M143 8h12.5v4.3h-7v3.2h6.4v4h-6.4v3.2h7.2V27H143z"/>
+        </g>
+        <path d="M28 66 C 40 112, 200 112, 212 66" fill="none" stroke="#d6232a" stroke-width="7.5"/>
+        <g fill="#1d1d1f">
+          <path d="M50 40h6l20 72h-8.5L53 56l-12 56h-3.2z"/>
+          <path d="M122 48.5c-3.5-6-9-9.2-15.5-9.2-9 0-15.5 5.6-15.5 13.2 0 17 28 13 28 29 0 7-5.6 11.6-12.4 11.6-6.6 0-11.4-3.8-14-9.4l-4.2 2.6c3.3 7.3 10 12 18.4 12 11 0 19.3-7 19.3-16.8 0-19.4-28-14.6-28-29.6 0-5 4-8.6 9.6-8.6 4.6 0 8.2 2.2 10.6 6z"/>
+          <path d="M141 40h7v100h-7z"/>
+          <path d="M176 40h6l20 72h-8.5L179 56l-12 56h-3.2z"/>
+        </g>
+      </symbol>
+
+      <!-- Watercolour koi for the landing tile -->
       <clipPath id="koi-body-clip">
         <path d="M18 25 C 30 15, 60 10, 95 14 C 112 16, 118 22, 118 25 C 118 28, 112 34, 95 36 C 60 40, 30 35, 18 25Z" />
       </clipPath>
       <symbol id="koi" viewBox="0 0 120 50">
-        <path d="M22 25 C 10 14, 3 8, 0 5 C 7 18, 7 32, 0 45 C 3 42, 10 36, 22 25Z" fill="rgba(255,240,228,.8)" />
-        <path d="M88 15 C 84 6, 76 2, 70 2 C 74 8, 78 12, 84 16Z" fill="rgba(255,240,228,.75)" />
-        <path d="M88 35 C 84 44, 76 48, 70 48 C 74 42, 78 38, 84 34Z" fill="rgba(255,240,228,.75)" />
-        <path d="M18 25 C 30 15, 60 10, 95 14 C 112 16, 118 22, 118 25 C 118 28, 112 34, 95 36 C 60 40, 30 35, 18 25Z" fill="#f7f3ea" />
-        <g clip-path="url(#koi-body-clip)">
-          <ellipse cx="92" cy="21" rx="13" ry="9" fill="#e8481c" />
-          <ellipse cx="60" cy="28" rx="15" ry="9" fill="#e8481c" />
-          <ellipse cx="34" cy="22" rx="8" ry="6" fill="#e8481c" />
+        <g stroke="rgba(60,58,55,.35)" stroke-width=".8">
+          <path d="M22 25 C 10 14, 3 8, 0 5 C 7 18, 7 32, 0 45 C 3 42, 10 36, 22 25Z" fill="rgba(255,250,243,.9)" />
+          <path d="M88 15 C 84 6, 76 2, 70 2 C 74 8, 78 12, 84 16Z" fill="rgba(255,250,243,.9)" />
+          <path d="M88 35 C 84 44, 76 48, 70 48 C 74 42, 78 38, 84 34Z" fill="rgba(255,250,243,.9)" />
+          <path d="M18 25 C 30 15, 60 10, 95 14 C 112 16, 118 22, 118 25 C 118 28, 112 34, 95 36 C 60 40, 30 35, 18 25Z" fill="#fffaf3" />
         </g>
-        <circle cx="108" cy="19" r="1.6" fill="#161616" />
-        <circle cx="108" cy="31" r="1.6" fill="#161616" />
+        <g clip-path="url(#koi-body-clip)">
+          <ellipse cx="92" cy="21" rx="15" ry="10" fill="#e0472a" opacity=".3" />
+          <ellipse cx="92" cy="21" rx="12" ry="8" fill="#e0472a" opacity=".9" />
+          <ellipse cx="60" cy="28" rx="17" ry="10" fill="#e0472a" opacity=".3" />
+          <ellipse cx="60" cy="28" rx="14" ry="8" fill="#e0472a" opacity=".9" />
+          <ellipse cx="34" cy="22" rx="7" ry="5" fill="#e0472a" opacity=".85" />
+        </g>
+        <circle cx="108" cy="19" r="1.5" fill="#1b1b1b" />
+        <circle cx="108" cy="31" r="1.5" fill="#1b1b1b" />
+      </symbol>
+
+      <!-- Watercolour lily pad -->
+      <symbol id="pad" viewBox="-50 -50 100 100">
+        <path d="M0 0 L46 -10 C 50 10 40 38 10 46 C -20 52 -46 30 -46 2 C -46 -26 -22 -48 4 -46 C 28 -44 42 -30 46 -10 Z" fill="currentColor" fill-opacity=".38"/>
+        <path d="M0 0 L42 -9 C 44 9 36 34 9 41 C -18 46 -41 27 -41 2 C -41 -23 -20 -43 4 -41 C 25 -39 38 -27 42 -9 Z" fill="currentColor" fill-opacity=".22" stroke="currentColor" stroke-opacity=".45" stroke-width="1.2"/>
       </symbol>
     </defs>
   </svg>
 
   <!-- Animated backgrounds -->
   <div class="scene" aria-hidden="true">
-    <div class="scene-pond">
-      <canvas id="pond"></canvas>
-      <div class="sunrays"><span></span><span></span><span></span></div>
-    </div>
+    <div class="scene-pond"><canvas id="pond"></canvas></div>
     <div class="scene-grove" id="grove"></div>
   </div>
 
   <!-- ============ LANDING ============ -->
   <section class="landing" id="landing" aria-labelledby="brand-title">
+    <div class="landing__decor" aria-hidden="true">
+      <svg class="decor-pad decor-pad--1"><use href="#pad"/></svg>
+      <svg class="decor-pad decor-pad--2"><use href="#pad"/></svg>
+      <svg class="decor-pad decor-pad--3"><use href="#pad"/></svg>
+      <svg class="decor-koi decor-koi--1" viewBox="0 0 120 50"><use href="#koi"/></svg>
+      <svg class="decor-koi decor-koi--2" viewBox="0 0 120 50"><use href="#koi"/></svg>
+    </div>
+
     <div class="landing__inner">
       <header class="brand">
-        <div class="brand__mark" aria-hidden="true">
-          <svg viewBox="0 0 64 64"><path d="M32 54 C 12 40 7 28 14 20 c 6-7 14-5 18 2 c 4-7 12-9 18-2 c 7 8 2 20-18 34z" fill="currentColor"/></svg>
-        </div>
-        <h1 class="brand__name" id="brand-title">Love Asia</h1>
-        <p class="brand__tag" id="brand-tag">Pan-Asian Kitchen</p>
+        <h1 class="brand__logo" id="brand-title">
+          <svg viewBox="0 0 194 142" role="img" aria-label="Love Asia"><use href="#logo"/></svg>
+        </h1>
+        <p class="brand__menu">Menu</p>
       </header>
 
       <p class="landing__prompt">How would you like to dine today?</p>
@@ -61,35 +94,42 @@
       <div class="choices">
         <button class="choice choice--nonveg" data-mode="nonveg" type="button">
           <span class="choice__art" aria-hidden="true">
+            <svg class="mini-pad mini-pad--a"><use href="#pad"/></svg>
+            <svg class="mini-pad mini-pad--b"><use href="#pad"/></svg>
             <span class="mini-ripple"></span><span class="mini-ripple"></span>
             <span class="koi-orbit">
               <span class="koi-pos koi-pos--a"><svg class="koi-svg" viewBox="0 0 120 50"><use href="#koi"/></svg></span>
-              <span class="koi-pos koi-pos--b"><svg class="koi-svg koi-svg--gold" viewBox="0 0 120 50"><use href="#koi"/></svg></span>
+              <span class="koi-pos koi-pos--b"><svg class="koi-svg koi-svg--b" viewBox="0 0 120 50"><use href="#koi"/></svg></span>
             </span>
           </span>
           <span class="choice__label">
             <span class="mark mark--nonveg" aria-hidden="true"></span>
-            <span>
+            <span class="choice__text">
               <strong>Non-Veg</strong>
               <small>The full menu</small>
             </span>
+            <span class="seal" aria-hidden="true">鯉</span>
           </span>
         </button>
 
         <button class="choice choice--veg" data-mode="veg" type="button">
           <span class="choice__art" aria-hidden="true">
-            <svg class="mini-bamboo" viewBox="0 0 160 160">
-              <g class="mb mb--1"><rect x="40" y="10" width="10" height="160" rx="3"/><rect x="38" y="50" width="14" height="4" rx="2"/><rect x="38" y="100" width="14" height="4" rx="2"/><path d="M45 52 C 30 46, 16 46, 6 52 C 18 56, 32 56, 45 52Z"/><path d="M45 100 C 32 90, 22 86, 12 88 C 22 96, 32 100, 45 100Z"/></g>
-              <g class="mb mb--2"><rect x="80" y="0" width="12" height="170" rx="3"/><rect x="78" y="38" width="16" height="4" rx="2"/><rect x="78" y="92" width="16" height="4" rx="2"/><path d="M92 40 C 108 30, 124 30, 136 36 C 122 42, 106 44, 92 40Z"/><path d="M86 2 C 76 -6, 66 -8, 56 -4 C 66 2, 76 4, 86 2Z"/></g>
-              <g class="mb mb--3"><rect x="118" y="24" width="9" height="150" rx="3"/><rect x="116" y="70" width="13" height="4" rx="2"/><rect x="116" y="120" width="13" height="4" rx="2"/><path d="M122 72 C 136 64, 148 64, 158 70 C 148 74, 136 76, 122 72Z"/></g>
+            <svg class="mini-scene" viewBox="0 0 200 160" preserveAspectRatio="xMidYMax slice">
+              <circle cx="132" cy="58" r="30" fill="#e2765f" opacity=".38"/>
+              <path d="M0 118 C 30 100 50 84 80 86 C 110 88 120 108 150 100 C 175 94 188 80 200 84 V160 H0Z" fill="#c4cbca" opacity=".7"/>
+              <path d="M0 132 C 40 124 80 136 120 128 C 160 120 180 130 200 126 V160 H0Z" fill="#efebe2"/>
+              <g class="mb mb--1" fill="#5f685a"><rect x="48" y="14" width="7" height="150" rx="2"/><rect x="46" y="54" width="11" height="3" rx="1.5" fill="#3a4036"/><rect x="46" y="100" width="11" height="3" rx="1.5" fill="#3a4036"/><path d="M51 56 C 36 50, 22 50, 12 56 C 24 60, 38 60, 51 56Z" fill="#2f372c"/><path d="M51 102 C 38 92, 28 88, 18 90 C 28 98, 38 102, 51 102Z" fill="#46513f"/></g>
+              <g class="mb mb--2" fill="#7d8578"><rect x="74" y="4" width="8" height="160" rx="2"/><rect x="72" y="42" width="12" height="3" rx="1.5" fill="#4c5448"/><rect x="72" y="96" width="12" height="3" rx="1.5" fill="#4c5448"/><path d="M82 44 C 98 34, 114 34, 126 40 C 112 46, 96 48, 82 44Z" fill="#46513f"/><path d="M78 6 C 68 -2, 58 -4, 48 0 C 58 6, 68 8, 78 6Z" fill="#2f372c"/></g>
+              <g class="mb mb--3" fill="#a5ad9c"><rect x="160" y="30" width="6" height="140" rx="2"/><rect x="158" y="76" width="10" height="3" rx="1.5" fill="#7d8578"/><path d="M163 78 C 177 70, 189 70, 199 76 C 189 80, 177 82, 163 78Z" fill="#6b7665"/></g>
             </svg>
           </span>
           <span class="choice__label">
             <span class="mark mark--veg" aria-hidden="true"></span>
-            <span>
+            <span class="choice__text">
               <strong>Veg</strong>
               <small>Pure vegetarian</small>
             </span>
+            <span class="seal seal--veg" aria-hidden="true">竹</span>
           </span>
         </button>
       </div>
@@ -100,15 +140,15 @@
   <div class="menu-view" id="menu-view" hidden>
     <header class="topbar">
       <button class="icon-btn" id="back-btn" type="button" aria-label="Back to start">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="topbar__brand">Love Asia</div>
+      <svg class="topbar__logo" viewBox="0 0 194 142" role="img" aria-label="Love Asia"><use href="#logo"/></svg>
       <div class="mode-switch" role="radiogroup" aria-label="Menu type">
         <button type="button" role="radio" data-mode="veg" aria-checked="false"><span class="mark mark--veg" aria-hidden="true"></span>Veg</button>
         <button type="button" role="radio" data-mode="nonveg" aria-checked="false"><span class="mark mark--nonveg" aria-hidden="true"></span>Non-Veg</button>
       </div>
       <button class="icon-btn" id="search-btn" type="button" aria-label="Search the menu" aria-expanded="false" aria-controls="search-bar">
-        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5L20 20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
     </header>
 
@@ -119,9 +159,10 @@
     <nav class="cats" id="cats" aria-label="Menu sections"></nav>
 
     <div class="menu-hero">
+      <span class="seal seal--hero" id="hero-seal" aria-hidden="true"></span>
       <p class="menu-hero__kicker" id="hero-kicker"></p>
-      <h1 class="menu-hero__title">Love Asia</h1>
       <p class="menu-hero__sub" id="hero-sub"></p>
+      <span class="menu-hero__rule" aria-hidden="true"></span>
     </div>
 
     <main class="menu" id="menu" tabindex="-1"></main>
@@ -134,13 +175,14 @@
       </p>
       <p class="fine">Prices are exclusive of applicable taxes. Please inform your server of any allergies.</p>
       <p class="fine" id="mode-hint"></p>
+      <svg class="footer__logo" viewBox="0 0 194 142" aria-hidden="true"><use href="#logo"/></svg>
     </footer>
   </div>
 
   <!-- Printed menu viewer -->
   <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Printed menu">
     <button class="icon-btn lightbox__close" id="lightbox-close" type="button" aria-label="Close">
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
     <div class="lightbox__track" id="lightbox-track"></div>
   </div>

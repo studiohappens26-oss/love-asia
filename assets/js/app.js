@@ -26,8 +26,6 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const price = (p) => (typeof p === "number" ? DATA.currency + p.toLocaleString("en-IN") : esc(p || ""));
 
-  $("#brand-title").textContent = DATA.name;
-  $("#brand-tag").textContent = DATA.tagline;
 
   /* ------------------------------ render ------------------------------ */
   const isVegPrice = (p, item) => (p.veg === undefined ? (item ? item.veg : true) : p.veg);
@@ -85,10 +83,16 @@
             </li>`;
   }
 
+  // colour a sub-heading green/red when every dish in it is veg/non-veg
+  function groupTone(g) {
+    const v = g.items.map((i) => (i.variants ? i.variants.some((x) => isVegPrice(x, i)) : i.veg));
+    return v.every(Boolean) ? " group__name--veg" : v.some(Boolean) ? "" : " group__name--nonveg";
+  }
+
   function groupHtml(g) {
     const head = g.name || (g.prices && g.prices.length)
       ? `<div class="group__head">
-          ${g.name ? `<h3 class="group__name">${esc(g.name)}</h3>` : ""}
+          ${g.name ? `<h3 class="group__name${groupTone(g)}">${esc(g.name)}</h3>` : ""}
           ${g.prices && g.prices.length ? `<div class="pills pills--group">${pills(g.prices)}</div>` : ""}
         </div>`
       : "";
@@ -114,7 +118,9 @@
         )
         .join("") + `<p class="empty" id="empty" hidden>No dishes match your search.</p>`;
 
-    $("#hero-kicker").textContent = mode === "veg" ? "Pure Vegetarian" : "The Full Menu";
+    $("#hero-seal").textContent = mode === "veg" ? "竹" : "鯉";
+    $("#hero-seal").classList.toggle("seal--veg", mode === "veg");
+    $("#hero-kicker").textContent = mode === "veg" ? "Vegetarian Menu" : "The Full Menu";
     $("#hero-sub").textContent = mode === "veg" ? "Fresh from the bamboo grove" : "From the koi pond — veg & non-veg";
     $("#mode-hint").textContent =
       mode === "veg" ? "You’re viewing the vegetarian menu." : "You’re viewing the full menu (veg & non-veg).";
@@ -208,7 +214,7 @@
     body.classList.toggle("mode-veg", mode === "veg");
     body.classList.toggle("mode-nonveg", mode === "nonveg");
     $$(".mode-switch [data-mode]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.mode === mode)));
-    document.querySelector('meta[name="theme-color"]').setAttribute("content", mode === "veg" ? "#e6f0d8" : "#0d2a33");
+    document.querySelector('meta[name="theme-color"]').setAttribute("content", mode === "veg" ? "#f4f1e8" : "#eef2f1");
 
     if (mode === "nonveg") pond.start();
     else { pond.stop(); grove.build(); }
@@ -232,6 +238,7 @@
 
   function showLanding() {
     pond.stop();
+    document.querySelector('meta[name="theme-color"]').setAttribute("content", "#f6f1e7");
     body.classList.add("is-landing");
     body.classList.remove("is-menu");
     landing.removeAttribute("aria-hidden");
