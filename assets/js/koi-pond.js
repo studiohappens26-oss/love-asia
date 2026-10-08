@@ -563,7 +563,9 @@
   }
 
   /* ------------------------------ Pond ------------------------------ */
-  function KoiPond(canvas, causticEl) {
+  // opts.contained: size to the canvas's parent box (e.g. a card) instead of the viewport
+  function KoiPond(canvas, causticEl, opts = {}) {
+    const contained = !!opts.contained;
     const ctx = canvas.getContext("2d");
     const layer = document.createElement("canvas");
     const lctx = layer.getContext("2d");
@@ -577,22 +579,24 @@
     let running = false, raf = 0, last = 0, t = 0, nextLeap = 240;
 
     function resize() {
-      dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+      // big screens get a 1× canvas: the watercolour is soft anyway and it halves the fill cost
+      dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth > 900 ? 1 : 1.25);
       // size to the *large* viewport (the scene is 100lvh) so the phone's
       // address bar showing/hiding never resizes or clears the canvas
-      W = window.innerWidth;
+      W = contained ? canvas.parentElement.clientWidth : window.innerWidth;
       H = (canvas.parentElement && canvas.parentElement.clientHeight) || window.innerHeight;
       prevBoxes = [];
       for (const c of [canvas, layer]) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
       canvas.style.width = W + "px"; canvas.style.height = H + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const newUnit = Math.max(85, Math.min(150, Math.min(W, H) * 0.27));
+      const newUnit = contained ? Math.max(70, Math.min(120, Math.min(W, H) * 0.3)) : Math.max(85, Math.min(150, Math.min(W, H) * 0.27));
       if (!koi.length || Math.abs(newUnit - unit) > 20) {
         unit = newUnit;
-        koi = Array.from({ length: W * H > 700000 ? 8 : 6 }, () => new Koi(W, H, unit));
-        pads = Array.from({ length: W > 700 ? 6 : 4 }, () => new LilyPad(W, H, unit));
-        petals = Array.from({ length: W > 700 ? 12 : 8 }, () => new Petal(W, H));
+        const area = W * H;
+        koi = Array.from({ length: Math.max(3, Math.min(6, Math.round(area / 30000))) }, () => new Koi(W, H, unit));
+        pads = Array.from({ length: contained ? 3 : W > 700 ? 6 : 4 }, () => new LilyPad(W, H, unit));
+        petals = Array.from({ length: contained ? 5 : W > 700 ? 12 : 8 }, () => new Petal(W, H));
       }
       if (!reduced) frame(performance.now(), true);
     }
@@ -777,7 +781,8 @@
     window.addEventListener("resize", () => {
       if (!prepared) return;
       const h = (canvas.parentElement && canvas.parentElement.clientHeight) || window.innerHeight;
-      if (window.innerWidth !== W || Math.abs(h - H) > 120) resize();
+      const w = contained ? canvas.parentElement.clientWidth : window.innerWidth;
+      if (w !== W || Math.abs(h - H) > (contained ? 2 : 120)) resize();
     });
     window.addEventListener("scroll", () => { scrollBusyUntil = performance.now() + 200; }, { passive: true });
     document.addEventListener("visibilitychange", () => {

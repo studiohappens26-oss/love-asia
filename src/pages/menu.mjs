@@ -205,7 +205,7 @@ ${SVG_DEFS}
   </div>
   <div class="landing__inner">
     <a class="landing__home" href="${root}" aria-label="Back to the Love Asia home page">← Home</a>
-    <h1 class="brand"><span class="brand__logo">${logoSvg({ intro: true, label: "Love Asia menu" })}</span></h1>
+    <h1 class="brand"><span class="brand__logo">${logoSvg({ label: "Love Asia menu" })}</span></h1>
     <p class="landing__prompt">How would you like to dine today?</p>
     ${choiceTiles(root, "strong")}
     <p class="landing__more">

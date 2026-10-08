@@ -4,6 +4,9 @@
  * the structured data and the sitemap are rebuilt from it.
  */
 
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
 export const SITE_URL = "https://studiohappens26-oss.github.io/love-asia"; // no trailing slash
 export const BASE_PATH = new URL(SITE_URL + "/").pathname; // "/love-asia/"
 
@@ -22,7 +25,7 @@ export const BUSINESS = {
     country: "IN",
   },
   geo: { lat: 13.0676369, lng: 77.6482515 },
-  hours: { label: "Open daily, 12 noon – 11 pm", days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "12:00", closes: "23:00" },
+  hours: { label: "Open daily, 12:00 PM – 11:00 PM", short: "12:00 PM – 11:00 PM", days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "12:00", closes: "23:00" },
   priceRange: "₹₹",
   costForTwo: "₹1,000 for two (approx.)",
   capacity: 100,
@@ -43,9 +46,6 @@ export const fullAddress = () => {
   return `${a.street}, ${a.area}, ${a.locality}, ${a.region} ${a.postal}`;
 };
 
-// every kanji used on the site, so the seal font is downloaded as a tiny subset
-const SEAL_GLYPHS = "鯉竹愛宴寿司拉麺包点心飲誕童家祝";
-
 export const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 export const abs = (path) => SITE_URL + "/" + path.replace(/^\//, "");
 export const waLink = (text) => `https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent(text)}`;
@@ -53,9 +53,9 @@ export const waLink = (text) => `https://wa.me/${BUSINESS.whatsapp}?text=${encod
 /* ------------------------------- logo ------------------------------- */
 // Traced from the Love Asia logo. Inline so its parts can animate.
 let logoCount = 0;
-export function logoSvg({ intro = false, label = BUSINESS.name } = {}) {
+export function logoSvg({ label = BUSINESS.name } = {}) {
   const id = "lg-cut-" + ++logoCount;
-  return `<svg class="logo${intro ? " logo--intro" : ""}" viewBox="24 40 154 128" role="img" aria-label="${esc(label)}">
+  return `<svg class="logo" viewBox="24 40 154 128" role="img" aria-label="${esc(label)}">
   <defs><clipPath id="${id}"><rect x="0" y="85.5" width="204" height="60"/></clipPath></defs>
   <path class="lg-smile" clip-path="url(#${id})" d="M26.3 78A77 67 0 0 0 173.7 78" pathLength="1" fill="none" stroke="#dd1b46" stroke-width="6.6"/>
   <g class="lg-asia" fill="#231f20"><path d="M55 67h8L32.5 146H26z"/><path d="M60 67h7v79h-7z"/><path d="M111 67h7.6v79H111z"/><path d="M134 67h7v79h-7z"/><path d="M138 67h9l28 79h-7z"/></g>
@@ -75,6 +75,17 @@ export const ICON = {
 };
 
 /* ------------------------------- head ------------------------------- */
+// Stylesheets are inlined into every page (no render-blocking requests). Relative
+// url(../…) references inside them are rewritten to the page's asset root.
+const cssCache = new Map();
+function inlineCss(file, root) {
+  if (!cssCache.has(file)) {
+    const raw = readFileSync(fileURLToPath(new URL("../" + file, import.meta.url)), "utf8");
+    cssCache.set(file, raw.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s*\n\s*/g, "\n").replace(/\n{2,}/g, "\n"));
+  }
+  return cssCache.get(file).replace(/url\(\.\.\//g, `url(${root}assets/`);
+}
+
 export function head({ title, description, path, root, css = [], schema = [], ogType = "website", image = "assets/img/og-image.png", noindex = false, extraHead = "" }) {
   const url = abs(path);
   const ld = schema.length
@@ -109,11 +120,10 @@ export function head({ title, description, path, root, css = [], schema = [], og
   <meta name="twitter:image" content="${abs(image)}" />
   <link rel="icon" href="${root}assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="${root}assets/img/apple-touch-icon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&text=${encodeURIComponent(SEAL_GLYPHS)}&display=swap" rel="stylesheet" />
-  ${css.map((c) => `<link rel="stylesheet" href="${root}${c}" />`).join("\n  ")}
+  <link rel="preload" href="${root}assets/fonts/zen-kaku-gothic-new-400.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="${root}assets/fonts/shippori-mincho-500.woff2" as="font" type="font/woff2" crossorigin />
+  <script>document.documentElement.classList.add("js")</script>
+  <style>${["assets/css/fonts.css", ...css].map((c) => inlineCss(c, root)).join("\n")}</style>
   ${extraHead}
   ${ld}
 </head>`;
@@ -179,7 +189,7 @@ export function restaurantSchema() {
     "@type": "Restaurant",
     "@id": abs("#restaurant"),
     name: b.name,
-    description: "Sushi and Pan-Asian restaurant in Hennur, Bengaluru with a koi pond, air-conditioned dining for 100+ guests, à la carte and buffet options, and a venue for birthday parties and events.",
+    description: "Sushi and Pan-Asian restaurant in Hennur, Bengaluru with a koi pond, open-air and air-conditioned seating, à la carte and buffet options, and a venue for birthday parties and events.",
     url: abs(""),
     image: [abs("assets/img/og-image.png")],
     logo: abs("assets/img/logo.png"),
@@ -201,7 +211,7 @@ export function restaurantSchema() {
     hasMap: b.maps,
     areaServed: ["Hennur", "Kothanur", "Kalyan Nagar", "HBR Layout", "Horamavu", "North Bengaluru"],
     openingHoursSpecification: [{ "@type": "OpeningHoursSpecification", dayOfWeek: b.hours.days, opens: b.hours.opens, closes: b.hours.closes }],
-    amenityFeature: ["Koi pond", "Air-conditioned dining", "Seating for 100+ guests", "Outdoor seating", "Rooftop seating", "Kid-friendly", "Buffet", "Private parties & events"].map((n) => ({ "@type": "LocationFeatureSpecification", name: n, value: true })),
+    amenityFeature: ["Koi pond", "Open-air seating", "Air-conditioned indoor seating", "Seating for 100+ guests at once", "Kid-friendly", "Buffet", "Birthday parties & events"].map((n) => ({ "@type": "LocationFeatureSpecification", name: n, value: true })),
     sameAs: [b.google, ...b.listings],
   };
 }

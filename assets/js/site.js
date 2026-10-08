@@ -1,31 +1,29 @@
-/* Home & events pages: sticky header state, events background, enquiry → WhatsApp. */
+/* Home & events pages: header state, map on demand, party enquiry → WhatsApp. */
 (function () {
   "use strict";
 
   const header = document.querySelector(".site-header");
   if (header) {
-    const onScroll = () => header.classList.toggle("is-scrolled", window.scrollY > 40);
+    let on = null;
+    const onScroll = () => {
+      const s = window.scrollY > 40;
+      if (s !== on) { on = s; header.classList.toggle("is-scrolled", s); }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
   }
 
-  // events page: the bamboo grove from the veg menu as a fixed backdrop
-  const grove = document.getElementById("grove");
-  if (grove && window.BambooGrove && document.body.classList.contains("page-events")) window.BambooGrove(grove).build();
-
-  // paper grain on the backgrounds
-  try {
-    const c = document.createElement("canvas");
-    c.width = c.height = 140;
-    const g = c.getContext("2d");
-    const img = g.createImageData(140, 140);
-    for (let i = 0; i < img.data.length; i += 4) {
-      img.data[i] = img.data[i + 1] = img.data[i + 2] = Math.random() < 0.5 ? 60 : 255;
-      img.data[i + 3] = Math.random() * 22;
-    }
-    g.putImageData(img, 0, 0);
-    document.documentElement.style.setProperty("--grain", `url(${c.toDataURL()})`);
-  } catch (e) { /* decorative */ }
+  // the Google map is only loaded when asked for (keeps the page light)
+  const map = document.getElementById("map");
+  if (map) {
+    map.querySelector(".map__load").addEventListener("click", () => {
+      const f = document.createElement("iframe");
+      f.title = "Map showing Love Asia in Kothanur, Hennur, Bengaluru";
+      f.src = map.dataset.src;
+      f.referrerPolicy = "no-referrer-when-downgrade";
+      map.replaceChildren(f);
+    });
+  }
 
   // party enquiry: compose a WhatsApp message from the form
   const form = document.getElementById("enquiry");

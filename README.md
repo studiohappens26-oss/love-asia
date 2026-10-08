@@ -10,7 +10,7 @@ page into plain HTML, so search engines can read all the content and every dish.
 
 | URL | What it is |
 |---|---|
-| `/` | Home. The camera starts in the sky in front of a pastel bamboo grove. Scrolling parts the bamboo to reveal text behind it, then the camera descends past the ground into the koi pond. Sections cover the place, the menu (Veg / Non-Veg tiles), signature dishes, events, why guests come back, visit info with a map, and FAQs. |
+| `/` | Home. A pastel bamboo grove that parts as you scroll to reveal text behind it, then the page scrolls past the ground and a stone pond edge into the water. Sections cover the place, the menu (Veg / Non-Veg tiles), signature dishes, an interactive "feed our koi" pond, events, why guests come back, visit info, and FAQs. |
 | `/menu/` | The Veg / Non-Veg chooser. |
 | `/non-veg/` | The full menu (veg + non-veg) over the animated koi pond. |
 | `/veg/` | The pure-vegetarian menu in the bamboo grove. |
@@ -28,7 +28,9 @@ Old QR codes that point at `/#veg` or `/#nonveg` still work; they redirect to th
   - **BreadcrumbList**
 - `sitemap.xml`, `robots.txt` and a friendly 404 page.
 - One H1 per page, semantic sections, descriptive link text, and local keywords (Hennur, Kothanur, Bengaluru).
-- Light pages: no frameworks, deferred scripts, and fonts subset to the glyphs used.
+- Light pages: CSS inlined, self-hosted font subsets (Shippori Mincho + Zen Kaku Gothic New),
+  scenery pre-rendered at build time into static SVGs (`src/scenery.mjs`), the Google map loads on demand,
+  and the koi pond script only loads when you reach it. Lighthouse (mobile): 99–100 on every category.
 
 ## Editing
 

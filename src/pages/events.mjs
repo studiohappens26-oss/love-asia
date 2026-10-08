@@ -1,7 +1,8 @@
+import { groveLayers } from "./scene.mjs";
 import { BUSINESS, esc, head, siteHeader, siteFooter, restaurantSchema, breadcrumbSchema, faqSchema, faqHtml, waLink, ICON, fullAddress } from "../site.mjs";
 
 export const EVENTS_FAQ = [
-  { q: "How many guests can Love Asia host?", a: "We comfortably host 100+ guests, so everything from an intimate birthday dinner to a large family celebration or office party fits." },
+  { q: "How many guests can Love Asia host?", a: "We can seat 100+ guests at the same time, across our air-conditioned indoor dining room and open-air seating — so everything from an intimate birthday dinner to a large family celebration or office party fits." },
   { q: "Do you offer buffets for parties?", a: "Yes. For parties and group bookings you can choose a buffet or order from our à la carte menu — we'll help you pick what suits your group and budget." },
   { q: "Can we have both veg and non-veg food?", a: `Of course. Our <a href="../veg/">vegetarian menu</a> and <a href="../non-veg/">full menu</a> are both available for events, with dishes clearly marked veg or non-veg.` },
   { q: "Is Love Asia good for kids' birthday parties?", a: "Yes — it's kid-friendly with a play area for children, and the koi pond is always a hit with little guests." },
@@ -23,29 +24,29 @@ export function eventsPage() {
   const b = BUSINESS;
   return `${head({
     title: "Birthday Party & Event Venue in Hennur, Bengaluru — Love Asia",
-    description: "Birthday parties, kids' parties, corporate lunches and family celebrations at Love Asia, Hennur. Seats 100+, air-conditioned, buffet or à la carte.",
+    description: "Birthday parties, kids' parties and corporate lunches at Love Asia, Hennur. Seats 100+ guests at once, AC and open-air, buffet or à la carte.",
     path,
     root,
     css: ["assets/css/style.css", "assets/css/site.css"],
     schema: [restaurantSchema(), breadcrumbSchema([{ name: "Home", path: "" }, { name: "Events & Parties", path }]), faqSchema(EVENTS_FAQ)],
   })}
-<body class="page-events mode-veg">
-<div class="scene" aria-hidden="true"><div class="scene-grove" id="grove"></div></div>
+<body class="page-events">
 
 ${siteHeader({ root, current: "events" })}
 
 <main id="main" class="sub-main">
-  <section class="sub-hero" aria-labelledby="ev-title">
+  <section class="frame-hero" aria-labelledby="ev-title">
+    <div class="frame-hero__scene" aria-hidden="true">${groveLayers(root)}</div>
     <div class="panel panel--hero">
       <span class="seal" aria-hidden="true">宴</span>
       <p class="eyebrow">Events &amp; parties</p>
       <h1 id="ev-title">Birthday parties &amp; events in Hennur, Bengaluru</h1>
-      <p class="lede">Celebrate by the koi pond. Love Asia hosts 100+ guests in an air-conditioned, Japanese-garden setting, with buffet or à la carte menus your whole group will enjoy.</p>
+      <p class="lede">Celebrate by the koi pond. Love Asia can seat 100+ guests at the same time — across an air-conditioned indoor dining room and open-air seating — with buffet or à la carte menus your whole group will enjoy.</p>
       <ul class="facts">
-        <li><b>100+</b><span>guests</span></li>
+        <li><b>100+</b><span>guests at once</span></li>
         <li><b>Buffet</b><span>or à la carte</span></li>
         <li><b>Veg</b><span>&amp; non-veg</span></li>
-        <li><b>AC</b><span>dining room</span></li>
+        <li><b>AC</b><span>&amp; open-air</span></li>
       </ul>
       <div class="cta-row">
         <a class="btn btn--ink" href="#enquire">Enquire now ${ICON.arrow}</a>
@@ -69,8 +70,8 @@ ${siteHeader({ root, current: "events" })}
       <p class="eyebrow">Why celebrate here</p>
       <h2 id="why-ev">Everything your party needs</h2>
       <ul class="ticks">
-        <li><b>Room for everyone</b> — seating for 100+ guests</li>
-        <li><b>Comfortable all year</b> — air-conditioned dining, plus outdoor and rooftop seating</li>
+        <li><b>Room for everyone</b> — we can seat 100+ guests at the same time</li>
+        <li><b>Indoors or out</b> — an air-conditioned dining room, plus open-air seating in the garden</li>
         <li><b>Food people talk about</b> — sushi, dim sum, bao, ramen, Thai curries and noodles</li>
         <li><b>Your choice of format</b> — buffet spreads or à la carte from the full menu</li>
         <li><b>Something for every diet</b> — a dedicated pure-veg menu, clearly marked</li>
@@ -119,7 +120,6 @@ ${siteHeader({ root, current: "events" })}
 
 ${siteFooter({ root })}
 
-<script src="${root}assets/js/bamboo.js" defer></script>
 <script src="${root}assets/js/site.js" defer></script>
 </body>
 </html>`;

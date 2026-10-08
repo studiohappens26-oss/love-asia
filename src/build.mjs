@@ -12,6 +12,7 @@ import { SITE_URL, BASE_PATH, head, logoSvg, siteHeader, siteFooter } from "./si
 import { homePage } from "./pages/home.mjs";
 import { chooserPage, menuPage } from "./pages/menu.mjs";
 import { eventsPage } from "./pages/events.mjs";
+import { skySvg, curtainSvg, groundSvg, shoreSvg, sprigSvg } from "./scenery.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(ROOT, "dist");
@@ -56,7 +57,7 @@ function build() {
 
   console.log("Building pages:");
   const pages = [
-    ["index.html", homePage(DATA), "", "1.0", "weekly"],
+    ["index.html", homePage(), "", "1.0", "weekly"],
     ["menu/index.html", chooserPage(DATA), "menu/", "0.9", "monthly"],
     ["non-veg/index.html", menuPage(DATA, "nonveg"), "non-veg/", "0.9", "monthly"],
     ["veg/index.html", menuPage(DATA, "veg"), "veg/", "0.9", "monthly"],
@@ -75,6 +76,20 @@ ${pages.map(([, , p, pr, cf]) => `  <url><loc>${SITE_URL}/${p}</loc><lastmod>${t
   writeFileSync(join(OUT, ".nojekyll"), "");
 
   cpSync(join(ROOT, "assets"), join(OUT, "assets"), { recursive: true });
+
+  // painted scenery, pre-rendered as static SVG images
+  const scene = {
+    sky: skySvg(),
+    "curtain-near-l": curtainSvg("l", "near"),
+    "curtain-near-r": curtainSvg("r", "near"),
+    "curtain-far-l": curtainSvg("l", "far"),
+    "curtain-far-r": curtainSvg("r", "far"),
+    ground: groundSvg(),
+    shore: shoreSvg(),
+    "sprig-a": sprigSvg("a"),
+    "sprig-b": sprigSvg("b"),
+  };
+  for (const [name, svg] of Object.entries(scene)) write(`assets/img/scene/${name}.svg`, svg);
   console.log(`Done → ${OUT}`);
 }
 
