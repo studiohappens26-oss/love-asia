@@ -70,6 +70,10 @@
     1: { stem: ["#5f685a", "#939c86", "#4c5448"], node: "#3a4036", leaves: ["#2f372c", "#46513f", "#5b6853"], op: 0.92 },
     2: { stem: ["#8f978a", "#b8bfae", "#7d8578"], node: "#6c7368", leaves: ["#6b7665", "#808a78", "#5c6657"], op: 0.75 },
     3: { stem: ["#c4c9bd", "#d9ddd1", "#b6bcaf"], node: "#aab1a3", leaves: ["#b3bba9", "#c3c9b9"], op: 0.6 },
+    // pastel set used by the home page curtain
+    p1: { stem: ["#9db08c", "#c9d8b9", "#8aa079"], node: "#76906a", leaves: ["#7f9a6e", "#97b085", "#6f8a60"], op: 0.95 },
+    p2: { stem: ["#b9c8ab", "#dbe5cf", "#a9ba99"], node: "#97ab88", leaves: ["#a3b893", "#b7c9a7"], op: 0.85 },
+    p3: { stem: ["#d3ddc8", "#e7eee0", "#c6d2ba"], node: "#bac8ad", leaves: ["#c4d2b6", "#d2ddc6"], op: 0.8 },
   };
 
   function leafCluster(g, x, y, dir, scale, tone) {
@@ -90,14 +94,14 @@
     g.appendChild(c);
   }
 
-  function stalk({ height, width, left, depth }) {
+  function stalk({ height, width, left, depth, tone }) {
     const svgW = 260;
     const svg = el("svg", { class: `bamboo-stalk depth-${depth}`, viewBox: `0 0 ${svgW} ${height}`, width: svgW, height, "aria-hidden": "true" });
     svg.style.left = `${left}px`;
     svg.style.animationDuration = `${rand(5.5, 8.5).toFixed(2)}s`;
     svg.style.animationDelay = `${-rand(0, 6).toFixed(2)}s`;
     svg.style.setProperty("--sway", `${rand(1.2, 2.6).toFixed(2)}deg`);
-    const tones = TONES[depth];
+    const tones = TONES[tone || depth];
     svg.style.opacity = tones.op;
 
     const gid = `bg${Math.random().toString(36).slice(2, 8)}`;
@@ -234,4 +238,5 @@
   }
 
   window.BambooGrove = BambooGrove;
+  window.BambooKit = { stalk, backdrop, clouds, sakuraBranch, fallingPetals };
 })();

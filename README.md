@@ -1,55 +1,47 @@
-# Love Asia — Digital Menu
+# Love Asia — website
 
-A lightweight, fully static, mobile-first animated menu for **Love Asia**.
+The website for **Love Asia**, a sushi and Pan-Asian restaurant at 1, Phase 2, Anjanappa Layout,
+Kothanur, Hennur, Bengaluru 560077.
 
-- **Landing:** the Love Asia logo draws itself in. Guests then choose **Non-Veg** or **Veg**, and both choices fit on any phone screen.
-  Tapping a choice opens the menu with a ripple-out reveal.
-- **Non-Veg** shows the **full menu** (veg + non-veg) over a watercolour koi pond. The koi swim with flexible
-  wave-like strokes, and every few seconds one leaps out with a splash. Lily pads, lotus flowers, sakura petals
-  and a visiting dragonfly add life. Tapping the water drops food, and the koi swim over to it.
-- **Veg** shows **only vegetarian dishes** in a Japanese ink-wash bamboo grove with swaying bamboo, a red sun,
-  misty mountains, a pagoda, cherry blossom and falling petals.
-- Every dish is its own see-through card showing only the name and price. **Tap a dish** to expand its description,
-  price options and tags.
-- The **burger button** (bottom right) opens a section list to jump between sections. A Veg/Non-Veg switch and
-  search sit in the top bar.
+It's a fully static, SEO-optimised site with no frameworks. A small Node build script renders every
+page into plain HTML, so search engines can read all the content and every dish.
 
-There are no frameworks and no build step: plain HTML, CSS and JS (~60 KB before fonts).
-Animations pause when the tab is hidden and respect the "reduce motion" setting.
+## Pages
 
-## Editing the menu
+| URL | What it is |
+|---|---|
+| `/` | Home. The camera starts in the sky in front of a pastel bamboo grove. Scrolling parts the bamboo to reveal text behind it, then the camera descends past the ground into the koi pond. Sections cover the place, the menu (Veg / Non-Veg tiles), signature dishes, events, why guests come back, visit info with a map, and FAQs. |
+| `/menu/` | The Veg / Non-Veg chooser. |
+| `/non-veg/` | The full menu (veg + non-veg) over the animated koi pond. |
+| `/veg/` | The pure-vegetarian menu in the bamboo grove. |
+| `/events/` | Birthday parties and events: 100+ guests, buffets, and an enquiry form that opens WhatsApp. |
 
-All dishes live in **`assets/js/menu-data.js`**. Each item looks like this:
+Old QR codes that point at `/#veg` or `/#nonveg` still work; they redirect to the new pages.
 
-```js
-{ name: "Tom Yum", desc: "Hot & sour lemongrass broth", price: 229, veg: true, tags: ["spicy"] }
-```
+## SEO
 
-- `veg: true` dishes appear in both menus. `veg: false` dishes appear only in the Non-Veg menu.
-- `tags` (optional): `spicy`, `chef`, `new`, `jain`.
-- Change `currency`, `name` and `tagline` at the top of the file.
+- Each page has its own title, meta description, canonical URL, Open Graph and Twitter tags, and share image.
+- Structured data (JSON-LD):
+  - **Restaurant** (address, geo, hours, phone, cuisines, price range, capacity, amenities, listings)
+  - **Menu** with every **MenuItem** and its price
+  - **FAQPage**
+  - **BreadcrumbList**
+- `sitemap.xml`, `robots.txt` and a friendly 404 page.
+- One H1 per page, semantic sections, descriptive link text, and local keywords (Hennur, Kothanur, Bengaluru).
+- Light pages: no frameworks, deferred scripts, and fonts subset to the glyphs used.
 
-> The dishes were typed up from the photos of the printed menu in `assets/menu/`.
+## Editing
 
-### Printed menu photos (optional)
-Photos live in `assets/menu/` and are listed in `menuPages` in `menu-data.js`.
-A "View printed menu" button then appears with a swipeable viewer.
+- **Business details** (phone, address, hours, map links): `src/site.mjs` → `BUSINESS`.
+- **Menu dishes and prices**: `assets/js/menu-data.js`.
+- **Home page copy**: `src/pages/home.mjs`. **Events copy**: `src/pages/events.mjs`.
+- **Live URL**: update `SITE_URL` in `src/site.mjs` when you move to a custom domain.
 
-## Direct links
-- `index.html#nonveg` opens the full (koi) menu directly
-- `index.html#veg` opens the veg (bamboo) menu directly
-
-These links work well for table QR codes.
-
-## Running locally / hosting
-Open `index.html`, or serve the folder:
+## Build & deploy
 
 ```sh
-python3 -m http.server 8000
+node src/build.mjs          # → dist/
+python3 -m http.server -d dist 8000
 ```
 
-Deployment is automatic: `.github/workflows/pages.yml` publishes the site to GitHub Pages on every push to `main`.
-It can also be run by hand from the Actions tab.
-One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-
-The live site is at https://studiohappens26-oss.github.io/love-asia/
+GitHub Actions (`.github/workflows/pages.yml`) builds and publishes `dist/` to GitHub Pages on every push to `main`.
