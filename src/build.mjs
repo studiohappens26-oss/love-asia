@@ -12,7 +12,7 @@ import { SITE_URL, BASE_PATH, head, logoSvg, siteHeader, siteFooter } from "./si
 import { homePage } from "./pages/home.mjs";
 import { chooserPage, menuPage } from "./pages/menu.mjs";
 import { eventsPage } from "./pages/events.mjs";
-import { skySvg, curtainSvg, groundSvg, shoreSvg, sprigSvg } from "./scenery.mjs";
+import { skySvg, curtainSvg, groundSvg, shoreSvg, sprigSvg, sakuraSvg } from "./scenery.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(ROOT, "dist");
@@ -80,10 +80,13 @@ ${pages.map(([, , p, pr, cf]) => `  <url><loc>${SITE_URL}/${p}</loc><lastmod>${t
   // painted scenery, pre-rendered as static SVG images
   const scene = {
     sky: skySvg(),
-    "curtain-near-l": curtainSvg("l", "near"),
-    "curtain-near-r": curtainSvg("r", "near"),
-    "curtain-far-l": curtainSvg("l", "far"),
-    "curtain-far-r": curtainSvg("r", "far"),
+    "curtain-back-l": curtainSvg("l", "back"),
+    "curtain-back-r": curtainSvg("r", "back"),
+    "curtain-near-a-l": curtainSvg("l", "near-a"),
+    "curtain-near-b-l": curtainSvg("l", "near-b"),
+    "curtain-near-a-r": curtainSvg("r", "near-a"),
+    "curtain-near-b-r": curtainSvg("r", "near-b"),
+    sakura: sakuraSvg(),
     ground: groundSvg(),
     shore: shoreSvg(),
     "sprig-a": sprigSvg("a"),

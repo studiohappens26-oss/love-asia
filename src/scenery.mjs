@@ -17,13 +17,15 @@ const f1 = (n) => (Math.round(n * 10) / 10).toString();
 
 const LEAF = "M0 0C14 -7 46 -8 78 0C46 6 14 6 0 0Z";
 
+// Ink-wash tones, the same palette as the bamboo grove on the Veg menu
 const TONES = {
-  near: { stem: ["#8aa079", "#cbdabb", "#9fb28e"], node: "#728b64", leaves: ["#6f8a60", "#7f9a6e", "#91ab7f"] },
-  far: { stem: ["#bccab0", "#e1e9d8", "#c8d4bd"], node: "#aebda2", leaves: ["#b2c3a3", "#c2d1b4"] },
+  near: { stem: ["#5f685a", "#939c86", "#4c5448"], node: "#3a4036", leaves: ["#2f372c", "#46513f", "#5b6853"] },
+  mid: { stem: ["#8f978a", "#b8bfae", "#7d8578"], node: "#6c7368", leaves: ["#6b7665", "#808a78", "#5c6657"] },
+  far: { stem: ["#c4c9bd", "#d9ddd1", "#b6bcaf"], node: "#aab1a3", leaves: ["#b3bba9", "#c3c9b9"] },
 };
 
 function gradient(id, t) {
-  return `<linearGradient id="${id}" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="${t.stem[2]}"/><stop offset=".42" stop-color="${t.stem[1]}"/><stop offset="1" stop-color="${t.stem[0]}"/></linearGradient>`;
+  return `<linearGradient id="${id}" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="${t.stem[2]}"/><stop offset=".4" stop-color="${t.stem[1]}"/><stop offset="1" stop-color="${t.stem[0]}"/></linearGradient>`;
 }
 
 // leaves reference one shared <path id="lf"> via <use> to keep the files small
@@ -31,52 +33,63 @@ function leafCluster(r, x, y, dir, scale, tone) {
   let s = `<g transform="translate(${f1(x)} ${f1(y)})">`;
   const n = 3 + Math.floor(r() * 3);
   for (let i = 0; i < n; i++) {
-    const ang = dir * (10 + r() * 48) + (dir < 0 ? 180 : 0) + (r() * 16 - 8);
-    const k = scale * (0.75 + r() * 0.45);
-    s += `<use href="#lf" fill="${tone.leaves[Math.floor(r() * tone.leaves.length)]}" transform="rotate(${Math.round(ang)})scale(${k.toFixed(2)} ${(k * (0.8 + r() * 0.3)).toFixed(2)})"/>`;
+    const ang = dir * (10 + r() * 45) + (dir < 0 ? 180 : 0) + (r() * 16 - 8);
+    const k = scale * (0.75 + r() * 0.4);
+    s += `<use href="#lf" fill="${tone.leaves[Math.floor(r() * tone.leaves.length)]}" fill-opacity="${(0.7 + r() * 0.25).toFixed(2)}" transform="rotate(${Math.round(ang)})scale(${k.toFixed(2)} ${(k * (0.8 + r() * 0.3)).toFixed(2)})"/>`;
   }
   return s + "</g>";
 }
 
-// one stalk = a single shaded body, one highlight, one path for all its nodes, plus leaf sprays
-function stalk(r, cx, w, H, tone, gid) {
-  const thin = w < 20;
-  let nodes = "", leaves = "", branches = "";
-  let y = H + 30;
-  const segH = Math.max(115, (100 + r() * 50) * (w / 24));
-  while (y > -40) {
+// one ink bamboo stalk: tapered segments, node rings, a highlight, side branches with leaf sprays
+function stalk(r, cx, w, H, tone, gid, leafy = 0.72) {
+  let s = "", leaves = "";
+  let y = H + 20;
+  const segH = Math.max(95, (95 + r() * 45) * (w / 22));
+  while (y > -60) {
     const h = segH * (0.85 + r() * 0.25);
+    const w1 = w * 0.94;
+    s += `<path d="M${f1(cx - w / 2)} ${f1(y - 2)}L${f1(cx - w1 / 2)} ${f1(y - h + 3)}Q${f1(cx)} ${f1(y - h)} ${f1(cx + w1 / 2)} ${f1(y - h + 3)}L${f1(cx + w / 2)} ${f1(y - 2)}Z" fill="url(#${gid})"/>`;
+    s += `<path d="M${f1(cx - w / 2 - 2)} ${f1(y - h + 1)}Q${f1(cx)} ${f1(y - h - 4)} ${f1(cx + w / 2 + 2)} ${f1(y - h + 1)}" stroke="${tone.node}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+    if (w >= 16 && h > 40) s += `<rect x="${f1(cx - w * 0.24)}" y="${f1(y - h + 10)}" width="${f1(w * 0.1)}" height="${f1(h - 26)}" rx="2" fill="#fff" fill-opacity=".22"/>`;
     y -= h;
-    nodes += `M${f1(cx - w / 2 - 2)} ${f1(y + 1)}q${f1(w / 2 + 2)} -5 ${f1(w + 4)} 0`;
-    if (y < H * 0.82 && r() < 0.62) {
+    if (y < H * 0.78 && r() < leafy) {
       const dir = r() < 0.5 ? -1 : 1;
-      const bx = cx + dir * w * 0.5, ex = bx + dir * (26 + r() * 40), ey = y - (16 + r() * 40);
-      branches += `M${f1(bx)} ${f1(y)}Q${f1((bx + ex) / 2)} ${f1(y - 6)} ${f1(ex)} ${f1(ey)}`;
+      const bx = cx + dir * w * 0.5, ex = bx + dir * (28 + r() * 32), ey = y - (18 + r() * 32);
+      s += `<path d="M${f1(bx)} ${f1(y)}Q${f1((bx + ex) / 2)} ${f1(y - 6)} ${f1(ex)} ${f1(ey)}" stroke="${tone.node}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
       leaves += leafCluster(r, ex, ey, dir, w / 22, tone);
     }
   }
-  let s = `<rect x="${f1(cx - w / 2)}" y="-40" width="${f1(w)}" height="${H + 80}" rx="${f1(w * 0.3)}" fill="url(#${gid})"/>`;
-  if (!thin) s += `<rect x="${f1(cx - w * 0.26)}" y="-40" width="${f1(w * 0.1)}" height="${H + 80}" fill="#fff" fill-opacity=".2"/>`;
-  s += `<path d="${nodes}" stroke="${tone.node}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
-  if (branches) s += `<path d="${branches}" stroke="${tone.node}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
   return s + leaves;
 }
 
-/* One half of the bamboo "curtain". viewBox 900×1000; the inner edge is the side
-   that stays on screen after parting (right edge for the left curtain). */
+/* One layer of one half of the bamboo "curtain" (viewBox 900×1000; the inner edge
+   is the side that stays on screen after parting).
+     back   — distant pale stalks + mid-tone stalks, as one image
+     near-a / near-b — the dark foreground stalks, split in two so they can sway
+                       out of step with each other */
 export function curtainSvg(side, layer) {
-  const r = rng((side === "l" ? 11 : 23) + (layer === "near" ? 0 : 100));
-  const W = 900, H = 1000, t = TONES[layer], gid = `g${side}${layer}`;
-  const spacing = layer === "near" ? 78 : 52, wr = layer === "near" ? [26, 34] : [13, 18];
-  let x = 20 + r() * 20, stalks = "";
-  while (x < W - 10) {
-    stalks += stalk(r, x, wr[0] + r() * (wr[1] - wr[0]), H, t, gid);
-    x += spacing * (0.75 + r() * 0.5);
-  }
+  const W = 900, H = 1000;
   const flip = side === "r" ? ` transform="translate(${W} 0) scale(-1 1)"` : "";
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><defs>${gradient(gid, t)}<path id="lf" d="${LEAF}" fill-opacity=".86"/></defs><g${flip}>${stalks}</g></svg>`;
+  const draw = (seed, tone, spacing, wr, pick, opacity, leafy) => {
+    const r = rng(seed), t = TONES[tone], gid = `g${side}${tone}`;
+    let x = 10 + r() * 30, out = "", i = 0;
+    while (x < W + 10) {
+      const w = wr[0] + r() * (wr[1] - wr[0]);
+      const body = stalk(r, x, w, H, t, gid, leafy);
+      if (!pick || pick(i)) out += body;
+      x += spacing * (0.75 + r() * 0.5);
+      i++;
+    }
+    return { defs: gradient(gid, t), body: `<g opacity="${opacity}">${out}</g>` };
+  };
+  let parts;
+  const base = side === "l" ? 11 : 23;
+  if (layer === "back") parts = [draw(base + 200, "far", 56, [8, 11], null, 0.6, 0.3), draw(base + 100, "mid", 74, [13, 16], null, 0.78, 0.5)];
+  else parts = [draw(base, "near", 88, [20, 26], (i) => (i % 2 === 0) === (layer === "near-a"), 0.94, 0.72)];
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><defs>${parts.map((p) => p.defs).join("")}<path id="lf" d="${LEAF}"/></defs><g${flip}>${parts.map((p) => p.body).join("")}</g></svg>`;
 }
 
+/* ---------------------- Japanese architecture silhouettes ---------------------- */
 function pagoda(x, baseY, s) {
   let out = "", y = baseY;
   for (let i = 0; i < 5; i++) {
@@ -87,28 +100,92 @@ function pagoda(x, baseY, s) {
     y -= roofH;
   }
   out += `<rect x="${f1(x - 1.2 * s)}" y="${f1(y - 22 * s)}" width="${f1(2.4 * s)}" height="${f1(22 * s)}"/>`;
+  for (let i = 0; i < 4; i++) out += `<rect x="${f1(x - 3 * s)}" y="${f1(y - 6 * s - i * 4.5 * s)}" width="${f1(6 * s)}" height="${f1(1.6 * s)}"/>`;
   return out;
 }
 
-/* Sky behind the grove: paper, a soft red sun, misty mountains and a pagoda. */
+// a curved-eave roof (upturned corners) spanning x0..x1, sitting on y, rising to y - h
+const curvedRoof = (x0, x1, y, h, eave) =>
+  `<path d="M${f1(x0 - eave)} ${f1(y + h * 0.05)}Q${f1(x0 + eave * 0.4)} ${f1(y - h * 0.08)} ${f1(x0 + (x1 - x0) * 0.16)} ${f1(y - h)}L${f1(x1 - (x1 - x0) * 0.16)} ${f1(y - h)}Q${f1(x1 - eave * 0.4)} ${f1(y - h * 0.08)} ${f1(x1 + eave)} ${f1(y + h * 0.05)}Z"/>`;
+
+// temple hall (irimoya roof, two tiers) on a stone base
+function templeHall(x, base, s) {
+  const w = 120 * s;
+  let out = `<rect x="${f1(x - w * 0.55)}" y="${f1(base - 6 * s)}" width="${f1(w * 1.1)}" height="${f1(6 * s)}"/>`;
+  out += `<rect x="${f1(x - w * 0.4)}" y="${f1(base - 30 * s)}" width="${f1(w * 0.8)}" height="${f1(24 * s)}"/>`;
+  out += curvedRoof(x - w * 0.5, x + w * 0.5, base - 30 * s, 13 * s, 12 * s);
+  out += `<rect x="${f1(x - w * 0.27)}" y="${f1(base - 53 * s)}" width="${f1(w * 0.54)}" height="${f1(11 * s)}"/>`;
+  out += curvedRoof(x - w * 0.34, x + w * 0.34, base - 53 * s, 15 * s, 10 * s);
+  out += `<rect x="${f1(x - w * 0.22)}" y="${f1(base - 70 * s)}" width="${f1(w * 0.44)}" height="${f1(2.5 * s)}"/>`;
+  return out;
+}
+
+// torii gate
+function torii(x, base, s) {
+  return `<rect x="${f1(x - 16 * s)}" y="${f1(base - 40 * s)}" width="${f1(3 * s)}" height="${f1(40 * s)}"/>` +
+    `<rect x="${f1(x + 13 * s)}" y="${f1(base - 40 * s)}" width="${f1(3 * s)}" height="${f1(40 * s)}"/>` +
+    `<rect x="${f1(x - 20 * s)}" y="${f1(base - 33 * s)}" width="${f1(40 * s)}" height="${f1(2.6 * s)}"/>` +
+    `<path d="M${f1(x - 26 * s)} ${f1(base - 40 * s)}Q${f1(x)} ${f1(base - 37 * s)} ${f1(x + 26 * s)} ${f1(base - 40 * s)}L${f1(x + 27 * s)} ${f1(base - 44.5 * s)}Q${f1(x)} ${f1(base - 41.5 * s)} ${f1(x - 27 * s)} ${f1(base - 44.5 * s)}Z"/>`;
+}
+
+// small farmhouse (minka) with a steep thatched roof
+function minka(x, base, s) {
+  const w = 50 * s;
+  return `<rect x="${f1(x - w * 0.42)}" y="${f1(base - 14 * s)}" width="${f1(w * 0.84)}" height="${f1(14 * s)}"/>` +
+    `<path d="M${f1(x - w * 0.58)} ${f1(base - 12 * s)}L${f1(x - w * 0.2)} ${f1(base - 34 * s)}L${f1(x + w * 0.2)} ${f1(base - 34 * s)}L${f1(x + w * 0.58)} ${f1(base - 12 * s)}Z"/>`;
+}
+
+export function skylineSvgGroup(fill, opacity) {
+  // temples on the far hill, houses and a torii on the near one
+  return `<g fill="${fill}" fill-opacity="${opacity}">${templeHall(372, 612, 1.05)}${pagoda(655, 640, 2.1)}${torii(500, 652, 1.15)}${minka(250, 660, 1)}${minka(800, 654, 0.85)}${minka(845, 660, 0.7)}</g>`;
+}
+
+/* Sky behind the grove: paper, soft red sun, misty ink mountains, temples and a pagoda. */
 export function skySvg() {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
 <defs>
-  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdfcf8"/><stop offset=".7" stop-color="#f7f4ec"/><stop offset="1" stop-color="#eef0e4"/></linearGradient>
-  <radialGradient id="sun"><stop offset="0" stop-color="#ef9f8b" stop-opacity=".55"/><stop offset=".7" stop-color="#ef9f8b" stop-opacity=".42"/><stop offset="1" stop-color="#ef9f8b" stop-opacity="0"/></radialGradient>
-  <linearGradient id="m1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9dfdb"/><stop offset=".7" stop-color="#f3f2ea" stop-opacity="0"/></linearGradient>
-  <linearGradient id="m2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c7d0cb"/><stop offset=".75" stop-color="#f1f0e7" stop-opacity="0"/></linearGradient>
-  <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6f4ec" stop-opacity="0"/><stop offset=".5" stop-color="#f6f4ec" stop-opacity=".95"/><stop offset="1" stop-color="#eef1e5"/></linearGradient>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f8f4ec"/><stop offset=".6" stop-color="#f3efe6"/><stop offset="1" stop-color="#ece7dc"/></linearGradient>
+  <radialGradient id="sun"><stop offset="0" stop-color="#e2765f" stop-opacity=".55"/><stop offset=".72" stop-color="#e2765f" stop-opacity=".42"/><stop offset="1" stop-color="#e2765f" stop-opacity="0"/></radialGradient>
+  <linearGradient id="m1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3cacb"/><stop offset=".6" stop-color="#e7e6df" stop-opacity="0"/></linearGradient>
+  <linearGradient id="m2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9b2b0"/><stop offset=".65" stop-color="#ece9e1" stop-opacity="0"/></linearGradient>
+  <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3efe6" stop-opacity="0"/><stop offset=".5" stop-color="#f3efe6" stop-opacity=".95"/><stop offset="1" stop-color="#ece7dc"/></linearGradient>
 </defs>
 <rect width="1000" height="1000" fill="url(#sky)"/>
-<circle cx="610" cy="320" r="110" fill="url(#sun)"/>
-<g fill="#fff" fill-opacity=".75"><rect x="120" y="230" width="300" height="9" rx="4.5"/><rect x="190" y="248" width="180" height="7" rx="3.5"/><rect x="640" y="190" width="260" height="8" rx="4"/><rect x="700" y="207" width="140" height="6" rx="3"/></g>
+<circle cx="610" cy="330" r="120" fill="url(#sun)"/>
 <path d="M0 560C60 530 110 470 170 460C240 448 270 520 330 515C400 510 430 410 500 405C570 400 610 488 680 500C750 512 800 450 860 455C920 460 960 500 1000 510V1000H0Z" fill="url(#m1)"/>
 <path d="M0 640C70 620 120 575 200 578C280 581 300 640 380 630C450 622 500 568 580 572C660 576 690 640 770 632C850 624 910 590 1000 600V1000H0Z" fill="url(#m2)"/>
-<g fill="#aeb8b2" fill-opacity=".7">${pagoda(655, 640, 2.1)}</g>
-<rect y="600" width="1000" height="400" fill="url(#mist)"/>
+${skylineSvgGroup("#8e9694", 0.55)}
+<path d="M-10 690C80 670 170 690 260 678C350 666 430 690 520 676C610 662 700 688 790 676C880 664 950 684 1010 674V1000H-10Z" fill="#f2efe7" fill-opacity=".85"/>
+<rect y="700" width="1000" height="300" fill="url(#mist)"/>
 </svg>`;
 }
+
+/* Cherry-blossom branch reaching in from the top-right corner (as on the Veg menu). */
+export function sakuraSvg() {
+  const r = rng(77);
+  const rr = (a, b) => a + r() * (b - a);
+  const blossom = (x, y, rad) => {
+    let s = `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${Math.round(rr(0, 72))})">`;
+    for (let i = 0; i < 5; i++) {
+      s += `<path d="M0 0C${f1(-rad * 0.55)} ${f1(-rad * 0.4)} ${f1(-rad * 0.5)} ${f1(-rad * 1.1)} 0 ${f1(-rad * 1.2)}C${f1(rad * 0.12)} ${f1(-rad)} ${f1(rad * 0.28)} ${f1(-rad)} ${f1(rad * 0.36)} ${f1(-rad * 1.15)}C${f1(rad * 0.75)} ${f1(-rad * 0.95)} ${f1(rad * 0.55)} ${f1(-rad * 0.35)} 0 0Z" transform="rotate(${i * 72})" fill="${i % 2 ? "#f6c9cf" : "#f3bcc4"}" stroke="#d98c98" stroke-width=".5" stroke-opacity=".6"/>`;
+    }
+    return s + `<circle r="${f1(rad * 0.22)}" fill="#d0606f"/></g>`;
+  };
+  let branch = `<path d="M-10 30C40 50 80 62 130 72C175 82 215 96 290 128" stroke="#4b403a" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+  branch += `<path d="M110 70C125 100 140 120 150 150" stroke="#4b403a" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  branch += `<path d="M190 92C200 70 215 55 236 46" stroke="#4b403a" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  branch += `<path d="M60 56C70 80 66 100 74 118" stroke="#4b403a" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+  let flowers = "";
+  for (const [x, y] of [[150, 152], [74, 120], [236, 46], [290, 128], [0, 40], [60, 62], [120, 70], [170, 92], [220, 98], [270, 124]]) {
+    flowers += blossom(x + rr(-8, 8), y + rr(-10, 10), rr(8, 12));
+    if (r() < 0.7) flowers += blossom(x + rr(-22, 22), y + rr(-16, 18), rr(6, 9));
+    if (r() < 0.6) flowers += `<circle cx="${f1(x + rr(-26, 26))}" cy="${f1(y + rr(-18, 20))}" r="3.2" fill="#e79aa6"/>`;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 320 180"><g transform="scale(-1 1) translate(-320 0)">${branch}${flowers}</g></svg>`;
+}
+
+export const PETAL = "M0 0C-7 -6 -7 -15 0 -19C2 -16 4 -16 6 -19C13 -15 13 -6 0 0Z";
+export const LEAF_PATH = LEAF;
 
 /* The ground where the bamboo is planted: soft watercolour washes, no cartoon tufts. */
 export function groundSvg() {

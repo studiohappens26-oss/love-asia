@@ -244,7 +244,6 @@ export function menuPage(DATA, mode) {
     .map((c, n) => `<li style="--i:${n}"><a href="#cat-${esc(c.id)}" data-cat="${esc(c.id)}"><span>${esc(c.name)}</span><small>${c.groups.reduce((s, g) => s + g.items.length, 0)}</small></a></li>`)
     .join("");
 
-  const pages = (DATA.menuPages || []).map((src) => root + src);
   const scene = mode === "veg"
     ? `<div class="scene-grove" id="grove"></div>`
     : `<div class="scene-pond"><div class="pond-caustics" id="caustics"></div><canvas id="pond"></canvas></div>`;
@@ -295,7 +294,6 @@ export function menuPage(DATA, mode) {
   </main>
 
   <footer class="menu-footer">
-    ${pages.length ? `<button class="pages-btn" type="button">View printed menu</button>` : ""}
     <p class="legend">
       <span><span class="mark mark--veg" aria-hidden="true"></span> Vegetarian</span>
       <span><span class="mark mark--nonveg" aria-hidden="true"></span> Non-vegetarian</span>
@@ -313,19 +311,12 @@ export function menuPage(DATA, mode) {
   <ol class="sheet__list" id="sheet-list">${sheetItems}</ol>
   <div class="sheet__foot">
     <button type="button" id="sheet-top">Back to top</button>
-    ${pages.length ? `<button type="button" class="pages-btn">Printed menu</button>` : ""}
   </div>
 </div>
 <button class="fab" id="fab" type="button" aria-label="Menu sections" aria-expanded="false" aria-controls="sheet">
   <span class="fab__icon" aria-hidden="true"><i></i><i></i><i></i></span>
 </button>
 
-<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Printed menu">
-  <button class="icon-btn lightbox__close" id="lightbox-close" type="button" aria-label="Close">
-    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-  </button>
-  <div class="lightbox__track" id="lightbox-track">${pages.map((src, i) => `<figure><img src="${esc(src)}" alt="Love Asia printed menu, page ${i + 1}" loading="lazy" decoding="async" width="720" height="1280" /></figure>`).join("")}</div>
-</div>
 
 <script src="${root}assets/js/${mode === "veg" ? "bamboo" : "koi-pond"}.js" defer></script>
 <script src="${root}assets/js/menu.js" defer></script>

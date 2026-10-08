@@ -125,16 +125,24 @@ body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
   height: 100vh;
   height: 100svh;
   overflow: hidden;
-  background: #f7f4ec;
+  background: #f3efe6;
 }
-.g-sky { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; }
+.g-sky { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+.grove__stage .sakura, .frame-hero .sakura { top: calc(var(--safe-top) + 64px); width: min(64vw, 380px); height: auto; }
 .g-curtain { position: absolute; top: 0; bottom: 0; width: 62%; will-change: translate; }
 .g-l { left: 0; }
 .g-r { right: 0; }
+/* each layer leans in the wind on its own rhythm, so neighbouring stalks move out of step */
 .g-sway { position: absolute; inset: 0; transform-origin: 50% 100%; animation: lean 7s ease-in-out infinite alternate; will-change: transform; }
-.g-sway--r { animation-duration: 8.5s; animation-delay: -3s; }
-.is-paused .g-sway { animation-play-state: paused; }
-@keyframes lean { from { transform: skewX(-.8deg); } to { transform: skewX(.8deg); } }
+.g-sway--back { --amp: 1deg; animation-duration: 9.5s; animation-delay: -4s; }
+.g-sway--a { --amp: 2.3deg; animation-duration: 6.2s; }
+.g-sway--b { --amp: 2.9deg; animation-duration: 7.8s; animation-delay: -3.3s; }
+.g-r .g-sway--a { animation-duration: 6.9s; animation-delay: -2.1s; }
+.g-r .g-sway--b { animation-duration: 8.6s; animation-delay: -5.4s; }
+@keyframes lean { from { transform: skewX(calc(var(--amp, 1.5deg) * -1)); } to { transform: skewX(var(--amp, 1.5deg)); } }
+.g-petals { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.grove__stage .jp-clouds, .frame-hero .jp-clouds { pointer-events: none; }
+.is-paused .g-sway, .is-paused .falling-leaf, .is-paused .falling-leaf__inner, .is-paused .sakura, .is-paused .jp-cloud { animation-play-state: paused; }
 .g-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .g-l .g-img { object-position: right bottom; }
 .g-r .g-img { object-position: left bottom; }
@@ -405,7 +413,6 @@ html.js .reveal-card { opacity: 0; }
   background: #f7f4ec;
 }
 .frame-hero__scene { position: absolute; inset: 0; }
-.frame-hero .g-sway { animation: none; }
 .frame-hero .g-near.g-l { translate: -82% 0; }
 .frame-hero .g-near.g-r { translate: 82% 0; }
 .frame-hero .g-far.g-l { translate: -66% 0; }

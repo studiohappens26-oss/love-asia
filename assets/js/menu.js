@@ -68,7 +68,7 @@
     pond.start();
     setTimeout(() => pond.leap(), 900);
     document.addEventListener("pointerdown", (e) => {
-      if (e.target.closest("button, a, input, .topbar, .dish, .sheet, .fab, .lightbox")) return;
+      if (e.target.closest("button, a, input, .topbar, .dish, .sheet, .fab")) return;
       pond.addRipple(e.clientX, e.clientY, true);
     }, { passive: true });
   } else if (mode === "veg" && window.BambooGrove) {
@@ -160,19 +160,4 @@
   $("#sheet-top").addEventListener("click", () => { toggleSheet(false); window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !sheet.hidden) { toggleSheet(false); fab.focus(); } });
 
-  // printed menu viewer
-  const lightbox = $("#lightbox");
-  let opener = null;
-  $$(".pages-btn").forEach((b) =>
-    b.addEventListener("click", () => {
-      opener = b;
-      toggleSheet(false);
-      lightbox.hidden = false;
-      body.classList.add("no-scroll");
-      $("#lightbox-close").focus();
-    })
-  );
-  const closeBox = () => { lightbox.hidden = true; body.classList.remove("no-scroll"); if (opener && opener.offsetParent) opener.focus(); };
-  $("#lightbox-close").addEventListener("click", closeBox);
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !lightbox.hidden) closeBox(); });
 })();

@@ -34,6 +34,19 @@
     return out;
   }
 
+  // temple hall, torii gate and farmhouses — faint silhouettes on the hills
+  const roof = (x0, x1, y, h, e) => `<path d="M${x0 - e} ${y + h * 0.05}Q${x0 + e * 0.4} ${y - h * 0.08} ${x0 + (x1 - x0) * 0.16} ${y - h}L${x1 - (x1 - x0) * 0.16} ${y - h}Q${x1 - e * 0.4} ${y - h * 0.08} ${x1 + e} ${y + h * 0.05}Z"/>`;
+  function skyline() {
+    const hall = (x, b, s) => {
+      const w = 120 * s;
+      return `<rect x="${x - w * 0.55}" y="${b - 6 * s}" width="${w * 1.1}" height="${6 * s}"/><rect x="${x - w * 0.4}" y="${b - 30 * s}" width="${w * 0.8}" height="${24 * s}"/>` +
+        roof(x - w * 0.5, x + w * 0.5, b - 30 * s, 13 * s, 12 * s) + `<rect x="${x - w * 0.27}" y="${b - 53 * s}" width="${w * 0.54}" height="${11 * s}"/>` + roof(x - w * 0.34, x + w * 0.34, b - 53 * s, 15 * s, 10 * s);
+    };
+    const torii = (x, b, s) => `<rect x="${x - 16 * s}" y="${b - 40 * s}" width="${3 * s}" height="${40 * s}"/><rect x="${x + 13 * s}" y="${b - 40 * s}" width="${3 * s}" height="${40 * s}"/><rect x="${x - 20 * s}" y="${b - 33 * s}" width="${40 * s}" height="${2.6 * s}"/><path d="M${x - 26 * s} ${b - 40 * s}Q${x} ${b - 37 * s} ${x + 26 * s} ${b - 40 * s}L${x + 27 * s} ${b - 44.5 * s}Q${x} ${b - 41.5 * s} ${x - 27 * s} ${b - 44.5 * s}Z"/>`;
+    const minka = (x, b, s) => { const w = 50 * s; return `<rect x="${x - w * 0.42}" y="${b - 14 * s}" width="${w * 0.84}" height="${14 * s}"/><path d="M${x - w * 0.58} ${b - 12 * s}L${x - w * 0.2} ${b - 34 * s}L${x + w * 0.2} ${b - 34 * s}L${x + w * 0.58} ${b - 12 * s}Z"/>`; };
+    return `<g fill="#8e9694" opacity=".5">${hall(150, 548, 0.5)}${torii(232, 596, 0.5)}${minka(70, 590, 0.45)}${minka(370, 586, 0.4)}</g>`;
+  }
+
   function backdrop() {
     return `
 <svg class="jp-backdrop" viewBox="0 0 400 800" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
@@ -46,6 +59,7 @@
   <path d="M0 520 C 30 500 55 455 92 440 C 128 425 150 470 185 468 C 222 466 246 395 292 392 C 334 389 362 446 400 458 V 800 H 0 Z" fill="url(#mt-far)"/>
   <path d="M-10 585 C 40 570 70 520 120 522 C 170 524 188 575 236 566 C 280 558 318 515 410 532 V 800 H -10 Z" fill="url(#mt-mid)"/>
   <g fill="#8e9694" opacity=".55">${pagoda(318, 548, 1)}</g>
+  ${skyline()}
   <path d="M-10 640 C 60 620 120 640 190 628 C 260 616 330 640 410 626 V 800 H -10 Z" fill="#f2efe7" opacity=".85"/>
 </svg>`;
   }
