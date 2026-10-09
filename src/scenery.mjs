@@ -110,6 +110,7 @@ export function curtainSvg(side, layer, H = 1000, crop = 0) {
 }
 
 /* ---------------------- Japanese architecture silhouettes ---------------------- */
+// The near ridge rises into a low knoll under the temple hall so its base sits on the ground.
 // The far hill holds a temple hall and a five-storey pagoda among pines; the nearer
 // hill has a torii and farmhouses. Laid out so the middle third (what a phone shows)
 // carries the temple, pagoda and torii.
@@ -128,7 +129,7 @@ const HILL_DEFS = `
   <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3efe6" stop-opacity="0"/><stop offset=".5" stop-color="#f3efe6" stop-opacity=".95"/><stop offset="1" stop-color="#ece7dc"/></linearGradient>`;
 const HILLS = () => `
 <path d="M0 560C60 530 110 470 170 460C240 448 270 520 330 515C400 510 430 410 500 405C570 400 610 488 680 500C750 512 800 450 860 455C920 460 960 500 1000 510V1000H0Z" fill="url(#m1)"/>
-<path d="M0 640C70 620 120 575 200 578C280 581 300 640 380 630C450 622 500 568 580 572C660 576 690 640 770 632C850 624 910 590 1000 600V1000H0Z" fill="url(#m2)"/>
+<path d="M0 640C70 620 120 575 200 578C250 580 290 616 330 619C380 615 440 615 490 618C520 610 545 575 580 572C660 576 690 640 770 632C850 624 910 590 1000 600V1000H0Z" fill="url(#m2)"/>
 ${skylineSvgGroup()}
 <path d="M-10 690C80 670 170 690 260 678C350 666 430 690 520 676C610 662 700 688 790 676C880 664 950 684 1010 674V1000H-10Z" fill="#f2efe7" fill-opacity=".85"/>
 <rect y="700" width="1000" height="300" fill="url(#mist)"/>`;
