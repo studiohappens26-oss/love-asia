@@ -1,5 +1,5 @@
 /* ================================================================
-   LOVE ASIA — home & events pages (inlined after style.css)
+   LOVE ASIA: home & events pages (inlined after style.css)
    Pastel, paper-white, Japanese ink-and-watercolour.
    Performance rules: the page scrolls natively; the only things that
    move are pre-rendered images via transform/translate/opacity.
@@ -118,18 +118,19 @@ body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
 .cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
 
 /* ------------------------------ the grove (home) ------------------------------ */
-.grove { position: relative; height: 240vh; height: 240svh; }
-.grove__stage {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100svh;
-  overflow: hidden;
-  background: #f3efe6;
-}
-.g-sky { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
-.grove__stage .sakura, .frame-hero .sakura { top: calc(var(--safe-top) + 64px); width: min(64vw, 380px); height: auto; }
-.g-curtain { position: absolute; top: 0; bottom: 0; width: 62%; will-change: translate; }
+/* Two layers. The back (sky, clouds, hills with temples, pale bamboo) is pinned while you
+   scroll through the grove and drifts up slowly. The front (tall dark bamboo, the cards,
+   the cherry branch) scrolls with the page, so it feels like a camera panning down the
+   stalks while they part. Everything moves at its own speed for depth.
+   The parting and drift are CSS scroll-driven animations (run by the compositor);
+   home.js does the same with a few lines of JS where those aren't supported. */
+.grove { position: relative; height: 245vh; height: 245svh; background: #f3efe6; }
+.grove__back { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; contain: layout paint; }
+.grove__front { position: absolute; inset: 0; overflow: hidden; overflow: clip; }
+.g-sky { position: absolute; left: 0; top: 0; width: 100%; height: 106%; object-fit: cover; object-position: 50% 62%; }
+.g-hills { position: absolute; left: 0; top: 30%; width: 100%; height: 72%; object-fit: cover; object-position: 54% 0; }
+.g-curtain { position: absolute; top: 0; bottom: 0; width: 62%; }
+.grove__back .g-curtain { bottom: auto; height: 150%; }
 .g-l { left: 0; }
 .g-r { right: 0; }
 /* each layer leans in the wind on its own rhythm, so neighbouring stalks move out of step */
@@ -139,25 +140,41 @@ body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
 .g-sway--b { --amp: 2.9deg; animation-duration: 7.8s; animation-delay: -3.3s; }
 .g-r .g-sway--a { animation-duration: 6.9s; animation-delay: -2.1s; }
 .g-r .g-sway--b { animation-duration: 8.6s; animation-delay: -5.4s; }
+/* the home stalks are much taller, so the same lean needs a smaller angle */
+.grove .g-sway--back { --amp: .7deg; }
+.grove .g-sway--a { --amp: 1.2deg; }
+.grove .g-sway--b { --amp: 1.55deg; }
 @keyframes lean { from { transform: skewX(calc(var(--amp, 1.5deg) * -1)); } to { transform: skewX(var(--amp, 1.5deg)); } }
 .g-petals { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-.grove__stage .jp-clouds, .frame-hero .jp-clouds { pointer-events: none; }
-.is-paused .g-sway, .is-paused .falling-leaf, .is-paused .falling-leaf__inner, .is-paused .sakura, .is-paused .jp-cloud { animation-play-state: paused; }
+.jp-clouds { pointer-events: none; }
+.is-paused .g-sway, .is-paused .falling-leaf, .is-paused .falling-leaf__inner, .is-paused .sakura, .is-paused .kumo { animation-play-state: paused; }
 .g-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .g-l .g-img { object-position: right bottom; }
 .g-r .g-img { object-position: left bottom; }
-.g-ground { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 9%; object-fit: fill; }
+.g-ground { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 9vh; height: 9svh; object-fit: fill; }
+.grove__front .sakura { top: calc(var(--safe-top) + 64px); width: min(64vw, 380px); height: auto; }
 
-.hero-card, .reveal-card {
+.hero-wrap, .reveal-wrap {
   position: absolute;
-  inset: calc(64px + var(--safe-top)) 0 0 0;
-  margin: auto;
-  height: fit-content;
-  width: min(100% - 32px, 540px);
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: calc(64px + var(--safe-top)) 16px 4vh;
+  pointer-events: none;
+}
+.hero-wrap { top: 0; }
+.reveal-wrap { top: 110vh; top: 110svh; }
+.hero-card, .reveal-card {
+  position: relative;
+  width: min(100%, 540px);
   text-align: center;
   border-radius: 26px;
   background: rgba(252, 250, 245, .94);
   box-shadow: 0 24px 60px -36px rgba(60, 50, 35, .55);
+  pointer-events: auto;
 }
 .hero-card { padding: 24px 20px 22px; }
 .reveal-card { padding: 26px 22px; }
@@ -185,50 +202,80 @@ html.js .reveal-card { opacity: 0; }
 .reveal__seal { width: 46px; height: 46px; font-size: 26px; margin-bottom: 14px; }
 .reveal-card p { margin: 0; color: #3a3732; font-size: 1.02rem; line-height: 1.75; }
 @media (max-height: 640px) { .hero__logo .logo { height: 76px; } .hero__lede { display: none; } }
+/* without JS, show the grove already parted */
+html:not(.js) .grove .g-near.g-l { translate: -88% 0; }
+html:not(.js) .grove .g-near.g-r { translate: 88% 0; }
+
+@supports (animation-timeline: scroll()) {
+  /* (the timeline/range longhands must come after the shorthand, which resets them) */
+  .grove .g-near.g-l { animation: part-near-l 1ms linear both; animation-timeline: scroll(root); animation-range: 0 115svh; }
+  .grove .g-near.g-r { animation: part-near-r 1ms linear both; animation-timeline: scroll(root); animation-range: 0 115svh; }
+  .grove .g-far.g-l { animation: part-far-l 1ms linear both, drift-far 1ms linear both; animation-timeline: scroll(root), scroll(root); animation-range: 0 115svh, 0 145svh; }
+  .grove .g-far.g-r { animation: part-far-r 1ms linear both, drift-far 1ms linear both; animation-timeline: scroll(root), scroll(root); animation-range: 0 115svh, 0 145svh; }
+  .grove .g-hills { animation: drift-hills 1ms linear both; animation-timeline: scroll(root); animation-range: 0 145svh; }
+  .grove .g-sky { animation: drift-sky 1ms linear both; animation-timeline: scroll(root); animation-range: 0 145svh; }
+  .grove .jp-clouds { animation: drift-clouds 1ms linear both; animation-timeline: scroll(root); animation-range: 0 145svh; }
+  .grove__front .sakura { animation: branch 7s ease-in-out infinite alternate, rise-sakura 1ms linear both; animation-timeline: auto, scroll(root); animation-range: normal, 0 100svh; }
+  .grove .hero-card { animation: hero-out 1ms linear both; animation-timeline: scroll(root); animation-range: 6svh 62svh; }
+  .grove .reveal-card { animation: reveal-in 1ms linear both; animation-timeline: view(); animation-range: entry 20% contain 15%; }
+}
+@keyframes part-near-l { from { translate: 0 0; animation-timing-function: cubic-bezier(.42, 0, .34, 1); } to { translate: -88% 0; } }
+@keyframes part-near-r { from { translate: 0 0; animation-timing-function: cubic-bezier(.42, 0, .34, 1); } to { translate: 88% 0; } }
+@keyframes part-far-l { from { translate: 0 0; animation-timing-function: cubic-bezier(.42, 0, .34, 1); } to { translate: -80% 0; } }
+@keyframes part-far-r { from { translate: 0 0; animation-timing-function: cubic-bezier(.42, 0, .34, 1); } to { translate: 80% 0; } }
+@keyframes drift-far { to { transform: translateY(-30%); } }
+@keyframes drift-hills { to { transform: translateY(-20%); } }
+@keyframes drift-sky { to { transform: translateY(-5%); } }
+@keyframes drift-clouds { to { transform: translateY(-8vh); } }
+@keyframes rise-sakura { to { translate: 0 -34vh; } }
+@keyframes hero-out { to { opacity: 0; translate: 0 -10vh; } }
+@keyframes reveal-in { from { opacity: 0; scale: .94; translate: 0 8vh; } to { opacity: 1; scale: 1; translate: 0 0; } }
 
 /* ------------------------------ shore & water ------------------------------ */
-.shore { height: clamp(150px, 24vw, 300px); background: linear-gradient(180deg, #e9edde, #e3eeed); line-height: 0; }
+.shore { position: relative; height: clamp(150px, 24vw, 300px); background: linear-gradient(180deg, #e9edde, #e3eeed); line-height: 0; }
 .shore img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.pond-area {
-  position: relative;
+/* One live koi pond sits behind every water section: the cards scroll over it. */
+main, .site-footer { position: relative; z-index: 1; }
+.pond-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100lvh;
+  z-index: 0;
   overflow: hidden;
-  padding: 2vh 0 10vh;
-  background: linear-gradient(180deg, #e3eeed 0%, #dfebeb 45%, #dbe8e8 100%);
-}
-/* light dancing on the water, faded in so it never starts at a hard edge */
-.pond-area::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url(../img/caustics.png) 0 0 / 280px 280px;
-  -webkit-mask-image: linear-gradient(180deg, transparent, #000 360px);
-  mask-image: linear-gradient(180deg, transparent, #000 360px);
   pointer-events: none;
+  contain: strict;
+  background:
+    radial-gradient(70% 45% at 15% 8%, rgba(160, 188, 196, .26), transparent 70%),
+    radial-gradient(60% 40% at 92% 70%, rgba(214, 168, 128, .1), transparent 70%),
+    linear-gradient(180deg, #e3eeed, #dde9e9);
 }
-.pond-decor { position: absolute; inset: 0; pointer-events: none; }
-.p-pad { position: absolute; }
-.swimmer { position: absolute; left: 0; width: 84px; height: 35px; animation: swimA 46s linear infinite; will-change: transform; }
-.swimmer--b { animation-name: swimB; }
-.swimmer__koi { display: block; width: 100%; height: 100%; opacity: .78; animation: wiggle .9s ease-in-out infinite alternate; }
-.swimmer.is-paused, .swimmer.is-paused .swimmer__koi { animation-play-state: paused; }
-@keyframes swimA {
-  0% { transform: translate(-20vw, 0) rotate(4deg); }
-  24% { transform: translate(30vw, 46px) rotate(-6deg); }
-  48% { transform: translate(110vw, 0) rotate(6deg); }
-  50% { transform: translate(110vw, 0) rotate(186deg); }
-  74% { transform: translate(55vw, -40px) rotate(174deg); }
-  98% { transform: translate(-20vw, 0) rotate(186deg); }
-  100% { transform: translate(-20vw, 0) rotate(364deg); }
+.pond-bg.is-idle { visibility: hidden; }
+.pond-bg:not(.is-live) .pond-caustics, .pond-bg:not(.is-live) .pond-caustics::after { animation-play-state: paused; }
+.pond-area { position: relative; padding: 2vh 0 10vh; }
+
+/* big seal kanji drifting behind each section, at their own pace */
+.block__kanji {
+  position: absolute;
+  top: 2vh;
+  left: max(2vw, calc(50% - 470px));
+  writing-mode: vertical-rl;
+  font-family: var(--font-seal);
+  font-size: clamp(96px, 30vw, 230px);
+  line-height: 1;
+  color: rgba(46, 72, 74, .085);
+  pointer-events: none;
+  user-select: none;
 }
-@keyframes swimB {
-  0% { transform: translate(110vw, 0) rotate(184deg); }
-  24% { transform: translate(60vw, -42px) rotate(176deg); }
-  48% { transform: translate(-20vw, 0) rotate(186deg); }
-  50% { transform: translate(-20vw, 0) rotate(366deg); }
-  74% { transform: translate(35vw, 40px) rotate(356deg); }
-  98% { transform: translate(110vw, 0) rotate(364deg); }
-  100% { transform: translate(110vw, 0) rotate(544deg); }
+/* decorative: drawn from data-k so it isn't read or contrast-checked as text */
+.block__kanji::before, .sig__kanji::before, .occ__kanji::before { content: attr(data-k); }
+.block:nth-of-type(even) .block__kanji { left: auto; right: max(2vw, calc(50% - 470px)); }
+@supports (animation-timeline: view()) {
+  .block__kanji { animation: kanji-drift 1ms linear both; animation-timeline: view(); }
 }
+@keyframes kanji-drift { from { translate: 0 22vh; } to { translate: 0 -22vh; } }
 
 /* ------------------------------ sections & panels ------------------------------ */
 .block { position: relative; z-index: 1; padding: 10vh 16px; }
@@ -238,15 +285,15 @@ html.js .reveal-card { opacity: 0; }
   margin: 0 auto;
   padding: 30px 22px 26px;
   border-radius: 24px;
-  background: rgba(252, 250, 245, .95);
+  background: rgba(252, 250, 245, .93);
   border: 1px solid rgba(255, 255, 255, .9);
   box-shadow: 0 24px 60px -40px rgba(60, 50, 35, .55);
 }
 .panel--wide { width: min(100%, 900px); }
 @media (min-width: 720px) { .panel { padding: 40px 42px 36px; } }
 
-/* bamboo sprigs that hang over the top corner of every text panel */
-.panel::before, .reveal-card::before {
+/* bamboo sprigs only where the bamboo is: the grove's reveal card and the events hero */
+.frame-hero .panel::before, .reveal-card::before {
   content: "";
   position: absolute;
   top: -44px;
@@ -257,9 +304,8 @@ html.js .reveal-card { opacity: 0; }
   transform: scaleX(-1);
   pointer-events: none;
 }
-.panel--left::before { right: auto; left: -16px; transform: none; background-image: url(../img/scene/sprig-b.svg); }
 .reveal-card::before { top: -40px; right: auto; left: -12px; transform: none; }
-@media (min-width: 720px) { .panel::before { width: 190px; height: 130px; top: -56px; } }
+@media (min-width: 720px) { .frame-hero .panel::before { width: 190px; height: 130px; top: -56px; } }
 
 .facts { list-style: none; margin: 20px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 @media (min-width: 560px) { .facts { grid-template-columns: repeat(4, 1fr); } }
@@ -305,41 +351,33 @@ html.js .reveal-card { opacity: 0; }
 .chips { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .chips li { padding: 6px 13px; border-radius: 999px; background: #fff; border: 1px solid var(--hair); font-size: .86rem !important; line-height: 1.4 !important; }
 
-/* feed the koi */
-.feed-pond {
+/* feed the koi: an open stretch of the pond to tap on */
+.feed-zone {
   position: relative;
-  margin-top: 18px;
-  height: clamp(300px, 56vw, 440px);
-  border-radius: 20px;
-  overflow: hidden;
-  isolation: isolate;
+  height: 44vh;
+  height: 44svh;
+  min-height: 260px;
   cursor: pointer;
   touch-action: manipulation;
-  border: 1px solid var(--hair);
-  background: radial-gradient(70% 50% at 25% 15%, rgba(255, 255, 255, .8), transparent 70%), linear-gradient(180deg, #e9f1f0, #dae7e7);
+  -webkit-tap-highlight-color: transparent;
 }
-.feed-pond canvas { position: absolute; inset: 0; display: block; }
-.feed-pond:not(.is-live) .pond-caustics, .feed-pond:not(.is-live) .pond-caustics::after { animation-play-state: paused; }
-.panel .feed-hint {
+.feed-hint, .feed-count {
   position: absolute;
   left: 50%;
-  bottom: 14px;
   translate: -50% 0;
   margin: 0;
-  padding: 7px 16px;
+  padding: 8px 16px;
   border-radius: 999px;
-  background: rgba(252, 250, 245, .92);
-  font-size: .76rem;
-  letter-spacing: .14em;
-  text-transform: uppercase;
+  background: rgba(252, 250, 245, .9);
+  box-shadow: 0 10px 24px -18px rgba(40, 60, 60, .6);
   white-space: nowrap;
-  color: var(--ink-2);
   pointer-events: none;
-  transition: opacity .4s;
 }
-.panel .feed-hint.is-hidden { opacity: 0; }
-.panel .feed-count { position: absolute; top: 12px; left: 14px; margin: 0; padding: 0 10px; border-radius: 999px; background: rgba(252, 250, 245, .85); font-size: .85rem; color: var(--ink-2); pointer-events: none; }
-.panel .feed-count:empty { display: none; }
+.feed-hint { bottom: 22%; font-size: .76rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); transition: opacity .4s; animation: hint-bob 2.4s ease-in-out infinite alternate; }
+.feed-hint.is-hidden { opacity: 0; animation: none; }
+@keyframes hint-bob { to { translate: -50% -6px; } }
+.feed-count { top: 10%; font-size: .88rem; color: var(--ink-2); }
+.feed-count:empty { display: none; }
 
 .visit { display: grid; gap: 22px; }
 @media (min-width: 820px) { .visit { grid-template-columns: 1fr 1fr; align-items: center; } }
@@ -413,6 +451,9 @@ html.js .reveal-card { opacity: 0; }
   background: #f7f4ec;
 }
 .frame-hero__scene { position: absolute; inset: 0; }
+.frame-hero .g-sky { height: 100%; }
+.frame-hero .sakura { top: calc(var(--safe-top) + 64px); width: min(64vw, 380px); height: auto; }
+.frame-hero .jp-clouds { position: absolute; inset: 0; }
 .frame-hero .g-near.g-l { translate: -82% 0; }
 .frame-hero .g-near.g-r { translate: 82% 0; }
 .frame-hero .g-far.g-l { translate: -66% 0; }

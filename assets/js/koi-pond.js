@@ -564,6 +564,7 @@
 
   /* ------------------------------ Pond ------------------------------ */
   // opts.contained: size to the canvas's parent box (e.g. a card) instead of the viewport
+  // opts.maxDpr / maxKoi / petals: lighter settings (the home page pond sits behind content)
   function KoiPond(canvas, causticEl, opts = {}) {
     const contained = !!opts.contained;
     const ctx = canvas.getContext("2d");
@@ -580,7 +581,7 @@
 
     function resize() {
       // big screens get a 1× canvas: the watercolour is soft anyway and it halves the fill cost
-      dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth > 900 ? 1 : 1.25);
+      dpr = Math.min(window.devicePixelRatio || 1, opts.maxDpr || (window.innerWidth > 900 ? 1 : 1.25));
       // size to the *large* viewport (the scene is 100lvh) so the phone's
       // address bar showing/hiding never resizes or clears the canvas
       W = contained ? canvas.parentElement.clientWidth : window.innerWidth;
@@ -594,9 +595,9 @@
       if (!koi.length || Math.abs(newUnit - unit) > 20) {
         unit = newUnit;
         const area = W * H;
-        koi = Array.from({ length: Math.max(3, Math.min(6, Math.round(area / 30000))) }, () => new Koi(W, H, unit));
+        koi = Array.from({ length: Math.max(3, Math.min(opts.maxKoi || 6, Math.round(area / 30000))) }, () => new Koi(W, H, unit));
         pads = Array.from({ length: contained ? 3 : W > 700 ? 6 : 4 }, () => new LilyPad(W, H, unit));
-        petals = Array.from({ length: contained ? 5 : W > 700 ? 12 : 8 }, () => new Petal(W, H));
+        petals = Array.from({ length: contained ? 5 : opts.petals || (W > 700 ? 12 : 8) }, () => new Petal(W, H));
       }
       if (!reduced) frame(performance.now(), true);
     }

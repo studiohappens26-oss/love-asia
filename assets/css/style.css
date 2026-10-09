@@ -52,6 +52,11 @@ body {
   overflow-x: hidden;
 }
 body.no-scroll, body.is-landing { overflow: hidden; }
+/* Lenis (desktop smooth scrolling) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-stopped { overflow: clip; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
 button { font: inherit; color: inherit; }
 [hidden] { display: none !important; }
 
@@ -131,27 +136,11 @@ body.mode-nonveg .scene-pond, body.mode-veg .scene-grove { opacity: 1; }
 /* ---- bamboo grove: Japanese ink-wash ---- */
 .scene-grove { background: linear-gradient(180deg, #f8f4ec 0%, #f3efe6 55%, #ece7dc 100%); }
 .jp-backdrop { position: absolute; inset: 0; width: 100%; height: 100%; }
+.jp-hills { position: absolute; left: 0; top: 47%; width: 100%; height: 48%; object-fit: cover; object-position: 54% 0; }
+.kumo { position: absolute; left: 0; min-width: 200px; max-width: 560px; height: auto; opacity: .95; animation: drift 120s linear infinite; will-change: transform; }
 .jp-sun { transform-box: fill-box; transform-origin: center; animation: breathe 9s ease-in-out infinite alternate; }
 @keyframes breathe { from { transform: scale(.96); opacity: .85; } to { transform: scale(1.04); opacity: 1; } }
 .jp-clouds { position: absolute; inset: 0; }
-.jp-cloud {
-  position: absolute;
-  left: 0;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .55);
-  animation: drift 90s linear infinite;
-  will-change: transform;
-}
-.jp-cloud::before, .jp-cloud::after {
-  content: "";
-  position: absolute;
-  height: 10px;
-  border-radius: 999px;
-  background: inherit;
-}
-.jp-cloud::before { width: 55%; left: 18%; top: -12px; }
-.jp-cloud::after { width: 40%; left: 48%; top: 12px; }
 @keyframes drift { from { transform: translateX(-70vw); } to { transform: translateX(110vw); } }
 .jp-mist {
   position: absolute; left: 0; right: 0; bottom: 0; height: 38%;
@@ -718,7 +707,7 @@ div.dish__head { cursor: default; }
   pointer-events: none;
   transition: opacity .3s var(--ease);
 }
-body:has(.sheet.is-open) .sheet-backdrop { opacity: 1; pointer-events: auto; }
+.sheet-backdrop.is-open { opacity: 1; pointer-events: auto; }
 body:not(.is-menu) .fab { display: none; }
 .sheet {
   position: fixed;
@@ -735,9 +724,11 @@ body:not(.is-menu) .fab { display: none; }
   border: 1px solid var(--hair);
   box-shadow: 0 30px 60px -30px rgba(40, 30, 20, .55);
   transform-origin: 100% 100%;
-  transform: translateY(14px) scale(.7);
+  transform: translateY(10px) scale(.9);
   opacity: 0;
-  transition: transform .35s var(--ease), opacity .25s var(--ease);
+  transition: transform .26s var(--ease), opacity .18s linear;
+  contain: layout paint;
+  will-change: transform, opacity;
 }
 .sheet.is-open { transform: none; opacity: 1; }
 .sheet__title {
@@ -749,8 +740,6 @@ body:not(.is-menu) .fab { display: none; }
   color: var(--muted);
 }
 .sheet__list { list-style: none; margin: 0; padding: 0; }
-.sheet__list li { opacity: 0; transform: translateX(12px); transition: opacity .3s var(--ease), transform .35s var(--ease); transition-delay: calc(var(--i) * 22ms); }
-.sheet.is-open .sheet__list li { opacity: 1; transform: none; }
 .sheet__list a {
   display: flex;
   align-items: center;
@@ -787,7 +776,7 @@ body:not(.is-menu) .fab { display: none; }
 /* --------------------------- reduced motion --------------------------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
-  .falling-leaf, .jp-cloud, .decor-koi { display: none; }
+  .falling-leaf, .kumo, .decor-koi { display: none; }
 }
 
 /* ------------------------- links & chooser page ------------------------- */

@@ -2,20 +2,20 @@ import { groveLayers } from "./scene.mjs";
 import { BUSINESS, esc, head, siteHeader, siteFooter, restaurantSchema, breadcrumbSchema, faqSchema, faqHtml, waLink, ICON, fullAddress } from "../site.mjs";
 
 export const EVENTS_FAQ = [
-  { q: "How many guests can Love Asia host?", a: "We can seat 100+ guests at the same time, across our air-conditioned indoor dining room and open-air seating — so everything from an intimate birthday dinner to a large family celebration or office party fits." },
-  { q: "Do you offer buffets for parties?", a: "Yes. For parties and group bookings you can choose a buffet or order from our à la carte menu — we'll help you pick what suits your group and budget." },
-  { q: "Can we have both veg and non-veg food?", a: `Of course. Our <a href="../veg/">vegetarian menu</a> and <a href="../non-veg/">full menu</a> are both available for events, with dishes clearly marked veg or non-veg.` },
-  { q: "Is Love Asia good for kids' birthday parties?", a: "Yes — it's kid-friendly with a play area for children, and the koi pond is always a hit with little guests." },
-  { q: "How do I book a party?", a: `Send us your date, guest count and occasion on <a href="${waLink("Hi Love Asia! I'd like to plan a party.")}" rel="noopener" target="_blank">WhatsApp</a> or call <a href="tel:${BUSINESS.phoneE164}">${esc(BUSINESS.phone)}</a>. Weekends fill up quickly, so it helps to book early.` },
+  { q: "How many guests can Love Asia host?", a: "We can seat 100+ guests at the same time, between the air-conditioned dining room and the open-air seating outside. That's enough for anything from a small birthday dinner to a big family do or an office party." },
+  { q: "Do you offer buffets for parties?", a: "Yes. For parties and group bookings you can have a buffet or order à la carte. Tell us your numbers and budget and we'll help you work out the food." },
+  { q: "Can we have both veg and non-veg food?", a: `Yes. Our <a href="../veg/">vegetarian menu</a> and <a href="../non-veg/">full menu</a> are both available for events, and every dish is marked veg or non-veg.` },
+  { q: "Is Love Asia good for kids' birthday parties?", a: "Yes. There's a play area, and the kids usually spend half the party watching the koi." },
+  { q: "How do I book a party?", a: `Send us your date, guest count and occasion on <a href="${waLink("Hi Love Asia! I'd like to plan a party.")}" rel="noopener" target="_blank">WhatsApp</a> or call <a href="tel:${BUSINESS.phoneE164}">${esc(BUSINESS.phone)}</a>. Weekends go fast, so book early if you can.` },
 ];
 
 const OCCASIONS = [
-  ["Birthday parties", "Adult birthdays, milestone birthdays and surprise dinners, with space for the whole crowd.", "誕"],
-  ["Kids' birthdays", "A kid-friendly venue with a play area and a koi pond the little ones love.", "童"],
-  ["Anniversaries", "A calm, candle-lit corner by the pond for two — or a celebration for the whole family.", "愛"],
-  ["Corporate lunches & team dinners", "Air-conditioned dining for office teams, offsites and client meals.", "宴"],
-  ["Family get-togethers", "Reunions, festive lunches and kitty parties around big shared plates.", "家"],
-  ["Festive celebrations", "Make the most of the season with a buffet spread for your group.", "祝"],
+  ["Birthday parties", "Big birthdays, small birthdays and surprise dinners, with room for everyone you invite.", "誕"],
+  ["Kids' birthdays", "There's a play area, and the koi pond keeps the little ones busy.", "童"],
+  ["Anniversaries", "A quiet table by the pond for two, or a party for the whole family.", "愛"],
+  ["Corporate lunches & team dinners", "Air-conditioned dining for team lunches, offsites and client meals.", "宴"],
+  ["Family get-togethers", "Reunions, festive lunches and kitty parties over big shared plates.", "家"],
+  ["Festive celebrations", "Book a buffet for your group over the festive season.", "祝"],
 ];
 
 export function eventsPage() {
@@ -23,7 +23,7 @@ export function eventsPage() {
   const path = "events/";
   const b = BUSINESS;
   return `${head({
-    title: "Birthday Party & Event Venue in Hennur, Bengaluru — Love Asia",
+    title: "Birthday Party & Event Venue in Hennur, Bengaluru | Love Asia",
     description: "Birthday parties, kids' parties and corporate lunches at Love Asia, Hennur. Seats 100+ guests at once, AC and open-air, buffet or à la carte.",
     path,
     root,
@@ -41,7 +41,7 @@ ${siteHeader({ root, current: "events" })}
       <span class="seal" aria-hidden="true">宴</span>
       <p class="eyebrow">Events &amp; parties</p>
       <h1 id="ev-title">Birthday parties &amp; events in Hennur, Bengaluru</h1>
-      <p class="lede">Celebrate by the koi pond. Love Asia can seat 100+ guests at the same time — across an air-conditioned indoor dining room and open-air seating — with buffet or à la carte menus your whole group will enjoy.</p>
+      <p class="lede">Have your party by the koi pond. We can seat 100+ guests at the same time, inside in the air-conditioned dining room or out in the open air, with a buffet or à la carte.</p>
       <ul class="facts">
         <li><b>100+</b><span>guests at once</span></li>
         <li><b>Buffet</b><span>or à la carte</span></li>
@@ -58,9 +58,9 @@ ${siteHeader({ root, current: "events" })}
   <section class="block" aria-labelledby="occ-title">
     <div class="panel panel--wide">
       <p class="eyebrow">What we host</p>
-      <h2 id="occ-title">Celebrations of every size</h2>
+      <h2 id="occ-title">Parties big and small</h2>
       <ul class="occasions">
-        ${OCCASIONS.map(([t, d, k]) => `<li><span class="occ__kanji" aria-hidden="true">${k}</span><h3>${esc(t)}</h3><p>${esc(d)}</p></li>`).join("")}
+        ${OCCASIONS.map(([t, d, k]) => `<li><span class="occ__kanji" aria-hidden="true" data-k="${k}"></span><h3>${esc(t)}</h3><p>${esc(d)}</p></li>`).join("")}
       </ul>
     </div>
   </section>
@@ -68,17 +68,17 @@ ${siteHeader({ root, current: "events" })}
   <section class="block" aria-labelledby="why-ev">
     <div class="panel">
       <p class="eyebrow">Why celebrate here</p>
-      <h2 id="why-ev">Everything your party needs</h2>
+      <h2 id="why-ev">Why have it here</h2>
       <ul class="ticks">
-        <li><b>Room for everyone</b> — we can seat 100+ guests at the same time</li>
-        <li><b>Indoors or out</b> — an air-conditioned dining room, plus open-air seating in the garden</li>
-        <li><b>Food people talk about</b> — sushi, dim sum, bao, ramen, Thai curries and noodles</li>
-        <li><b>Your choice of format</b> — buffet spreads or à la carte from the full menu</li>
-        <li><b>Something for every diet</b> — a dedicated pure-veg menu, clearly marked</li>
-        <li><b>Great mocktails</b> — a hit with every age group</li>
-        <li><b>A team that's done this before</b> — warm, attentive staff who've run countless parties</li>
+        <li><b>Room for everyone.</b> We can seat 100+ guests at the same time.</li>
+        <li><b>Indoors or out.</b> An air-conditioned dining room, and open-air seating in the garden.</li>
+        <li><b>The food.</b> Sushi, dim sum, bao, ramen, Thai curries and noodles.</li>
+        <li><b>Buffet or à la carte.</b> Whichever suits your group.</li>
+        <li><b>Veg guests covered.</b> A separate pure-veg menu, with every dish marked.</li>
+        <li><b>Mocktails.</b> Kids and grown-ups both order them.</li>
+        <li><b>Staff who've done this before.</b> They've run a lot of parties.</li>
       </ul>
-      <p class="panel__more">See what's cooking: <a href="${root}veg/">Veg menu</a> · <a href="${root}non-veg/">Full menu</a></p>
+      <p class="panel__more">Have a look at the food: <a href="${root}veg/">Veg menu</a> · <a href="${root}non-veg/">Full menu</a></p>
     </div>
   </section>
 
@@ -86,7 +86,7 @@ ${siteHeader({ root, current: "events" })}
     <div class="panel">
       <p class="eyebrow">Plan your event</p>
       <h2 id="enq-title">Tell us about your celebration</h2>
-      <p>Fill this in and we'll open WhatsApp with your details ready to send — or simply call <a href="tel:${b.phoneE164}">${esc(b.phone)}</a>.</p>
+      <p>Fill this in and we'll open WhatsApp with your message ready to send. Or just call <a href="tel:${b.phoneE164}">${esc(b.phone)}</a>.</p>
       <form class="enquiry" id="enquiry" action="${waLink("Hi Love Asia! I'd like to plan a party.")}" method="get" target="_blank">
         <label>Your name<input name="name" autocomplete="name" required /></label>
         <label>Occasion
@@ -121,6 +121,7 @@ ${siteHeader({ root, current: "events" })}
 ${siteFooter({ root })}
 
 <script src="${root}assets/js/site.js" defer></script>
+<script src="${root}assets/js/smooth.js" defer></script>
 </body>
 </html>`;
 }

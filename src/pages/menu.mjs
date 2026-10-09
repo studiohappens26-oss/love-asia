@@ -186,7 +186,7 @@ export function chooserPage(DATA) {
   const root = "../";
   const path = "menu/";
   return `${head({
-    title: "Menu — Love Asia, Hennur | Sushi, Ramen, Dim Sum & Thai",
+    title: "Menu | Love Asia, Hennur | Sushi, Ramen, Dim Sum & Thai",
     description: "Browse the Love Asia menu: sushi, ramen, bao, dim sum, Thai curries, noodles and desserts. Choose the full veg & non-veg menu or the pure vegetarian menu.",
     path,
     root,
@@ -227,8 +227,8 @@ export function menuPage(DATA, mode) {
   const { groupHtml } = makeRender(DATA, mode);
   const count = cats.reduce((n, c) => n + c.groups.reduce((m, g) => m + g.items.length, 0), 0);
   const title = mode === "veg"
-    ? "Vegetarian Menu & Prices — Love Asia, Hennur Bengaluru"
-    : "Full Menu & Prices — Love Asia, Hennur | Sushi & Dim Sum";
+    ? "Vegetarian Menu & Prices | Love Asia, Hennur, Bengaluru"
+    : "Full Menu & Prices | Love Asia, Hennur | Sushi & Dim Sum";
   const description = mode === "veg"
     ? `Pure vegetarian menu at Love Asia, Hennur: ${count} dishes including veg sushi rolls, dim sum, gyoza, bao, Thai curries, ramen, noodles and desserts, with prices.`
     : `The full Love Asia menu with prices: ${count} dishes including sushi, dim sum, gyoza, bao, Thai curries, ramen, Khow Suey, noodles, rice and desserts. Veg & non-veg.`;
@@ -245,7 +245,7 @@ export function menuPage(DATA, mode) {
     .join("");
 
   const scene = mode === "veg"
-    ? `<div class="scene-grove" id="grove"></div>`
+    ? `<div class="scene-grove" id="grove" data-scene="${root}assets/img/scene/"></div>`
     : `<div class="scene-pond"><div class="pond-caustics" id="caustics"></div><canvas id="pond"></canvas></div>`;
 
   return `${head({
@@ -268,7 +268,7 @@ export function menuPage(DATA, mode) {
     <a class="icon-btn" href="${root}menu/" aria-label="Back to menu choices">
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
-    <a class="topbar__logo" href="${root}" aria-label="Love Asia — home">${logoSvg()}</a>
+    <a class="topbar__logo" href="${root}" aria-label="Love Asia home">${logoSvg()}</a>
     <nav class="mode-switch" aria-label="Menu type">
       <a href="${root}veg/"${mode === "veg" ? ' aria-current="page"' : ""}><span class="mark mark--veg" aria-hidden="true"></span>Veg</a>
       <a href="${root}non-veg/"${mode === "nonveg" ? ' aria-current="page"' : ""}><span class="mark mark--nonveg" aria-hidden="true"></span>Non-Veg</a>
@@ -285,7 +285,7 @@ export function menuPage(DATA, mode) {
   <div class="menu-hero">
     <span class="seal seal--hero${mode === "veg" ? " seal--veg" : ""}" aria-hidden="true">${mode === "veg" ? "竹" : "鯉"}</span>
     <h1 class="menu-hero__kicker">${mode === "veg" ? "Vegetarian Menu" : "The Full Menu"}</h1>
-    <p class="menu-hero__sub">${mode === "veg" ? "Fresh from the bamboo grove" : "From the koi pond — veg &amp; non-veg"}</p>
+    <p class="menu-hero__sub">${mode === "veg" ? "Fresh from the bamboo grove" : "From the koi pond, veg &amp; non-veg"}</p>
     <p class="menu-hero__hint">Tap a dish for details</p>
   </div>
 
@@ -301,7 +301,7 @@ export function menuPage(DATA, mode) {
     <p class="fine">Prices in ₹, exclusive of applicable taxes. Please inform your server of any allergies.</p>
     <p class="fine">${mode === "veg" ? `Looking for chicken, prawn or sushi? <a href="${root}${other}">See the full menu</a>.` : `Vegetarian? <a href="${root}${other}">See the pure-veg menu</a>.`} Hosting a party? <a href="${root}events/">Events &amp; buffets</a>.</p>
     <p class="fine"><a href="tel:${BUSINESS.phoneE164}">${esc(BUSINESS.phone)}</a> · ${esc(BUSINESS.hours.label)}</p>
-    <a class="footer__logo" href="${root}" aria-label="Love Asia — home">${logoSvg()}</a>
+    <a class="footer__logo" href="${root}" aria-label="Love Asia home">${logoSvg()}</a>
   </footer>
 </div>
 
@@ -320,6 +320,7 @@ export function menuPage(DATA, mode) {
 
 <script src="${root}assets/js/${mode === "veg" ? "bamboo" : "koi-pond"}.js" defer></script>
 <script src="${root}assets/js/menu.js" defer></script>
+<script src="${root}assets/js/smooth.js" defer></script>
 </body>
 </html>`;
 }

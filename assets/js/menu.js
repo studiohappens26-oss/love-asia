@@ -1,8 +1,7 @@
 /*
  * Menu pages (/menu/, /veg/, /non-veg/). All dishes are pre-rendered into the
  * HTML at build time (good for SEO); this script only adds behaviour:
- * tap-to-expand cards, the section sheet, search, the printed-menu viewer
- * and the animated backgrounds.
+ * tap-to-expand cards, the section sheet, search and the animated backgrounds.
  */
 (function () {
   "use strict";
@@ -60,6 +59,7 @@
   const fab = $("#fab");
   const sheet = $("#sheet");
   const sheetList = $("#sheet-list");
+  const backdrop = $("#sheet-backdrop");
 
   // backgrounds
   let pond = null;
@@ -137,27 +137,38 @@
     if (open === undefined) open = sheet.hidden;
     fab.setAttribute("aria-expanded", String(open));
     fab.classList.toggle("is-open", open);
+    backdrop.classList.toggle("is-open", open);
     if (open) {
       sheet.hidden = false;
-      requestAnimationFrame(() => sheet.classList.add("is-open"));
-      const active = $("a.is-active", sheetList) || $("a", sheetList);
-      if (active) { active.focus({ preventScroll: true }); active.scrollIntoView({ block: "nearest" }); }
+      // keep the current section in view inside the sheet (no page scroll, no layout thrash)
+      const active = $("a.is-active", sheetList);
+      if (active) sheet.scrollTop = Math.max(0, active.offsetTop - sheet.clientHeight / 2);
+      void sheet.offsetWidth; // start the transition from the closed state
+      sheet.classList.add("is-open");
+      const first = active || $("a", sheetList);
+      if (first) first.focus({ preventScroll: true });
     } else {
       sheet.classList.remove("is-open");
       setTimeout(() => { if (!sheet.classList.contains("is-open")) sheet.hidden = true; }, reduced ? 0 : 280);
     }
   }
   fab.addEventListener("click", () => toggleSheet());
-  $("#sheet-backdrop").addEventListener("click", () => toggleSheet(false));
+  backdrop.addEventListener("click", () => toggleSheet(false));
   sheetList.addEventListener("click", (e) => {
     const a = e.target.closest("a[data-cat]");
     if (!a) return;
     e.preventDefault();
     toggleSheet(false);
     const sec = document.getElementById("cat-" + a.dataset.cat);
-    if (sec) sec.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+    if (!sec) return;
+    if (window.smoothScroll) window.smoothScroll.scrollTo(sec, { offset: -(parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0) });
+    else sec.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
   });
-  $("#sheet-top").addEventListener("click", () => { toggleSheet(false); window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); });
+  $("#sheet-top").addEventListener("click", () => {
+    toggleSheet(false);
+    if (window.smoothScroll) window.smoothScroll.scrollTo(0);
+    else window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+  });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !sheet.hidden) { toggleSheet(false); fab.focus(); } });
 
 })();

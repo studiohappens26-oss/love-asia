@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Static site build — no dependencies, just Node 18+.
+ * Static site build with no dependencies, just Node 18+.
  *   node src/build.mjs        → writes the site into dist/
  * Menu content comes from assets/js/menu-data.js; business details from src/site.mjs.
  */
@@ -12,7 +12,7 @@ import { SITE_URL, BASE_PATH, head, logoSvg, siteHeader, siteFooter } from "./si
 import { homePage } from "./pages/home.mjs";
 import { chooserPage, menuPage } from "./pages/menu.mjs";
 import { eventsPage } from "./pages/events.mjs";
-import { skySvg, curtainSvg, groundSvg, shoreSvg, sprigSvg, sakuraSvg } from "./scenery.mjs";
+import { skySvg, hillsSvg, cloudSvg, curtainSvg, groundSvg, shoreSvg, sprigSvg, sakuraSvg } from "./scenery.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(ROOT, "dist");
@@ -34,7 +34,7 @@ function write(path, html) {
 function notFoundPage() {
   // served for any missing URL at any depth, so links must be absolute
   const root = BASE_PATH;
-  return `${head({ title: "Page not found — Love Asia", description: "This page doesn't exist. Head back to Love Asia's home page or menu.", path: "404.html", root, css: ["assets/css/style.css", "assets/css/site.css"], noindex: true })}
+  return `${head({ title: "Page not found | Love Asia", description: "This page doesn't exist. Head back to Love Asia's home page or menu.", path: "404.html", root, css: ["assets/css/style.css", "assets/css/site.css"], noindex: true })}
 <body class="page-404">
 ${siteHeader({ root, current: "" })}
 <main id="main" class="sub-main">
@@ -86,6 +86,17 @@ ${pages.map(([, , p, pr, cf]) => `  <url><loc>${SITE_URL}/${p}</loc><lastmod>${t
     "curtain-near-b-l": curtainSvg("l", "near-b"),
     "curtain-near-a-r": curtainSvg("r", "near-a"),
     "curtain-near-b-r": curtainSvg("r", "near-b"),
+    "sky-plain": skySvg(true),
+    hills: hillsSvg(),
+    "cloud-a": cloudSvg("a"),
+    "cloud-b": cloudSvg("b"),
+    "cloud-c": cloudSvg("c"),
+    "tall-back-l": curtainSvg("l", "back", 1500),
+    "tall-back-r": curtainSvg("r", "back", 1500),
+    "tall-near-a-l": curtainSvg("l", "near-a", 2600),
+    "tall-near-b-l": curtainSvg("l", "near-b", 2600),
+    "tall-near-a-r": curtainSvg("r", "near-a", 2600),
+    "tall-near-b-r": curtainSvg("r", "near-b", 2600),
     sakura: sakuraSvg(),
     ground: groundSvg(),
     shore: shoreSvg(),

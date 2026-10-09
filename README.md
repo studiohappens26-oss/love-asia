@@ -1,4 +1,4 @@
-# Love Asia — website
+# Love Asia website
 
 The website for **Love Asia**, a sushi and Pan-Asian restaurant at 1, Phase 2, Anjanappa Layout,
 Kothanur, Hennur, Bengaluru 560077.
@@ -10,7 +10,7 @@ page into plain HTML, so search engines can read all the content and every dish.
 
 | URL | What it is |
 |---|---|
-| `/` | Home. A pastel bamboo grove that parts as you scroll to reveal text behind it, then the page scrolls past the ground and a stone pond edge into the water. Sections cover the place, the menu (Veg / Non-Veg tiles), signature dishes, an interactive "feed our koi" pond, events, why guests come back, visit info, and FAQs. |
+| `/` | Home. You scroll down a bamboo grove like a camera panning down the stalks. The tall foreground bamboo parts as it scrolls past, while the sky, temples, pagoda and clouds drift behind at slower speeds. Then you pass the ground and a stone pond edge into the water, where live koi swim behind every section (tap the water to feed them). Sections cover the place, the menu (Veg / Non-Veg tiles), signature dishes, feeding the koi, events, why guests come back, visit info, and FAQs. |
 | `/menu/` | The Veg / Non-Veg chooser. |
 | `/non-veg/` | The full menu (veg + non-veg) over the animated koi pond. |
 | `/veg/` | The pure-vegetarian menu in the bamboo grove. |
@@ -30,7 +30,12 @@ Old QR codes that point at `/#veg` or `/#nonveg` still work; they redirect to th
 - One H1 per page, semantic sections, descriptive link text, and local keywords (Hennur, Kothanur, Bengaluru).
 - Light pages: CSS inlined, self-hosted font subsets (Shippori Mincho + Zen Kaku Gothic New),
   scenery pre-rendered at build time into static SVGs (`src/scenery.mjs`), the Google map loads on demand,
-  and the koi pond script only loads when you reach it. Lighthouse (mobile): 99–100 on every category.
+  and the koi pond script only loads when you reach it. Lighthouse (mobile): 98 to 100 in every category.
+- Motion: the grove's parting and parallax are CSS scroll-driven animations, run by the compositor, with a
+  small JS fallback in `assets/js/home.js`. The temples, pagoda, torii, farmhouses, pines and clouds
+  are drawn in `src/architecture.mjs`. On desktop (mouse or trackpad), scrolling is smoothed with
+  [Lenis](https://github.com/darkroomengineering/lenis) (`assets/vendor/`, MIT). Phones keep native scrolling,
+  and Lenis isn't downloaded there.
 
 ## Editing
 

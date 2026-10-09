@@ -1,93 +1,109 @@
 /*
  * Home page.
- *  - The grove is pinned (CSS position: sticky) while scrolling parts the bamboo;
- *    only `translate`/`opacity` of six elements change, so it stays on the GPU.
- *  - The koi in the water are CSS animations; off-screen ones are paused.
- *  - The interactive "feed our koi" pond loads its script only when you get near it
- *    and stops drawing whenever it's off-screen.
+ *  - The grove's parting and parallax are CSS scroll-driven animations. Where the
+ *    browser doesn't support those yet, the same motion is set here on scroll
+ *    (only `translate`/`transform`/`opacity`, so it stays on the GPU).
+ *  - One live koi pond sits behind all the water sections. Its script loads when
+ *    you get near the water, and it only draws while the water is on screen.
+ *  - Tap the open water anywhere to drop food for the koi.
  */
 (function () {
   "use strict";
 
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
-  const ease = (t) => 1 - Math.pow(1 - t, 2.2);
+  const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
   /* ------------------------------ the grove ------------------------------ */
   const grove = document.querySelector(".grove");
-  const stage = grove && grove.querySelector(".grove__stage");
-  if (stage) {
-    const q = (s) => stage.querySelector(s);
-    const nearL = q(".g-near.g-l"), nearR = q(".g-near.g-r"), farL = q(".g-far.g-l"), farR = q(".g-far.g-r");
-    const hero = document.getElementById("hero"), reveal = document.getElementById("reveal");
-    let vh = stage.clientHeight, end = grove.offsetHeight, lastP = -1, ticking = false;
+  if (grove) {
+    // the bamboo sway, clouds and petals only run while the grove is on screen
+    new IntersectionObserver(([e]) => grove.classList.toggle("is-paused", !e.isIntersecting)).observe(grove);
 
-    function update() {
-      ticking = false;
-      const p = Math.min(window.scrollY, end) / vh;
-      if (p === lastP) return;
-      lastP = p;
-      const part = ease(clamp((p - 0.06) / 0.8));
-      nearL.style.translate = `${(-part * 86).toFixed(2)}% 0`;
-      nearR.style.translate = `${(part * 86).toFixed(2)}% 0`;
-      farL.style.translate = `${(-part * 70).toFixed(2)}% 0`;
-      farR.style.translate = `${(part * 70).toFixed(2)}% 0`;
-      const h = clamp(1 - p / 0.32);
-      hero.style.opacity = h.toFixed(3);
-      hero.style.translate = `0 ${(-p * 70).toFixed(1)}px`;
-      hero.style.visibility = h < 0.02 ? "hidden" : "";
-      const r = clamp((part - 0.42) / 0.5);
-      reveal.style.opacity = r.toFixed(3);
-      reveal.style.scale = (0.95 + r * 0.05).toFixed(4);
+    const supported = window.CSS && CSS.supports("animation-timeline: scroll()");
+    if (!supported) {
+      const q = (s) => grove.querySelector(s);
+      const nearL = q(".g-near.g-l"), nearR = q(".g-near.g-r"), farL = q(".g-far.g-l"), farR = q(".g-far.g-r");
+      const hills = q(".g-hills"), sky = q(".g-sky"), cloudsEl = q(".jp-clouds"), sakura = q(".grove__front .sakura");
+      const hero = document.getElementById("hero"), reveal = document.getElementById("reveal");
+      let vh = window.innerHeight, lastY = -1, ticking = false;
+
+      const update = () => {
+        ticking = false;
+        const y = Math.min(window.scrollY, vh * 2.45);
+        if (y === lastY) return;
+        lastY = y;
+        const p = y / vh; // progress in screen heights
+        const part = ease(clamp(p / 1.15));
+        const drift = clamp(p / 1.45);
+        nearL.style.translate = `${(-part * 88).toFixed(2)}% 0`;
+        nearR.style.translate = `${(part * 88).toFixed(2)}% 0`;
+        farL.style.translate = `${(-part * 80).toFixed(2)}% 0`;
+        farR.style.translate = `${(part * 80).toFixed(2)}% 0`;
+        farL.style.transform = farR.style.transform = `translateY(${(-drift * 30).toFixed(2)}%)`;
+        hills.style.transform = `translateY(${(-drift * 20).toFixed(2)}%)`;
+        sky.style.transform = `translateY(${(-drift * 5).toFixed(2)}%)`;
+        cloudsEl.style.transform = `translateY(${(-drift * 8 * vh / 100).toFixed(1)}px)`;
+        if (sakura) sakura.style.translate = `0 ${(-clamp(p) * 34 * vh / 100).toFixed(1)}px`;
+        const h = clamp((p - 0.06) / 0.56);
+        hero.style.opacity = (1 - h).toFixed(3);
+        hero.style.translate = `0 ${(-h * vh * 0.1).toFixed(1)}px`;
+        // the reveal card fades in as it rises into view
+        const r = clamp((p - 0.5) / 0.45);
+        reveal.style.opacity = r.toFixed(3);
+        reveal.style.scale = (0.94 + r * 0.06).toFixed(4);
+        reveal.style.translate = `0 ${((1 - r) * vh * 0.08).toFixed(1)}px`;
+      };
+      const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", () => { vh = window.innerHeight; lastY = -1; onScroll(); });
+      update();
     }
-    const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", () => { vh = stage.clientHeight; end = grove.offsetHeight; lastP = -1; onScroll(); });
-    update();
-
-    // the gentle bamboo sway only runs while the grove is on screen
-    new IntersectionObserver(([e]) => stage.classList.toggle("is-paused", !e.isIntersecting)).observe(grove);
   }
 
-  /* ------------------------- koi drifting in the water ------------------------- */
-  const swimIO = new IntersectionObserver((entries) => entries.forEach((e) => e.target.classList.toggle("is-paused", !e.isIntersecting)), { rootMargin: "100px 0px" });
-  document.querySelectorAll(".swimmer").forEach((s) => { s.classList.add("is-paused"); swimIO.observe(s); });
-
-  /* ------------------------------ feed the koi ------------------------------ */
-  const feed = document.getElementById("feed-pond");
-  if (feed) {
-    const canvas = document.getElementById("feed-canvas");
+  /* ------------------------------ the koi pond ------------------------------ */
+  const area = document.getElementById("pond-area");
+  const bg = document.getElementById("pond-bg");
+  if (area && bg) {
     const hint = document.getElementById("feed-hint");
     const countEl = document.getElementById("feed-count");
-    let pond = null, loading = false, visible = false, fed = 0;
+    let pond = null, loading = false, inWater = false, fed = 0;
 
     const boot = () => {
-      pond = window.KoiPond(canvas, document.getElementById("feed-caustics"), { contained: true });
-      if (visible) pond.start();
+      // the cards cover much of the water, so a lighter pond is plenty here
+      pond = window.KoiPond(document.getElementById("pond"), document.getElementById("caustics"), { maxDpr: 1, maxKoi: window.innerWidth > 900 ? 6 : 4, petals: 6 });
+      if (inWater) pond.start();
     };
-    new IntersectionObserver(([e]) => {
-      visible = e.isIntersecting;
-      feed.classList.toggle("is-live", visible);
-      if (visible && !pond && !loading) {
-        loading = true;
-        if (window.KoiPond) return boot();
-        const s = document.createElement("script");
-        s.src = "assets/js/koi-pond.js";
-        s.onload = boot;
-        document.head.appendChild(s);
-      } else if (pond) {
-        visible ? pond.start() : pond.stop();
-      }
-    }, { rootMargin: "150px 0px" }).observe(feed);
+    const load = () => {
+      if (pond || loading) return;
+      loading = true;
+      if (window.KoiPond) return boot();
+      const s = document.createElement("script");
+      s.src = "assets/js/koi-pond.js";
+      s.onload = boot;
+      document.head.appendChild(s);
+    };
 
-    canvas.addEventListener("pointerdown", (e) => {
-      if (!pond) return;
-      const r = canvas.getBoundingClientRect();
-      pond.addRipple(e.clientX - r.left, e.clientY - r.top, true);
+    // fetch the pond script a little before you reach the water
+    new IntersectionObserver(([e]) => { if (e.isIntersecting) load(); }, { rootMargin: "100% 0px" }).observe(area);
+    // draw (and show the water layer) only while the water is on screen
+    new IntersectionObserver(([e]) => {
+      inWater = e.isIntersecting;
+      bg.classList.toggle("is-live", inWater);
+      bg.classList.toggle("is-idle", !inWater);
+      if (pond) inWater ? pond.start() : pond.stop();
+    }).observe(area);
+    bg.classList.add("is-idle");
+
+    // tap the open water (not a card, link or button) to drop food
+    area.addEventListener("pointerdown", (e) => {
+      if (!pond || e.button > 0) return;
+      if (e.target.closest("a, button, input, select, textarea, summary, iframe, .panel")) return;
+      pond.addRipple(e.clientX, e.clientY, true);
       fed++;
-      hint.classList.add("is-hidden");
-      countEl.textContent = fed === 1 ? "Here they come!" : `${fed} pinches of food scattered`;
+      if (hint) hint.classList.add("is-hidden");
+      if (countEl) countEl.textContent = fed === 1 ? "Here they come!" : `${fed} pinches of food`;
       if (!reduced && fed % 4 === 0) setTimeout(() => pond.leap(), 600);
-    });
+    }, { passive: true });
   }
 })();

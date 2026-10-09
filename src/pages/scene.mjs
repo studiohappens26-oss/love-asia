@@ -7,9 +7,11 @@ const img = (root, name, cls, extra = "") =>
 // deterministic "random" so builds are stable
 const jitter = (i, k) => ((Math.sin(i * 12.9898 + k * 78.233) * 43758.5453) % 1 + 1) % 1;
 
-function clouds() {
-  return `<div class="jp-clouds">${[0, 1, 2, 3].map((i) =>
-    `<div class="jp-cloud" style="top:${(14 + i * 9 + jitter(i, 1) * 5).toFixed(1)}%;width:${(38 + jitter(i, 2) * 24).toFixed(0)}vw;animation-duration:${(70 + jitter(i, 3) * 40).toFixed(0)}s;animation-delay:-${(jitter(i, 4) * 100).toFixed(0)}s"></div>`).join("")}</div>`;
+// Japanese-screen clouds drifting across the sky (pre-drawn images, moved by the compositor)
+function clouds(root) {
+  const set = [["a", 9, 64, 120, 10], ["c", 22, 52, 150, 70], ["b", 31, 70, 135, 35], ["a", 4, 44, 170, 100]];
+  return `<div class="jp-clouds">${set.map(([v, top, w, dur, delay]) =>
+    `<img class="kumo" src="${root}assets/img/scene/cloud-${v}.svg" alt="" width="420" height="120" decoding="async" style="top:${top}%;width:${w}vw;animation-duration:${dur}s;animation-delay:-${delay}s" />`).join("")}</div>`;
 }
 
 function petals(n) {
@@ -24,16 +26,41 @@ function petals(n) {
   return `<div class="g-petals">${out}</div>`;
 }
 
-/* The bamboo grove, in the same ink style as the Veg menu: sky with temples, clouds,
-   a pale back grove, mist, two independently swaying foreground layers per side,
-   a cherry-blossom branch and falling petals. */
-export function groveLayers(root, { middle = "" } = {}) {
+/* Home page grove, in two parts.
+   groveBack: the far scene (sky with temples, clouds, the pale back grove, mist, petals).
+     It is pinned while you scroll through the grove and drifts up slowly.
+   groveFront: the tall foreground bamboo, which scrolls with the page like a camera
+     panning down the stalks while they part to show the card behind them. */
+export function groveBack(root) {
+  return `
+    ${img(root, "sky-plain", "g-sky")}
+    ${clouds(root)}
+    <img class="g-hills" src="${root}assets/img/scene/hills.svg" alt="" width="1000" height="620" decoding="async" />
+    <div class="g-curtain g-far g-l"><div class="g-sway g-sway--back">${img(root, "tall-back-l", "g-img")}</div></div>
+    <div class="g-curtain g-far g-r"><div class="g-sway g-sway--back">${img(root, "tall-back-r", "g-img")}</div></div>
+    <div class="jp-mist"></div>
+    ${petals(12)}`;
+}
+
+export function groveFront(root, { hero, reveal }) {
+  const near = (side) =>
+    `<div class="g-curtain g-near g-${side}" aria-hidden="true"><div class="g-sway g-sway--a">${img(root, `tall-near-a-${side}`, "g-img", ' fetchpriority="high"')}</div><div class="g-sway g-sway--b">${img(root, `tall-near-b-${side}`, "g-img")}</div></div>`;
+  return `
+    <div class="reveal-wrap">${reveal}</div>
+    ${near("l")}
+    ${near("r")}
+    <img class="sakura sakura--right" src="${root}assets/img/scene/sakura.svg" alt="" width="320" height="180" decoding="async" aria-hidden="true" />
+    <img class="g-ground" src="${root}assets/img/scene/ground.svg" alt="" width="1200" height="200" decoding="async" aria-hidden="true" />
+    <div class="hero-wrap">${hero}</div>`;
+}
+
+/* A shorter, already-parted grove that frames a panel (events page). */
+export function groveLayers(root) {
   return `
     ${img(root, "sky", "g-sky", ' fetchpriority="high"')}
-    ${clouds()}
+    ${clouds(root)}
     <div class="g-curtain g-far g-l"><div class="g-sway g-sway--back">${img(root, "curtain-back-l", "g-img")}</div></div>
     <div class="g-curtain g-far g-r"><div class="g-sway g-sway--back">${img(root, "curtain-back-r", "g-img")}</div></div>
-    ${middle}
     <div class="jp-mist"></div>
     <div class="g-curtain g-near g-l"><div class="g-sway g-sway--a">${img(root, "curtain-near-a-l", "g-img", ' fetchpriority="high"')}</div><div class="g-sway g-sway--b">${img(root, "curtain-near-b-l", "g-img")}</div></div>
     <div class="g-curtain g-near g-r"><div class="g-sway g-sway--a">${img(root, "curtain-near-a-r", "g-img", ' fetchpriority="high"')}</div><div class="g-sway g-sway--b">${img(root, "curtain-near-b-r", "g-img")}</div></div>
@@ -44,16 +71,4 @@ export function groveLayers(root, { middle = "" } = {}) {
 
 export function shore(root) {
   return `<div class="shore" aria-hidden="true"><img src="${root}assets/img/scene/shore.svg" alt="" width="1200" height="360" loading="lazy" decoding="async" /></div>`;
-}
-
-// a few lily pads and koi drifting in the water behind the content (CSS-animated, GPU-only)
-export function pondDecor() {
-  const pads = [
-    [6, 4, 74, "#c9946c"], [80, 9, 56, "#8ea1a8"], [64, 22, 44, "#9a9a96"], [10, 33, 60, "#8ea1a8"],
-    [84, 46, 70, "#c9946c"], [4, 58, 50, "#9a9a96"], [72, 70, 58, "#8ea1a8"], [14, 84, 66, "#c9946c"], [78, 93, 48, "#9a9a96"],
-  ].map(([x, y, s, c]) => `<svg class="p-pad" style="left:${x}%;top:${y}%;width:${s}px;height:${s}px;color:${c}"><use href="#pad"/></svg>`).join("");
-  const koi = [
-    ["a", 12, 46], ["b", 41, 58], ["a", 67, 52], ["b", 88, 64],
-  ].map(([dir, top, dur], i) => `<div class="swimmer swimmer--${dir}" style="top:${top}%;animation-duration:${dur}s;animation-delay:-${i * 11}s"><svg class="swimmer__koi" viewBox="0 0 120 50"><use href="#koi"/></svg></div>`).join("");
-  return `<div class="pond-decor" aria-hidden="true">${pads}${koi}</div>`;
 }

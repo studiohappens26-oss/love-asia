@@ -25,7 +25,7 @@ export const BUSINESS = {
     country: "IN",
   },
   geo: { lat: 13.0676369, lng: 77.6482515 },
-  hours: { label: "Open daily, 12:00 PM – 11:00 PM", short: "12:00 PM – 11:00 PM", days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "12:00", closes: "23:00" },
+  hours: { label: "Open daily, 12:00 PM to 11:00 PM", short: "12 PM to 11 PM", days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "12:00", closes: "23:00" },
   priceRange: "₹₹",
   costForTwo: "₹1,000 for two (approx.)",
   capacity: 100,
@@ -113,7 +113,7 @@ export function head({ title, description, path, root, css = [], schema = [], og
   <meta property="og:image" content="${abs(image)}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Love Asia — sushi and Pan-Asian restaurant in Hennur, Bengaluru" />
+  <meta property="og:image:alt" content="Love Asia, a sushi and Pan-Asian restaurant in Hennur, Bengaluru" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${esc(title)}" />
   <meta name="twitter:description" content="${esc(description)}" />
@@ -145,7 +145,7 @@ export function siteHeader({ root, current }) {
     })
     .join("");
   return `<header class="site-header">
-  <a class="site-header__logo" href="${root}" aria-label="${esc(BUSINESS.name)} — home">${logoSvg()}</a>
+  <a class="site-header__logo" href="${root}" aria-label="${esc(BUSINESS.name)} home">${logoSvg()}</a>
   <nav class="site-nav" aria-label="Main">${links}</nav>
   <a class="site-header__call" href="tel:${BUSINESS.phoneE164}" aria-label="Call ${esc(BUSINESS.name)}">${ICON.phone}<span>Call</span></a>
 </header>`;
@@ -156,7 +156,7 @@ export function siteFooter({ root }) {
   return `<footer class="site-footer">
   <div class="site-footer__inner">
     <div class="site-footer__brand">
-      <a href="${root}" aria-label="${esc(BUSINESS.name)} — home">${logoSvg()}</a>
+      <a href="${root}" aria-label="${esc(BUSINESS.name)} home">${logoSvg()}</a>
       <p>${esc(BUSINESS.tagline)}.</p>
     </div>
     <div>
