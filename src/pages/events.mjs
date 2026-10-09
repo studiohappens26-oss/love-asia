@@ -48,7 +48,7 @@ ${siteHeader({ root, current: "events" })}
 
 <main id="main">
   <!-- the same grove as the home page, shorter: the bamboo parts as you scroll down to the pond -->
-  <section class="grove grove--short" id="top" aria-labelledby="ev-title" data-part=".7" data-pin=".6" data-len="1.6">
+  <section class="grove grove--short" id="top" aria-labelledby="ev-title" data-part=".6" data-pin=".5" data-len="1.5">
     <div class="grove__back" aria-hidden="true">${groveBack(root)}</div>
     <div class="grove__front">${groveFront(root, { hero: heroCard, reveal: "" })}</div>
   </section>

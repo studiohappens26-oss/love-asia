@@ -21,6 +21,17 @@
     // the bamboo sway, clouds and petals only run while the grove is on screen
     new IntersectionObserver(([e]) => grove.classList.toggle("is-paused", !e.isIntersecting)).observe(grove);
 
+    // on phones the bamboo holds still while your finger is scrolling (it resumes from
+    // the same lean when you stop), so the GPU has less to blend during the scroll
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      let still = 0, scrolling = false;
+      window.addEventListener("scroll", () => {
+        if (!scrolling) { scrolling = true; grove.classList.add("is-scrolling"); }
+        clearTimeout(still);
+        still = setTimeout(() => { scrolling = false; grove.classList.remove("is-scrolling"); }, 180);
+      }, { passive: true });
+    }
+
     const supported = window.CSS && CSS.supports("animation-timeline: scroll()");
     if (!supported) {
       const q = (s) => grove.querySelector(s);
@@ -29,7 +40,7 @@
       const hero = document.getElementById("hero"), reveal = document.getElementById("reveal");
       // grove lengths in screen heights (the same numbers as the CSS custom properties)
       const num = (k, d) => parseFloat(grove.dataset[k]) || d;
-      const PART = num("part", 1.15), PIN = num("pin", 1.45), LEN = num("len", 2.45);
+      const PART = num("part", 1.0), PIN = num("pin", 1.05), LEN = num("len", 2.05);
       let vh = window.innerHeight, lastY = -1, ticking = false;
 
       const update = () => {
@@ -53,7 +64,7 @@
         hero.style.opacity = (1 - h).toFixed(3);
         hero.style.translate = `0 ${(-h * vh * 0.1).toFixed(1)}px`;
         // the reveal card fades in as it rises into view
-        const r = clamp((p - 0.5) / 0.45);
+        const r = clamp((p - 0.38) / 0.45);
         reveal.style.opacity = r.toFixed(3);
         reveal.style.scale = (0.94 + r * 0.06).toFixed(4);
         reveal.style.translate = `0 ${((1 - r) * vh * 0.08).toFixed(1)}px`;

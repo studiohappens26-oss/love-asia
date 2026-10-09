@@ -124,9 +124,9 @@ body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
    stalks while they part. Everything moves at its own speed for depth.
    The parting and drift are CSS scroll-driven animations (run by the compositor);
    home.js does the same with a few lines of JS where those aren't supported. */
-.grove { --part: 115svh; --pin: 145svh; position: relative; height: 245vh; height: 245svh; background: #f3efe6; }
+.grove { --part: 100svh; --pin: 105svh; position: relative; height: 205vh; height: 205svh; background: #f3efe6; }
 /* events page: just the hero card, so a shorter walk through the grove */
-.grove--short { --part: 70svh; --pin: 60svh; height: 160vh; height: 160svh; }
+.grove--short { --part: 60svh; --pin: 50svh; height: 150vh; height: 150svh; }
 .grove__back { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; contain: layout paint; }
 .grove__front { position: absolute; inset: 0; overflow: hidden; overflow: clip; }
 .g-sky { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
@@ -157,7 +157,7 @@ body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
 @keyframes lean { from { transform: skewX(calc(var(--amp, 1.5deg) * -1)); } to { transform: skewX(var(--amp, 1.5deg)); } }
 .g-petals { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .jp-clouds { pointer-events: none; }
-.is-paused .g-sway, .is-paused .falling-leaf, .is-paused .falling-leaf__inner, .is-paused .sakura, .is-paused .kumo { animation-play-state: paused; }
+.is-scrolling .g-sway, .is-paused .g-sway, .is-paused .falling-leaf, .is-paused .falling-leaf__inner, .is-paused .sakura, .is-paused .kumo { animation-play-state: paused; }
 .g-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .g-l .g-img { object-position: right bottom; }
 .g-r .g-img { object-position: left bottom; }
@@ -175,7 +175,7 @@ body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
   pointer-events: none;
 }
 .hero-wrap { top: 0; }
-.reveal-wrap { top: 110vh; top: 110svh; }
+.reveal-wrap { top: 95vh; top: 95svh; }
 .hero-card, .reveal-card {
   position: relative;
   width: min(100%, 540px);
@@ -278,7 +278,9 @@ main, .site-footer { position: relative; z-index: 1; }
 }
 .pond-bg.is-idle { visibility: hidden; }
 .pond-bg:not(.is-live) .caustic { animation-play-state: paused; }
-.pond-area { position: relative; padding: 0 0 10vh; }
+/* overflow-x: clip (not hidden) so the drifting kanji's tall glyph boxes can't widen the page,
+   without making this a scroll container (that would break sticky and the scroll timelines) */
+.pond-area { position: relative; padding: 0 0 10vh; overflow-x: hidden; overflow-x: clip; }
 
 /* big seal kanji drifting behind each section, at their own pace */
 .block__kanji {
