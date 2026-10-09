@@ -18,7 +18,7 @@
   --hair-2: rgba(31, 30, 28, 0.07);
   --red: #d6232a;
   --veg: #2f7d3a;
-  --nonveg: #a3301e;
+  --nonveg: #8a4a1f; /* FSSAI non-veg brown */
   --sage: #56664c;
 
   --panel: rgba(253, 251, 247, 0.93);
@@ -65,18 +65,18 @@ button { font: inherit; color: inherit; }
   display: inline-grid;
   place-items: center;
   flex: none;
-  width: 14px;
-  height: 14px;
-  border: 1.5px solid currentColor;
-  border-radius: 2px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-radius: 3px;
   background: #fff;
   vertical-align: -2px;
 }
 .mark::after { content: ""; display: block; }
 .mark--veg { color: var(--veg); }
-.mark--veg::after { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.mark--veg::after { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .mark--nonveg { color: var(--nonveg); }
-.mark--nonveg::after { width: 8px; height: 7px; background: currentColor; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.mark--nonveg::after { width: 9px; height: 8px; margin-top: -1px; background: currentColor; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 .mark--mixed { color: #8a857d; }
 .mark--mixed::after { width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(90deg, var(--veg) 50%, var(--nonveg) 50%); }
 
@@ -419,7 +419,7 @@ body.is-landing .landing { transition: opacity .5s var(--ease), transform .5s va
   transition: background .3s var(--ease), color .3s var(--ease);
 }
 .mode-switch a { text-decoration: none; }
-.mode-switch a .mark { width: 12px; height: 12px; }
+.mode-switch a .mark { width: 14px; height: 14px; border-width: 1.8px; }
 .mode-switch a .mark::after { transform: scale(.8); }
 .mode-switch a[aria-current="page"] { background: var(--ink); color: var(--paper-hi); }
 @media (max-width: 360px) { .mode-switch a { padding: 6px 8px; font-size: .72rem; } }
@@ -602,7 +602,7 @@ div.dish__head { cursor: default; }
   color: var(--ink-2);
   white-space: nowrap;
 }
-.pill .mark { width: 11px; height: 11px; border-width: 1.3px; }
+.pill .mark { width: 13px; height: 13px; border-width: 1.6px; }
 .pill .mark::after { transform: scale(.75); }
 .pill b { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
 .dish__tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }

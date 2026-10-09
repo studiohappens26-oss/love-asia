@@ -40,7 +40,7 @@
       const hero = document.getElementById("hero"), reveal = document.getElementById("reveal");
       // grove lengths in screen heights (the same numbers as the CSS custom properties)
       const num = (k, d) => parseFloat(grove.dataset[k]) || d;
-      const PART = num("part", 1.0), PIN = num("pin", 1.05), LEN = num("len", 2.05);
+      const PART = num("part", 0.95), PIN = num("pin", 0.95), LEN = num("len", 1.95);
       let vh = window.innerHeight, lastY = -1, ticking = false;
 
       const update = () => {
@@ -64,7 +64,7 @@
         hero.style.opacity = (1 - h).toFixed(3);
         hero.style.translate = `0 ${(-h * vh * 0.1).toFixed(1)}px`;
         // the reveal card fades in as it rises into view
-        const r = clamp((p - 0.38) / 0.45);
+        const r = clamp((p - 0.45) / 0.45);
         reveal.style.opacity = r.toFixed(3);
         reveal.style.scale = (0.94 + r * 0.06).toFixed(4);
         reveal.style.translate = `0 ${((1 - r) * vh * 0.08).toFixed(1)}px`;

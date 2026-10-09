@@ -4,15 +4,18 @@
  * koi pond behind the page shows through it; scrolling zooms into the pond until the
  * water fills the screen (see .dive in site.css and garden.js).
  *
- * viewBox 1600×1100. The pond is centred at (800, 650), 59.1% of the height, which is
- * where the image is anchored and zoomed from. Phones see roughly x 545–1055, so
+ * Drawn on a 1600×1100 grid, shown from y = 120 down (1600×980). The pond is centred at
+ * (800, 650): 54.1% of the picture's height, which is where it's anchored and zoomed from. Phones see roughly x 545–1055, so
  * everything that matters sits around the pond.
  */
 import { pine } from "./architecture.mjs";
 import { f, rng, smooth, rock, shrub, lantern, iris, grass } from "./garden-parts.mjs";
 
 const W = 1600, H = 1100;
-export const POND = { cx: 800, cy: 650, rx: 238, ry: 140, w: W, h: H };
+// the picture starts this far down the drawing (less empty mist above the fence)
+const TOP = 120;
+const PCY = 650; // pond centre in drawing units
+export const POND = { cx: 800, cy: PCY - TOP, rx: 238, ry: 140, w: W, h: H - TOP };
 
 // an organic, slightly kidney-shaped pond outline (closed)
 function pondPoints() {
@@ -21,7 +24,7 @@ function pondPoints() {
   for (let i = 0; i < n; i++) {
     const a = (i / n) * Math.PI * 2;
     const k = 1 + 0.07 * Math.sin(2 * a + 0.6) + 0.05 * Math.sin(3 * a + 1.9);
-    pts.push([POND.cx + Math.cos(a) * POND.rx * k, POND.cy + Math.sin(a) * POND.ry * k]);
+    pts.push([POND.cx + Math.cos(a) * POND.rx * k, PCY + Math.sin(a) * POND.ry * k]);
   }
   return pts;
 }
@@ -31,7 +34,7 @@ const closed = (pts) => smooth([...pts, pts[0], pts[1]]).replace(/^M[^C]+C/, `M$
 export function pondInnerRadii() {
   let rx = Infinity, ry = Infinity;
   for (const [x, y] of pondPoints()) {
-    const dx = Math.abs(x - POND.cx), dy = Math.abs(y - POND.cy);
+    const dx = Math.abs(x - POND.cx), dy = Math.abs(y - PCY);
     if (dy < POND.ry * 0.3) rx = Math.min(rx, dx);
     if (dx < POND.rx * 0.3) ry = Math.min(ry, dy);
   }
@@ -73,7 +76,7 @@ export function gardenSvg() {
   let moss = "";
   for (let i = 0; i < 90; i++) {
     const x = r() * W, y = 300 + r() * (H - 300);
-    const dx = (x - POND.cx) / (POND.rx + 30), dy = (y - POND.cy) / (POND.ry + 30);
+    const dx = (x - POND.cx) / (POND.rx + 30), dy = (y - PCY) / (POND.ry + 30);
     if (dx * dx + dy * dy < 1) continue;
     moss += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(10 + r() * 34)}" ry="${f(4 + r() * 9)}" fill="${r() < 0.5 ? "#c4d2ae" : "#e6ecda"}" fill-opacity="${(0.25 + r() * 0.3).toFixed(2)}"/>`;
   }
@@ -109,17 +112,17 @@ export function gardenSvg() {
   let petals = "";
   for (let i = 0; i < 26; i++) {
     const x = 300 + r() * 1000, y = 380 + r() * 680;
-    const dx = (x - POND.cx) / (POND.rx + 20), dy = (y - POND.cy) / (POND.ry + 20);
+    const dx = (x - POND.cx) / (POND.rx + 20), dy = (y - PCY) / (POND.ry + 20);
     if (dx * dx + dy * dy < 1) continue;
     petals += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="3.2" ry="2" transform="rotate(${Math.round(r() * 180)} ${f(x)} ${f(y)})" fill="${r() < 0.5 ? "#f2b9c3" : "#f6ccd3"}"/>`;
   }
 
   const lx = 1010, lb = 700; // lantern standing at the right edge of the water
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 ${TOP} ${W} ${H - TOP}">
 <defs>
   <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#efebe2"/><stop offset=".2" stop-color="#ebebdf"/><stop offset=".32" stop-color="#e2e9d4"/><stop offset=".65" stop-color="#d6e1c4"/><stop offset="1" stop-color="#c8d6b2"/></linearGradient>
-  <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#efebe2"/><stop offset="1" stop-color="#efebe2" stop-opacity="0"/></linearGradient>
+  <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox"><stop offset="0" stop-color="#efebe2"/><stop offset="1" stop-color="#efebe2" stop-opacity="0"/></linearGradient>
   <linearGradient id="post" x1="0" x2="1"><stop offset="0" stop-color="#c7b08c"/><stop offset="1" stop-color="#a48a66"/></linearGradient>
   <linearGradient id="rail" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ddc9a6"/><stop offset="1" stop-color="#b79d78"/></linearGradient>
   <radialGradient id="leafy" cx=".4" cy=".25" r=".85"><stop offset="0" stop-color="#c6d6b0"/><stop offset=".55" stop-color="#9fb68a"/><stop offset="1" stop-color="#7f9a6e"/></radialGradient>
@@ -131,7 +134,7 @@ export function gardenSvg() {
 </defs>
 <path d="M0 0H${W}V${H}H0Z${pond}" fill="url(#ground)" fill-rule="evenodd"/>
 ${bamboo}
-<rect width="${W}" height="140" fill="url(#mist)"/>
+<rect y="${TOP}" width="${W}" height="70" fill="url(#mist)"/>
 <g fill="#b6c6a2">${hedge}</g>
 ${fence(296)}
 ${moss}
