@@ -120,5 +120,51 @@
       if (countEl) countEl.textContent = fed === 1 ? "Here they come!" : `${fed} pinches of food`;
       if (!reduced && fed % 4 === 0) setTimeout(() => pond.leap(), 600);
     }, { passive: true });
+
+    /* ------------------------- diving into the garden pond ------------------------- */
+    // The garden picture is pinned and zoomed in on its pond (a hole that shows the live
+    // koi pond behind the page) until the water fills the screen. The zoom itself is a CSS
+    // scroll-driven animation; this works out how far to zoom for this screen, does the
+    // zoom in browsers without scroll-driven animations, and calls the koi over to the pond.
+    const dive = document.querySelector(".dive");
+    if (dive) {
+      const stage = dive.querySelector(".dive__stage"), img = dive.querySelector(".dive__garden"), sheen = dive.querySelector(".dive__sheen");
+      const [, cy, rx, ry, iw, ih] = img.dataset.pond.split(" ").map(Number);
+      const OY = cy / ih; // the picture is anchored and zoomed at the pond's centre
+      let S = 7;
+      const fit = () => {
+        const vw = stage.clientWidth, vh = stage.clientHeight;
+        const k = Math.max(vw / iw, vh / ih); // object-fit: cover
+        // smallest zoom at which the pond's inner ellipse covers the farthest screen corner
+        S = Math.hypot(vw / 2 / (rx * k), Math.max(OY, 1 - OY) * vh / (ry * k)) * 1.06;
+        dive.style.setProperty("--dive-scale", S.toFixed(2));
+        // the water starts this much smaller and grows to full size as you go in
+        document.documentElement.style.setProperty("--pond-from", (1 / (S * 0.55)).toFixed(3));
+      };
+      fit();
+      window.addEventListener("resize", fit);
+
+      const scrollDriven = window.CSS && CSS.supports("animation-timeline: view()");
+      let lured = false, ticking = false;
+      const onScroll = () => {
+        ticking = false;
+        const top = dive.getBoundingClientRect().top, vh = window.innerHeight;
+        // the koi come to the pond as you arrive at it
+        if (top > vh) lured = false;
+        else if (!lured && top <= 0 && pond) { lured = true; pond.addRipple(stage.clientWidth / 2, OY * stage.clientHeight, true); }
+        if (!scrollDriven) {
+          const p = clamp(-top / ((dive.offsetHeight - vh) * 0.82));
+          const z = 1 + (S - 1) * Math.pow(p, 2.2);
+          img.style.transform = `scale(${z.toFixed(3)})`;
+          const koi = document.getElementById("pond");
+          koi.style.transformOrigin = `50% ${(OY * stage.clientHeight).toFixed(0)}px`;
+          koi.style.transform = p >= 1 ? "" : `scale(${Math.min(1, z / (S * 0.55)).toFixed(3)})`;
+          const q = clamp((-top / (dive.offsetHeight - vh) - 0.4) / 0.6);
+          sheen.style.opacity = (q < 0.55 ? q / 0.55 : (1 - q) / 0.45) * 0.55;
+        }
+      };
+      window.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+      onScroll();
+    }
   }
 })();

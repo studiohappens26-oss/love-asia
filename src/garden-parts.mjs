@@ -1,19 +1,13 @@
 /*
- * The bank between the bamboo grove and the koi pond, as a Japanese garden edge:
- * moss, clipped azalea shrubs (karikomi), a pine leaning over the water, a snow-viewing
- * stone lantern (yukimi-doro), natural rocks, a pebble beach (suhama), irises and grasses.
- * Nothing is painted below the waterline except soft reflections and ripples, so the
- * live koi pond behind the page shows straight through and there is no seam.
- *
- * viewBox 1600×480. The band above SHORE_TOP is transparent and overlaps the bottom of the
- * grove, so there's no seam there either. Phones see roughly the middle 800 units
- * (x 400–1200), so the lantern, pine, beach, rocks and irises sit there.
+ * Garden pieces drawn as SVG markup: natural rocks with ripple rings, clipped azalea
+ * shrubs (karikomi), a snow-viewing stone lantern (yukimi-doro), irises and grasses.
+ * Used by the garden pond scene (src/garden-pond.mjs).
  */
 import { pine } from "./architecture.mjs";
 
-const f = (n) => (Math.round(n * 10) / 10).toString();
+export const f = (n) => (Math.round(n * 10) / 10).toString();
 
-function rng(seed) {
+export function rng(seed) {
   return () => {
     seed = (seed + 0x6d2b79f5) | 0;
     let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
@@ -23,7 +17,7 @@ function rng(seed) {
 }
 
 // smooth curve through points (Catmull-Rom → cubic Bézier)
-function smooth(pts) {
+export function smooth(pts) {
   let d = `M${f(pts[0][0])} ${f(pts[0][1])}`;
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
@@ -32,23 +26,7 @@ function smooth(pts) {
   return d;
 }
 
-const W = 1600, H = 480;
-// the land starts this far down; the band above is transparent and overlaps the grove's ground
-export const SHORE_TOP = 90;
-// the waterline, with a shallow cove for the pebble beach (x 640–880)
-const SHORE = [[-20, 250], [80, 258], [180, 246], [280, 260], [380, 254], [470, 262], [560, 262], [640, 274], [700, 296], [760, 306], [820, 302], [880, 284], [940, 266], [1020, 262], [1100, 270], [1180, 258], [1280, 252], [1380, 262], [1480, 250], [1560, 256], [1620, 252]];
-// the soft top edge of the bank
-const TOPLINE = [[-20, 96], [140, 88], [320, 100], [520, 90], [720, 98], [900, 86], [1100, 96], [1300, 88], [1480, 98], [1620, 92]];
-function waterY(x) {
-  for (let i = 0; i < SHORE.length - 1; i++) {
-    const [x0, y0] = SHORE[i], [x1, y1] = SHORE[i + 1];
-    if (x >= x0 && x <= x1) { const t = (x - x0) / (x1 - x0); return y0 + (y1 - y0) * (t * t * (3 - 2 * t)); }
-  }
-  return 260;
-}
-
-// a natural rock: irregular, flat-bottomed, lit from the upper left
-function rock(r, cx, base, w, h, moss) {
+export function rock(r, cx, base, w, h, moss) {
   const pts = [];
   const n = 9;
   for (let i = 0; i <= n; i++) {
@@ -70,7 +48,7 @@ function rock(r, cx, base, w, h, moss) {
 }
 
 // clipped azalea shrub: overlapping domes with a fine ink outline, optional blossoms
-function shrub(r, cx, base, w, blossoms, id) {
+export function shrub(r, cx, base, w, blossoms, id) {
   const h = w * 0.42;
   let shapes = "";
   const n = 4 + Math.floor(w / 60);
@@ -99,7 +77,7 @@ function shrub(r, cx, base, w, blossoms, id) {
 
 // snow-viewing stone lantern (yukimi-doro): curved legs, platform, fire box with a warm
 // window, a very wide umbrella roof and a jewel on top
-function lantern(x, base, s) {
+export function lantern(x, base, s) {
   const S = (n) => n * s;
   let o = "";
   // three curved legs
@@ -122,7 +100,7 @@ function lantern(x, base, s) {
 }
 
 // Japanese iris clump: slender blades and a few violet flowers
-function iris(r, x, base, s) {
+export function iris(r, x, base, s) {
   let o = "";
   for (let i = 0; i < 9; i++) {
     const lean = (i - 4) * 4 + (r() - 0.5) * 6, len = (34 + r() * 26) * s, w = 2.4 * s;
@@ -140,7 +118,7 @@ function iris(r, x, base, s) {
   return o;
 }
 
-function grass(r, x, base) {
+export function grass(r, x, base) {
   let o = "";
   const n = 5 + Math.floor(r() * 3);
   for (let i = 0; i < n; i++) {
@@ -148,91 +126,4 @@ function grass(r, x, base) {
     o += `<path d="M${f(x)} ${f(base)}Q${f(x + Math.sin(a) * len * 0.4)} ${f(base - len * 0.6)} ${f(x + Math.sin(a) * len)} ${f(base - Math.cos(a) * len)}"/>`;
   }
   return o;
-}
-
-export function shoreSvg() {
-  const r = rng(41);
-  const bankEdge = smooth(SHORE);
-  const bank = smooth(TOPLINE) + `L${W + 20} ${SHORE[SHORE.length - 1][1]}` + smooth([...SHORE].reverse()).replace(/^M[^C]+/, "") + "Z";
-
-  // watercolour moss texture on the bank
-  let moss = "";
-  for (let i = 0; i < 70; i++) {
-    const x = r() * W, yMax = waterY(x) - 14, y = 112 + r() * (yMax - 112);
-    moss += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(8 + r() * 26)}" ry="${f(3 + r() * 7)}" fill="${r() < 0.5 ? "#c7d4b2" : "#e7eddc"}" fill-opacity="${(0.25 + r() * 0.3).toFixed(2)}"/>`;
-  }
-
-  // pebble beach in the cove, a few continuing under the water
-  let pebbles = "";
-  const tones = ["#ece8e0", "#dcd7cd", "#cfcac0", "#f4f1eb", "#c4bfb5"];
-  for (let i = 0; i < 150; i++) {
-    const x = 680 + r() * 220;
-    const wy = waterY(x);
-    const y = wy - 34 + Math.pow(r(), 0.7) * 50;
-    const under = y > wy - 1;
-    const rx = 2.6 + r() * 4.2;
-    pebbles += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(rx)}" ry="${f(rx * (0.55 + r() * 0.2))}" fill="${tones[Math.floor(r() * tones.length)]}"${under ? ' fill-opacity=".38"' : ""}/>`;
-  }
-
-  // shrubs along the back of the bank
-  const shrubs = [
-    [60, 166, 150, 0], [250, 152, 124, 22], [600, 160, 112, 0], [880, 150, 160, 26], [1150, 162, 128, 0], [1340, 152, 170, 28], [1545, 164, 120, 0],
-  ].map(([x, y, w, b], i) => shrub(r, x, y, w, b, `sh${i}`)).join("");
-
-  // reflections of the lantern and the shrubs, very faint
-  const reflections = `<g opacity=".14" fill="#5d7275">` +
-    `<g transform="translate(0 ${f(2 * 284)}) scale(1 -1)">${lantern(1010, 284, 1.18)}</g>` +
-    `</g>`;
-
-  const rocks = [
-    [470, 266, 92, 40, true], [548, 268, 44, 20, false], [935, 276, 58, 26, false], [1050, 284, 116, 30, true], [1150, 276, 66, 30, false], [1395, 266, 104, 44, true], [1460, 270, 40, 18, false], [255, 264, 52, 22, false],
-  ].map(([x, b, w, h, m]) => rock(r, x, b, w, h, m)).join("");
-
-  let grasses = "";
-  for (const x of [150, 210, 360, 420, 600, 1180, 1260, 1300, 1340, 1500, 1560]) grasses += grass(r, x, waterY(x) - 2);
-  // a few tufts out on the moss
-  for (const [x, y] of [[120, 214], [330, 200], [980, 214], [1250, 206], [1470, 210]]) grasses += grass(r, x, y);
-
-  // stepping stones (tobi-ishi) across the moss down to the pebble beach
-  let steps = "";
-  for (const [x, y, rx] of [[330, 186], [392, 204], [448, 222], [512, 236], [584, 248], [652, 262]].map(([x, y], i) => [x, y, 19 - i * 0.8])) {
-    steps += `<ellipse cx="${f(x + 1)}" cy="${f(y + 2.4)}" rx="${f(rx)}" ry="${f(rx * 0.36)}" fill="#a4b392" fill-opacity=".6"/>`;
-    steps += `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(rx)}" ry="${f(rx * 0.36)}" fill="url(#stone)"/>`;
-    steps += `<ellipse cx="${f(x - rx * 0.2)}" cy="${f(y - rx * 0.08)}" rx="${f(rx * 0.55)}" ry="${f(rx * 0.16)}" fill="#f3f0ea" fill-opacity=".6"/>`;
-  }
-
-  let ripples = "";
-  for (let i = 0; i < 9; i++) {
-    const x = r() * W, y = waterY(x) + 30 + r() * 140, w = 20 + r() * 50;
-    ripples += `<path d="M${f(x - w)} ${f(y)}Q${f(x)} ${f(y - 3)} ${f(x + w)} ${f(y)}" stroke="#fff" stroke-opacity=".6" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
-  }
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMin slice">
-<defs>
-  <linearGradient id="bank" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8ecdc"/><stop offset=".35" stop-color="#e0e8d1"/><stop offset=".8" stop-color="#d3dfc1"/><stop offset="1" stop-color="#c8d6b3"/></linearGradient>
-  <linearGradient id="haze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ebeee0" stop-opacity="0"/><stop offset="1" stop-color="#e8ecdc"/></linearGradient>
-  <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fa7a8" stop-opacity=".34"/><stop offset="1" stop-color="#8fa7a8" stop-opacity="0"/></linearGradient>
-  <radialGradient id="leafy" cx=".4" cy=".25" r=".85"><stop offset="0" stop-color="#c6d6b0"/><stop offset=".55" stop-color="#9fb68a"/><stop offset="1" stop-color="#7f9a6e"/></radialGradient>
-  <linearGradient id="stone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6e2da"/><stop offset=".5" stop-color="#c9c4ba"/><stop offset="1" stop-color="#a9a397"/></linearGradient>
-  <linearGradient id="lant" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d4cfc5"/><stop offset=".55" stop-color="#bdb7ab"/><stop offset="1" stop-color="#9f998d"/></linearGradient>
-  <radialGradient id="glow"><stop offset="0" stop-color="#fbe3a8"/><stop offset="1" stop-color="#f0c27a"/></radialGradient>
-  <radialGradient id="refl"><stop offset="0" stop-color="#7f9799" stop-opacity=".35"/><stop offset="1" stop-color="#7f9799" stop-opacity="0"/></radialGradient>
-</defs>
-<path d="${bankEdge}L${W + 20} ${H}H-20Z" fill="url(#shade)" transform="translate(0 2)"/>
-${reflections}
-<rect x="-20" y="${SHORE_TOP - 50}" width="${W + 40}" height="70" fill="url(#haze)"/>
-<path d="${bank}" fill="url(#bank)"/>
-${moss}
-${steps}
-<g fill="#6b8763">${pine(560, 212, 2.5, 1, "#675e55")}</g>
-${shrubs}
-<path d="${bankEdge}" fill="none" stroke="#a9b99c" stroke-opacity=".55" stroke-width="5"/>
-<path d="${bankEdge}" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.6" transform="translate(0 4)"/>
-${pebbles}
-${rocks}
-<g fill="url(#lant)" stroke="#8d877b" stroke-opacity=".5" stroke-width="1">${lantern(1010, 284, 1.18)}</g>
-${iris(r, 640, 266, 1.05)}${iris(r, 1225, 262, 0.95)}
-<g stroke="#8fa67a" stroke-width="1.4" fill="none" stroke-linecap="round">${grasses}</g>
-${ripples}
-</svg>`;
 }

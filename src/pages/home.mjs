@@ -1,6 +1,6 @@
 import { BUSINESS, esc, head, logoSvg, siteHeader, siteFooter, restaurantSchema, faqSchema, faqHtml, fullAddress, waLink, ICON, abs } from "../site.mjs";
 import { choiceTiles, SVG_DEFS } from "./menu.mjs";
-import { groveBack, groveFront, shore } from "./scene.mjs";
+import { groveBack, groveFront, dive } from "./scene.mjs";
 
 export const HOME_FAQ = [
   { q: "Where is Love Asia in Bengaluru?", a: `You'll find us at ${esc(fullAddress())}, in Kothanur near Hennur. <a href="${BUSINESS.maps}" rel="noopener" target="_blank">Get directions</a>.` },
@@ -84,7 +84,7 @@ ${siteHeader({ root, current: "home" })}
   </section>
 
   <div class="pond-area" id="pond-area">
-    ${shore(root)}
+    ${dive(root)}
     <section class="block" id="about" aria-labelledby="about-title">
       <span class="block__kanji" aria-hidden="true" data-k="竹"></span>
       <div class="panel">

@@ -12,7 +12,7 @@ import { SITE_URL, BASE_PATH, head, logoSvg, siteHeader, siteFooter } from "./si
 import { homePage } from "./pages/home.mjs";
 import { chooserPage, menuPage } from "./pages/menu.mjs";
 import { eventsPage } from "./pages/events.mjs";
-import { shoreSvg } from "./shore.mjs";
+import { gardenSvg } from "./garden-pond.mjs";
 import { skySvg, hillsSvg, cloudSvg, curtainSvg, sakuraSvg } from "./scenery.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -101,7 +101,7 @@ ${pages.map(([, , p, pr, cf]) => `  <url><loc>${SITE_URL}/${p}</loc><lastmod>${t
     "tall-near-a-r-m": curtainSvg("r", "near", 2600, 320),
     "tall-near-b-r-m": EMPTY_SVG,
     sakura: sakuraSvg(),
-    shore: shoreSvg(),
+    garden: gardenSvg(),
   };
   for (const [name, svg] of Object.entries(scene)) write(`assets/img/scene/${name}.svg`, svg);
   console.log(`Done → ${OUT}`);

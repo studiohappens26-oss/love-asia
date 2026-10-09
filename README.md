@@ -10,11 +10,11 @@ page into plain HTML, so search engines can read all the content and every dish.
 
 | URL | What it is |
 |---|---|
-| `/` | Home. You scroll down a bamboo grove like a camera panning down the stalks. The tall foreground bamboo parts as it scrolls past, while the sky, temples, pagoda and clouds drift behind at slower speeds. Then you pass the ground and a stone pond edge into the water, where live koi swim behind every section (tap the water to feed them). Sections cover the place, the menu (Veg / Non-Veg tiles), signature dishes, feeding the koi, events, why guests come back, visit info, and FAQs. |
+| `/` | Home. You scroll down a bamboo grove like a camera panning down the stalks. The tall foreground bamboo parts as it scrolls past, while the sky, temples, pagoda and clouds drift behind at slower speeds. Then you step into a moss garden with a koi pond in the middle, and scrolling dives into the pond until the water fills the screen. From there, live koi swim behind every section (tap the water to feed them). Sections cover the place, the menu (Veg / Non-Veg tiles), signature dishes, feeding the koi, events, why guests come back, visit info, and FAQs. |
 | `/menu/` | The Veg / Non-Veg chooser. |
 | `/non-veg/` | The full menu (veg + non-veg) over the animated koi pond. |
 | `/veg/` | The pure-vegetarian menu in the bamboo grove. |
-| `/events/` | Birthday parties and events, in the same scenery as home: a shorter bamboo grove, the pond bank and live koi behind every section. 100+ guests, buffets, and an enquiry form that opens WhatsApp. |
+| `/events/` | Birthday parties and events, in the same scenery as home: a shorter bamboo grove, the dive into the garden pond, and live koi behind every section. 100+ guests, buffets, and an enquiry form that opens WhatsApp. |
 
 Old QR codes that point at `/#veg` or `/#nonveg` still work; they redirect to the new pages.
 
@@ -33,7 +33,7 @@ Old QR codes that point at `/#veg` or `/#nonveg` still work; they redirect to th
   and the koi pond script only loads when you reach it. Lighthouse (mobile): 98 to 100 in every category.
 - Motion: the grove's parting and parallax are CSS scroll-driven animations, run by the compositor, with a
   small JS fallback in `assets/js/garden.js` (shared by the home and events pages). The temples, pagoda, torii, farmhouses, pines and clouds
-  are drawn in `src/architecture.mjs`. On desktop (mouse or trackpad), scrolling is smoothed with
+  are drawn in `src/architecture.mjs`; the garden pond scene is `src/garden-pond.mjs`. On desktop (mouse or trackpad), scrolling is smoothed with
   [Lenis](https://github.com/darkroomengineering/lenis) (`assets/vendor/`, MIT). Phones keep native scrolling,
   and Lenis isn't downloaded there.
 

@@ -1,4 +1,4 @@
-import { groveBack, groveFront, shore } from "./scene.mjs";
+import { groveBack, groveFront, dive } from "./scene.mjs";
 import { BUSINESS, esc, head, siteHeader, siteFooter, restaurantSchema, breadcrumbSchema, faqSchema, faqHtml, waLink, ICON, fullAddress } from "../site.mjs";
 
 export const EVENTS_FAQ = [
@@ -54,7 +54,7 @@ ${siteHeader({ root, current: "events" })}
   </section>
 
   <div class="pond-area" id="pond-area">
-    ${shore(root)}
+    ${dive(root)}
 
     <section class="block" aria-labelledby="glance-title">
       <span class="block__kanji" aria-hidden="true" data-k="祝"></span>
