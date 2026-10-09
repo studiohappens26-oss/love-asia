@@ -64,9 +64,13 @@
   // backgrounds
   let pond = null;
   if (mode === "nonveg" && window.KoiPond) {
-    pond = window.KoiPond($("#pond"), $("#caustics"));
-    pond.start();
-    setTimeout(() => pond.leap(), 900);
+    // phones get the lighter pond the home page uses (fewer koi, 1× canvas), and it starts
+    // drawing once the page has finished loading so the menu is ready to use first
+    const small = window.innerWidth <= 900;
+    pond = window.KoiPond($("#pond"), $("#caustics"), small ? { maxDpr: 1, maxKoi: 4, petals: 6 } : {});
+    const go = () => { pond.start(); setTimeout(() => pond.leap(), 900); };
+    if (document.readyState === "complete") setTimeout(go, 300);
+    else window.addEventListener("load", () => setTimeout(go, 300), { once: true });
     document.addEventListener("pointerdown", (e) => {
       if (e.target.closest("button, a, input, .topbar, .dish, .sheet, .fab")) return;
       pond.addRipple(e.clientX, e.clientY, true);
