@@ -564,7 +564,7 @@
 
   /* ------------------------------ Pond ------------------------------ */
   // opts.contained: size to the canvas's parent box (e.g. a card) instead of the viewport
-  // opts.maxDpr / maxKoi / petals: lighter settings (the home page pond sits behind content)
+  // opts.maxDpr / maxKoi / pads / petals / noFly / unit(W, H): lighter settings for small or background ponds
   function KoiPond(canvas, causticEl, opts = {}) {
     const contained = !!opts.contained;
     const ctx = canvas.getContext("2d");
@@ -591,12 +591,12 @@
       canvas.style.width = W + "px"; canvas.style.height = H + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const newUnit = contained ? Math.max(70, Math.min(120, Math.min(W, H) * 0.3)) : Math.max(85, Math.min(150, Math.min(W, H) * 0.27));
+      const newUnit = opts.unit ? opts.unit(W, H) : contained ? Math.max(70, Math.min(120, Math.min(W, H) * 0.3)) : Math.max(85, Math.min(150, Math.min(W, H) * 0.27));
       if (!koi.length || Math.abs(newUnit - unit) > 20) {
         unit = newUnit;
         const area = W * H;
-        koi = Array.from({ length: Math.max(3, Math.min(opts.maxKoi || 6, Math.round(area / 30000))) }, () => new Koi(W, H, unit));
-        pads = Array.from({ length: contained ? 3 : W > 700 ? 6 : 4 }, () => new LilyPad(W, H, unit));
+        koi = Array.from({ length: Math.min(opts.maxKoi || 6, Math.max(3, Math.round(area / 30000))) }, () => new Koi(W, H, unit));
+        pads = Array.from({ length: opts.pads != null ? opts.pads : contained ? 3 : W > 700 ? 6 : 4 }, () => new LilyPad(W, H, unit));
         petals = Array.from({ length: contained ? 5 : opts.petals || (W > 700 ? 12 : 8) }, () => new Petal(W, H));
       }
       if (!reduced) frame(performance.now(), true);
@@ -741,7 +741,7 @@
 
       // an occasional dragonfly visit
       if (!once) {
-        if (!fly && t > nextFly) fly = new Dragonfly(W, H);
+        if (!fly && !opts.noFly && t > nextFly) fly = new Dragonfly(W, H);
         if (fly) {
           fly.update(dt, W, H);
           if (fly.done) { fly = null; nextFly = t + rand(1500, 2700); }

@@ -36,10 +36,10 @@
         const p = y / vh; // progress in screen heights
         const part = ease(clamp(p / 1.15));
         const drift = clamp(p / 1.45);
-        nearL.style.translate = `${(-part * 88).toFixed(2)}% 0`;
-        nearR.style.translate = `${(part * 88).toFixed(2)}% 0`;
-        farL.style.translate = `${(-part * 80).toFixed(2)}% 0`;
-        farR.style.translate = `${(part * 80).toFixed(2)}% 0`;
+        nearL.style.translate = `${(-part * 85).toFixed(2)}% 0`;
+        nearR.style.translate = `${(part * 85).toFixed(2)}% 0`;
+        farL.style.translate = `${(-part * 76).toFixed(2)}% 0`;
+        farR.style.translate = `${(part * 76).toFixed(2)}% 0`;
         farL.style.transform = farR.style.transform = `translateY(${(-drift * 30).toFixed(2)}%)`;
         hills.style.transform = `translateY(${(-drift * 20).toFixed(2)}%)`;
         sky.style.transform = `translateY(${(-drift * 5).toFixed(2)}%)`;

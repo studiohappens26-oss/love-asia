@@ -50,7 +50,6 @@ export function groveFront(root, { hero, reveal }) {
     ${near("l")}
     ${near("r")}
     <img class="sakura sakura--right" src="${root}assets/img/scene/sakura.svg" alt="" width="320" height="180" decoding="async" aria-hidden="true" />
-    <img class="g-ground" src="${root}assets/img/scene/ground.svg" alt="" width="1200" height="200" decoding="async" aria-hidden="true" />
     <div class="hero-wrap">${hero}</div>`;
 }
 
@@ -70,5 +69,5 @@ export function groveLayers(root) {
 }
 
 export function shore(root) {
-  return `<div class="shore" aria-hidden="true"><img src="${root}assets/img/scene/shore.svg" alt="" width="1200" height="360" loading="lazy" decoding="async" /></div>`;
+  return `<div class="shore" aria-hidden="true"><img src="${root}assets/img/scene/shore.svg" alt="" width="1600" height="440" loading="lazy" decoding="async" /></div>`;
 }

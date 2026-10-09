@@ -329,6 +329,11 @@ body.is-landing .landing { transition: opacity .5s var(--ease), transform .5s va
 }
 
 /* mini pond */
+.mini-koi { position: absolute; inset: 0; display: block; opacity: 0; transition: opacity .8s var(--ease); pointer-events: none; }
+.choice.is-live .mini-koi { opacity: 1; }
+.koi-orbit, .mini-pad, .mini-ripple { transition: opacity .8s var(--ease); }
+.choice.is-live .koi-orbit, .choice.is-live .mini-pad { opacity: 0; animation-play-state: paused; }
+.choice.is-live .mini-ripple { animation: none; opacity: 0; }
 .mini-pad { position: absolute; }
 .mini-pad--a { width: 58px; height: 58px; left: 6%; top: 8%; color: #c9946c; animation: float 8s ease-in-out infinite alternate; }
 .mini-pad--b { width: 44px; height: 44px; right: 8%; top: 42%; color: #8ea1a8; animation: float 9s ease-in-out infinite alternate-reverse; }

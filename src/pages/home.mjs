@@ -83,9 +83,8 @@ ${siteHeader({ root, current: "home" })}
     <div class="grove__front">${groveFront(root, { hero, reveal })}</div>
   </section>
 
-  ${shore(root)}
-
   <div class="pond-area" id="pond-area">
+    ${shore(root)}
     <section class="block" id="about" aria-labelledby="about-title">
       <span class="block__kanji" aria-hidden="true" data-k="竹"></span>
       <div class="panel">
@@ -133,7 +132,7 @@ ${siteHeader({ root, current: "home" })}
       <div class="panel">
         <p class="eyebrow">Say hello</p>
         <h2 id="koi-title">Come and feed our koi</h2>
-        <p>Everyone ends up at the koi pond sooner or later. Tap anywhere on the water around you to drop some food and watch them swim over. The real ones are waiting in Kothanur.</p>
+        <p>Everyone ends up at the koi pond sooner or later. Tap anywhere on the water around you to drop some food and watch them swim over. The real ones are waiting for you at Love Asia.</p>
       </div>
       <div class="feed-zone" id="feed-zone">
         <p class="feed-hint" id="feed-hint">Tap the water to feed the koi</p>
@@ -211,6 +210,7 @@ ${siteFooter({ root })}
 <script src="assets/js/site.js" defer></script>
 <script src="assets/js/smooth.js" defer></script>
 <script src="assets/js/home.js" defer></script>
+<script src="assets/js/tile-koi.js" defer></script>
 </body>
 </html>`;
 }

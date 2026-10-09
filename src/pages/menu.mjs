@@ -151,7 +151,9 @@ const MINI_BAMBOO = `<svg class="mini-scene" viewBox="0 0 84 240" preserveAspect
   <g class="mb mb--3" fill="#a5ad9c"><rect x="68" y="36" width="3.5" height="220" rx="1.5"/><rect x="66.8" y="96" width="6" height="1.8" rx=".9" fill="#7d8578"/><path d="M69 97 C 63 93 57 93 53 96 C 58 99 64 99 69 97Z" fill="#6b7665"/></g>
 </svg>`;
 
-const MINI_POND = `<svg class="mini-pad mini-pad--a"><use href="#pad"/></svg>
+// simple CSS fish shown until tile-koi.js swaps in the real swimming koi
+const MINI_POND = `<canvas class="mini-koi" hidden></canvas>
+  <svg class="mini-pad mini-pad--a"><use href="#pad"/></svg>
   <svg class="mini-pad mini-pad--b"><use href="#pad"/></svg>
   <span class="mini-ripple"></span><span class="mini-ripple"></span>
   <span class="koi-orbit">
@@ -214,6 +216,7 @@ ${SVG_DEFS}
   </div>
 </main>
 <script src="${root}assets/js/menu.js" defer></script>
+<script src="${root}assets/js/tile-koi.js" defer></script>
 </body>
 </html>`;
 }

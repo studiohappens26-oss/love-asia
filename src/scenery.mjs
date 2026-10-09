@@ -57,8 +57,9 @@ function stalk(r, cx, w, H, tone, gid, leafy = 0.72) {
     y -= h;
     if (y < H - 220 && r() < leafy) {
       const dir = r() < 0.5 ? -1 : 1;
-      const bx = cx + dir * w * 0.5, ex = bx + dir * (28 + r() * 32), ey = y - (18 + r() * 32);
-      s += `<path d="M${f1(bx)} ${f1(y)}Q${f1((bx + ex) / 2)} ${f1(y - 6)} ${f1(ex)} ${f1(ey)}" stroke="${tone.node}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+      // a short twig angled upward, so it never reads as a rope strung between stalks
+      const bx = cx + dir * w * 0.5, ex = bx + dir * (16 + r() * 18), ey = y - (22 + r() * 26);
+      s += `<path d="M${f1(bx)} ${f1(y)}Q${f1(bx + dir * 4)} ${f1(y - 12)} ${f1(ex)} ${f1(ey)}" stroke="${tone.node}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
       leaves += leafCluster(r, ex, ey, dir, w / 22, tone);
     }
   }
@@ -77,8 +78,10 @@ export function curtainSvg(side, layer, H = 1000) {
   const draw = (seed, tone, spacing, wr, pick, opacity, leafy) => {
     const r = rng(seed), t = TONES[tone], gid = `g${side}${tone}`;
     let x = 10 + r() * 30, out = "", i = 0;
-    while (x < W + 10) {
+    while (true) {
       const w = wr[0] + r() * (wr[1] - wr[0]);
+      // keep every stalk whole: the inner edge (x = W) is where the two halves meet
+      if (x + w / 2 > W - 6) break;
       const body = stalk(r, x, w, H, t, gid, leafy);
       if (!pick || pick(i)) out += body;
       x += spacing * (0.75 + r() * 0.5);
@@ -88,8 +91,8 @@ export function curtainSvg(side, layer, H = 1000) {
   };
   let parts;
   const base = side === "l" ? 11 : 23;
-  if (layer === "back") parts = [draw(base + 200, "far", 56, [8, 11], null, 0.6, 0.3), draw(base + 100, "mid", 74, [13, 16], null, 0.78, 0.5)];
-  else parts = [draw(base, "near", 88, [20, 26], (i) => (i % 2 === 0) === (layer === "near-a"), 0.94, 0.72)];
+  if (layer === "back") parts = [draw(base + 200, "far", 82, [8, 11], null, 0.6, 0.3), draw(base + 100, "mid", 108, [13, 16], null, 0.78, 0.5)];
+  else parts = [draw(base, "near", 128, [20, 26], (i) => (i % 2 === 0) === (layer === "near-a"), 0.94, 0.72)];
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><defs>${parts.map((p) => p.defs).join("")}<path id="lf" d="${LEAF}"/></defs><g${flip}>${parts.map((p) => p.body).join("")}</g></svg>`;
 }
 
@@ -173,78 +176,5 @@ export function groundSvg() {
 <path d="M0 46C120 30 220 52 340 40C470 27 560 50 690 38C820 26 930 48 1050 36C1110 30 1160 34 1200 38V200H0Z" fill="#d6e1c8" fill-opacity=".7"/>
 <path d="M0 62C140 48 250 70 380 58C520 45 610 68 740 56C880 44 990 66 1200 54V200H0Z" fill="url(#gw)"/>
 ${mounds}
-<path d="M0 62C140 48 250 70 380 58C520 45 610 68 740 56C880 44 990 66 1200 54" fill="none" stroke="#b9c9a8" stroke-opacity=".55" stroke-width="2"/>
 </svg>`;
-}
-
-/* The bank between the grove and the pond: grass → smooth stones → water.
-   The stones sit on the waterline so there is never a hard seam. */
-export const GROUND_BOTTOM = "#e9edde";
-export const WATER_TOP = "#e3eeed";
-export function shoreSvg() {
-  const r = rng(31);
-  const W = 1200, H = 300, EDGE = 88;
-  // rounded garden shrubs (karikomi) sitting on the bank
-  let shrubs = "";
-  for (const [x, w] of [[90, 170], [330, 120], [560, 200], [820, 140], [1080, 190]]) {
-    const h = w * 0.36;
-    shrubs += `<ellipse cx="${x}" cy="${f1(EDGE - h * 0.25)}" rx="${f1(w / 2)}" ry="${f1(h / 2)}" fill="url(#shrub)"/>`;
-    shrubs += `<ellipse cx="${f1(x - w * 0.12)}" cy="${f1(EDGE - h * 0.45)}" rx="${f1(w * 0.28)}" ry="${f1(h * 0.18)}" fill="#e6eedb" fill-opacity=".55"/>`;
-  }
-  // flat river stones straddling the waterline, with soft reflections
-  let stones = "", refl = "";
-  const tones = ["stoneW", "stoneC", "stoneW"];
-  for (let x = -40; x < W + 60; ) {
-    const rx = 26 + r() * 40, ry = rx * (0.3 + r() * 0.14);
-    const cy = EDGE + 4 + Math.sin(x / 160) * 5 + r() * 6;
-    const rot = r() * 10 - 5, g = tones[Math.floor(r() * tones.length)];
-    refl += `<ellipse cx="${f1(x)}" cy="${f1(cy + ry * 1.5)}" rx="${f1(rx * 0.9)}" ry="${f1(ry * 0.7)}" fill="#a9bcbe" fill-opacity=".22"/>`;
-    stones += `<ellipse cx="${f1(x)}" cy="${f1(cy)}" rx="${f1(rx)}" ry="${f1(ry)}" transform="rotate(${f1(rot)} ${f1(x)} ${f1(cy)})" fill="url(#${g})"/>`;
-    if (r() < 0.35) stones += `<ellipse cx="${f1(x - rx * 0.25)}" cy="${f1(cy - ry * 0.55)}" rx="${f1(rx * 0.35)}" ry="${f1(ry * 0.2)}" fill="#c3d2b0" fill-opacity=".8"/>`;
-    if (r() < 0.5) {
-      const px = x + rx * (0.9 + r() * 0.4), pr = 5 + r() * 6;
-      stones += `<ellipse cx="${f1(px)}" cy="${f1(cy + ry * 0.5)}" rx="${f1(pr)}" ry="${f1(pr * 0.55)}" fill="url(#stoneC)"/>`;
-    }
-    x += rx * (1.3 + r() * 0.7);
-  }
-  let ripples = "";
-  for (let i = 0; i < 8; i++) {
-    const x = r() * W, y = 175 + r() * 100, w = 26 + r() * 60;
-    ripples += `<path d="M${f1(x - w)} ${f1(y)}Q${f1(x)} ${f1(y - 4)} ${f1(x + w)} ${f1(y)}" stroke="#fff" stroke-opacity=".75" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-  }
-  const pad = (x, y, s, c) =>
-    `<g transform="translate(${x} ${y}) scale(${s} ${s * 0.62})"><path d="M0 0L46 -10C50 10 40 38 10 46C-20 52 -46 30 -46 2C-46 -26 -22 -48 4 -46C28 -44 42 -30 46 -10Z" fill="${c}" fill-opacity=".42" stroke="${c}" stroke-opacity=".55" stroke-width="1.5"/></g>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice">
-<defs>
-  <linearGradient id="bank" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${GROUND_BOTTOM}"/><stop offset=".55" stop-color="#e8e9da"/><stop offset="1" stop-color="#e6e2d4"/></linearGradient>
-  <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d3e1e0"/><stop offset=".45" stop-color="${WATER_TOP}"/><stop offset="1" stop-color="${WATER_TOP}"/></linearGradient>
-  <radialGradient id="shrub" cx=".42" cy=".3" r=".8"><stop offset="0" stop-color="#cbdab9"/><stop offset=".7" stop-color="#b6c9a3"/><stop offset="1" stop-color="#a6bc93"/></radialGradient>
-  <radialGradient id="stoneW" cx=".4" cy=".28" r=".8"><stop offset="0" stop-color="#f0ece4"/><stop offset=".6" stop-color="#d9d3c8"/><stop offset="1" stop-color="#c2bbae"/></radialGradient>
-  <radialGradient id="stoneC" cx=".4" cy=".28" r=".8"><stop offset="0" stop-color="#ecefed"/><stop offset=".6" stop-color="#d0d6d4"/><stop offset="1" stop-color="#b6bebd"/></radialGradient>
-</defs>
-<rect width="${W}" height="${H}" fill="url(#water)"/>
-<path d="M0 0H${W}V${EDGE}C1100 ${EDGE + 6} 1000 ${EDGE - 4} 900 ${EDGE + 3}C800 ${EDGE + 9} 700 ${EDGE - 3} 600 ${EDGE + 4}C500 ${EDGE + 10} 400 ${EDGE - 2} 300 ${EDGE + 5}C200 ${EDGE + 11} 100 ${EDGE} 0 ${EDGE + 6}Z" fill="url(#bank)"/>
-${shrubs}
-${refl}
-${stones}
-${ripples}
-${pad(180, 230, 0.9, "#c9946c")}${pad(760, 255, 0.7, "#8ea1a8")}${pad(1030, 215, 0.6, "#9a9a96")}
-</svg>`;
-}
-
-/* Small bamboo sprigs that hang over the corners of text panels. */
-export function sprigSvg(variant) {
-  const r = rng(variant === "a" ? 5 : 9);
-  const t = TONES.near;
-  let s = `<path d="M8 ${variant === "a" ? 24 : 40}Q70 ${variant === "a" ? 30 : 26} 140 ${variant === "a" ? 52 : 34}" stroke="${t.node}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
-  const pts = variant === "a" ? [[46, 28, 1], [92, 38, 1], [132, 50, 1], [70, 32, -1]] : [[40, 36, 1], [86, 30, 1], [128, 34, 1], [60, 33, -1], [104, 31, -1]];
-  for (const [x, y, d] of pts) {
-    const n = 2 + Math.floor(r() * 2);
-    for (let i = 0; i < n; i++) {
-      const ang = d * (25 + r() * 55);
-      const k = 0.85 + r() * 0.4;
-      s += `<path d="${LEAF}" transform="translate(${x} ${y}) rotate(${f1(ang)}) scale(${k.toFixed(2)} ${(k * 0.95).toFixed(2)})" fill="${t.leaves[Math.floor(r() * t.leaves.length)]}" fill-opacity="${(0.82 + r() * 0.15).toFixed(2)}"/>`;
-    }
-  }
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 150">${s}</svg>`;
 }
