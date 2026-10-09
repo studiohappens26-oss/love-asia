@@ -4,6 +4,11 @@ import { PETAL, LEAF_PATH } from "../scenery.mjs";
 const img = (root, name, cls, extra = "") =>
   `<img class="${cls}" src="${root}assets/img/scene/${name}.svg" alt="" width="900" height="1000" decoding="async"${extra} />`;
 
+// a tall bamboo layer: phones (≤600px wide) get a version cropped to the inner edge,
+// which is all they ever show, so there's a third as much to draw while scrolling
+const tall = (root, name, cls, extra = "") =>
+  `<picture><source media="(max-width: 600px)" srcset="${root}assets/img/scene/${name}-m.svg" />${img(root, name, cls, extra)}</picture>`;
+
 // deterministic "random" so builds are stable
 const jitter = (i, k) => ((Math.sin(i * 12.9898 + k * 78.233) * 43758.5453) % 1 + 1) % 1;
 
@@ -36,15 +41,15 @@ export function groveBack(root) {
     ${img(root, "sky-plain", "g-sky")}
     ${clouds(root)}
     <img class="g-hills" src="${root}assets/img/scene/hills.svg" alt="" width="1000" height="620" decoding="async" />
-    <div class="g-curtain g-far g-l"><div class="g-sway g-sway--back">${img(root, "tall-back-l", "g-img")}</div></div>
-    <div class="g-curtain g-far g-r"><div class="g-sway g-sway--back">${img(root, "tall-back-r", "g-img")}</div></div>
+    <div class="g-curtain g-far g-l"><div class="g-sway g-sway--back">${tall(root, "tall-back-l", "g-img")}</div></div>
+    <div class="g-curtain g-far g-r"><div class="g-sway g-sway--back">${tall(root, "tall-back-r", "g-img")}</div></div>
     <div class="jp-mist"></div>
     ${petals(12)}`;
 }
 
 export function groveFront(root, { hero, reveal }) {
   const near = (side) =>
-    `<div class="g-curtain g-near g-${side}" aria-hidden="true"><div class="g-sway g-sway--a">${img(root, `tall-near-a-${side}`, "g-img", ' fetchpriority="high"')}</div><div class="g-sway g-sway--b">${img(root, `tall-near-b-${side}`, "g-img")}</div></div>`;
+    `<div class="g-curtain g-near g-${side}" aria-hidden="true"><div class="g-sway g-sway--a">${tall(root, `tall-near-a-${side}`, "g-img", ' fetchpriority="high"')}</div><div class="g-sway g-sway--b">${tall(root, `tall-near-b-${side}`, "g-img")}</div></div>`;
   return `
     <div class="reveal-wrap">${reveal}</div>
     ${near("l")}

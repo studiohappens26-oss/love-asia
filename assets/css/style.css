@@ -119,17 +119,11 @@ body.mode-nonveg .scene-pond, body.mode-veg .scene-grove { opacity: 1; }
     linear-gradient(180deg, #f3f2ec 0%, #ecf0ee 55%, #e6ecea 100%);
 }
 #pond { position: absolute; inset: 0; display: block; }
-/* water shimmer: a static texture slid around by the compositor (no per-frame drawing) */
-.pond-caustics, .pond-caustics::after {
-  position: absolute;
-  inset: -320px;
-  background-image: var(--caustic, none);
-  background-size: 320px 320px;
-  opacity: .5;
-  animation: caustic 40s linear infinite;
-  will-change: transform;
-}
-.pond-caustics::after { content: ""; inset: 0; background-size: 480px 480px; opacity: .6; animation: caustic2 55s linear infinite; }
+/* water shimmer: two small 1× canvases (painted once by koi-pond.js) slid around by the compositor */
+.pond-caustics { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.caustic { position: absolute; display: block; will-change: transform; }
+.caustic--a { left: -320px; top: -320px; opacity: .5; animation: caustic 40s linear infinite; }
+.caustic--b { left: 0; top: -480px; opacity: .3; animation: caustic2 55s linear infinite; }
 @keyframes caustic { to { transform: translate3d(320px, 320px, 0); } }
 @keyframes caustic2 { to { transform: translate3d(-480px, 480px, 0); } }
 

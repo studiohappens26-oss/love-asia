@@ -25,7 +25,7 @@
     if (!supported) {
       const q = (s) => grove.querySelector(s);
       const nearL = q(".g-near.g-l"), nearR = q(".g-near.g-r"), farL = q(".g-far.g-l"), farR = q(".g-far.g-r");
-      const hills = q(".g-hills"), sky = q(".g-sky"), cloudsEl = q(".jp-clouds"), sakura = q(".grove__front .sakura");
+      const hills = q(".g-hills"), cloudsEl = q(".jp-clouds"), sakura = q(".grove__front .sakura");
       const hero = document.getElementById("hero"), reveal = document.getElementById("reveal");
       // grove lengths in screen heights (the same numbers as the CSS custom properties)
       const num = (k, d) => parseFloat(grove.dataset[k]) || d;
@@ -46,7 +46,6 @@
         farR.style.translate = `${(part * 76).toFixed(2)}% 0`;
         farL.style.transform = farR.style.transform = `translateY(${(-drift * 30).toFixed(2)}%)`;
         hills.style.transform = `translateY(${(-drift * 20).toFixed(2)}%)`;
-        sky.style.transform = `translateY(${(-drift * 5).toFixed(2)}%)`;
         cloudsEl.style.transform = `translateY(${(-drift * 8 * vh / 100).toFixed(1)}px)`;
         if (sakura) sakura.style.translate = `0 ${(-clamp(p) * 34 * vh / 100).toFixed(1)}px`;
         if (!reveal) return; // (events page: the hero card simply scrolls away)

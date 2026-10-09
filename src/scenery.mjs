@@ -32,38 +32,46 @@ function gradient(id, t) {
 }
 
 // leaves reference one shared <path id="lf"> via <use> to keep the files small
-function leafCluster(r, x, y, dir, scale, tone) {
+function leafCluster(r, x, y, dir, scale, tone, op = 1) {
   let s = `<g transform="translate(${f1(x)} ${f1(y)})">`;
   const n = 3 + Math.floor(r() * 3);
   for (let i = 0; i < n; i++) {
     const ang = dir * (10 + r() * 45) + (dir < 0 ? 180 : 0) + (r() * 16 - 8);
     const k = scale * (0.75 + r() * 0.4);
-    s += `<use href="#lf" fill="${tone.leaves[Math.floor(r() * tone.leaves.length)]}" fill-opacity="${(0.7 + r() * 0.25).toFixed(2)}" transform="rotate(${Math.round(ang)})scale(${k.toFixed(2)} ${(k * (0.8 + r() * 0.3)).toFixed(2)})"/>`;
+    s += `<use href="#lf" fill="${tone.leaves[Math.floor(r() * tone.leaves.length)]}" fill-opacity="${((0.7 + r() * 0.25) * op).toFixed(2)}" transform="rotate(${Math.round(ang)})scale(${k.toFixed(2)} ${(k * (0.8 + r() * 0.3)).toFixed(2)})"/>`;
   }
   return s + "</g>";
 }
 
-// one ink bamboo stalk: tapered segments, node rings, a highlight, side branches with leaf sprays
-function stalk(r, cx, w, H, tone, gid, leafy = 0.72) {
-  let s = "", leaves = "";
+// one ink bamboo stalk: tapered segments, node rings, a highlight, side branches with leaf sprays.
+// Each part type is merged into a single path, so a stalk is 4 shapes (+ leaves) to draw
+// instead of ~70; phones redraw these as they scroll, so fewer shapes means smoother scrolling.
+function stalk(r, cx, w, H, tone, gid, leafy = 0.72, op = 1) {
+  let seg = "", node = "", hl = "", twig = "", leaves = "";
   let y = H + 20;
   const segH = Math.max(95, (95 + r() * 45) * (w / 22));
   while (y > -60) {
     const h = segH * (0.85 + r() * 0.25);
     const w1 = w * 0.94;
-    s += `<path d="M${f1(cx - w / 2)} ${f1(y - 2)}L${f1(cx - w1 / 2)} ${f1(y - h + 3)}Q${f1(cx)} ${f1(y - h)} ${f1(cx + w1 / 2)} ${f1(y - h + 3)}L${f1(cx + w / 2)} ${f1(y - 2)}Z" fill="url(#${gid})"/>`;
-    s += `<path d="M${f1(cx - w / 2 - 2)} ${f1(y - h + 1)}Q${f1(cx)} ${f1(y - h - 4)} ${f1(cx + w / 2 + 2)} ${f1(y - h + 1)}" stroke="${tone.node}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
-    if (w >= 16 && h > 40) s += `<rect x="${f1(cx - w * 0.24)}" y="${f1(y - h + 10)}" width="${f1(w * 0.1)}" height="${f1(h - 26)}" rx="2" fill="#fff" fill-opacity=".22"/>`;
+    seg += `M${f1(cx - w / 2)} ${f1(y - 2)}L${f1(cx - w1 / 2)} ${f1(y - h + 3)}Q${f1(cx)} ${f1(y - h)} ${f1(cx + w1 / 2)} ${f1(y - h + 3)}L${f1(cx + w / 2)} ${f1(y - 2)}Z`;
+    node += `M${f1(cx - w / 2 - 2)} ${f1(y - h + 1)}Q${f1(cx)} ${f1(y - h - 4)} ${f1(cx + w / 2 + 2)} ${f1(y - h + 1)}`;
+    if (w >= 16 && h > 40) hl += `M${f1(cx - w * 0.24)} ${f1(y - h + 10)}h${f1(w * 0.1)}v${f1(h - 26)}h${f1(-w * 0.1)}Z`;
     y -= h;
     if (y < H - 220 && r() < leafy) {
       const dir = r() < 0.5 ? -1 : 1;
       // a short twig angled upward, so it never reads as a rope strung between stalks
       const bx = cx + dir * w * 0.5, ex = bx + dir * (16 + r() * 18), ey = y - (22 + r() * 26);
-      s += `<path d="M${f1(bx)} ${f1(y)}Q${f1(bx + dir * 4)} ${f1(y - 12)} ${f1(ex)} ${f1(ey)}" stroke="${tone.node}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
-      leaves += leafCluster(r, ex, ey, dir, w / 22, tone);
+      twig += `M${f1(bx)} ${f1(y)}Q${f1(bx + dir * 4)} ${f1(y - 12)} ${f1(ex)} ${f1(ey)}`;
+      leaves += leafCluster(r, ex, ey, dir, w / 22, tone, op);
     }
   }
-  return s + leaves;
+  // opacity goes on each shape: a semi-transparent <g> would force an offscreen pass per tile
+  const o = op < 1 ? ` fill-opacity="${op}"` : "", so = op < 1 ? ` stroke-opacity="${op}"` : "";
+  return `<path d="${seg}" fill="url(#${gid})"${o}/>` +
+    `<path d="${node}" stroke="${tone.node}" stroke-width="3" fill="none" stroke-linecap="round"${so}/>` +
+    (hl ? `<path d="${hl}" fill="#fff" fill-opacity="${(0.22 * op).toFixed(2)}"/>` : "") +
+    (twig ? `<path d="${twig}" stroke="${tone.node}" stroke-width="1.5" fill="none" stroke-linecap="round"${so}/>` : "") +
+    leaves;
 }
 
 /* One layer of one half of the bamboo "curtain" (viewBox 900×H; the inner edge
@@ -71,8 +79,10 @@ function stalk(r, cx, w, H, tone, gid, leafy = 0.72) {
      back:   distant pale stalks and mid-tone stalks, as one image
      near-a / near-b: the dark foreground stalks, split in two so they can sway
                       out of step with each other
-   The home page uses taller versions so the camera can pan down the stalks. */
-export function curtainSvg(side, layer, H = 1000) {
+   The home page uses taller versions so the camera can pan down the stalks.
+   crop: only the inner `crop` units wide (phones only ever see the inner edge), so a
+   phone has a third of the shapes to draw. */
+export function curtainSvg(side, layer, H = 1000, crop = 0) {
   const W = 900;
   const flip = side === "r" ? ` transform="translate(${W} 0) scale(-1 1)"` : "";
   const draw = (seed, tone, spacing, wr, pick, opacity, leafy) => {
@@ -82,18 +92,21 @@ export function curtainSvg(side, layer, H = 1000) {
       const w = wr[0] + r() * (wr[1] - wr[0]);
       // keep every stalk whole: the inner edge (x = W) is where the two halves meet
       if (x + w / 2 > W - 6) break;
-      const body = stalk(r, x, w, H, t, gid, leafy);
-      if (!pick || pick(i)) out += body;
+      const body = stalk(r, x, w, H, t, gid, leafy, opacity);
+      // (stalks outside the crop are still generated, so the random sequence and the art stay the same)
+      if ((!pick || pick(i)) && (!crop || x > W - crop - 70)) out += body;
       x += spacing * (0.75 + r() * 0.5);
       i++;
     }
-    return { defs: gradient(gid, t), body: `<g opacity="${opacity}">${out}</g>` };
+    return { defs: gradient(gid, t), body: out };
   };
   let parts;
   const base = side === "l" ? 11 : 23;
   if (layer === "back") parts = [draw(base + 200, "far", 82, [8, 11], null, 0.6, 0.3), draw(base + 100, "mid", 108, [13, 16], null, 0.78, 0.5)];
-  else parts = [draw(base, "near", 128, [20, 26], (i) => (i % 2 === 0) === (layer === "near-a"), 0.94, 0.72)];
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><defs>${parts.map((p) => p.defs).join("")}<path id="lf" d="${LEAF}"/></defs><g${flip}>${parts.map((p) => p.body).join("")}</g></svg>`;
+  // near-a / near-b: alternate stalks; "near" (phones): all of them in one image, one layer to move
+  else parts = [draw(base, "near", 128, [20, 26], layer === "near" ? null : (i) => (i % 2 === 0) === (layer === "near-a"), 1, 0.72)];
+  const vb = crop ? `${side === "r" ? 0 : W - crop} 0 ${crop} ${H}` : `0 0 ${W} ${H}`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}"><defs>${parts.map((p) => p.defs).join("")}<path id="lf" d="${LEAF}"/></defs><g${flip}>${parts.map((p) => p.body).join("")}</g></svg>`;
 }
 
 /* ---------------------- Japanese architecture silhouettes ---------------------- */

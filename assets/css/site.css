@@ -129,7 +129,7 @@ body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
 .grove--short { --part: 70svh; --pin: 60svh; height: 160vh; height: 160svh; }
 .grove__back { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; contain: layout paint; }
 .grove__front { position: absolute; inset: 0; overflow: hidden; overflow: clip; }
-.g-sky { position: absolute; left: 0; top: 0; width: 100%; height: 106%; object-fit: cover; object-position: 50% 62%; }
+.g-sky { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
 .g-hills { position: absolute; left: 0; top: 30%; width: 100%; height: 72%; object-fit: cover; object-position: 54% 0; }
 .g-curtain { position: absolute; top: 0; bottom: 0; width: 62%; }
 .grove__back .g-curtain { bottom: auto; height: 150%; }
@@ -148,6 +148,12 @@ body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
 .grove .g-sway--back { --amp: .7deg; }
 .grove .g-sway--a { --amp: 1.2deg; }
 .grove .g-sway--b { --amp: 1.55deg; }
+/* Phones: fewer layers for the GPU to blend on every frame. The two front layers per side
+   become one (its image holds all the stalks) and the faint back grove stops swaying. */
+@media (max-width: 600px) {
+  .grove .g-sway--b { display: none; }
+  .grove .g-sway--back { animation: none; }
+}
 @keyframes lean { from { transform: skewX(calc(var(--amp, 1.5deg) * -1)); } to { transform: skewX(var(--amp, 1.5deg)); } }
 .g-petals { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .jp-clouds { pointer-events: none; }
@@ -229,7 +235,6 @@ html:not(.js) .grove .g-near.g-r { translate: 85% 0; }
   .grove .g-far.g-l { animation: part-far-l 1ms linear both, drift-far 1ms linear both; animation-timeline: scroll(root), scroll(root); animation-range: 0 var(--part), 0 var(--pin); }
   .grove .g-far.g-r { animation: part-far-r 1ms linear both, drift-far 1ms linear both; animation-timeline: scroll(root), scroll(root); animation-range: 0 var(--part), 0 var(--pin); }
   .grove .g-hills { animation: drift-hills 1ms linear both; animation-timeline: scroll(root); animation-range: 0 var(--pin); }
-  .grove .g-sky { animation: drift-sky 1ms linear both; animation-timeline: scroll(root); animation-range: 0 var(--pin); }
   .grove .jp-clouds { animation: drift-clouds 1ms linear both; animation-timeline: scroll(root); animation-range: 0 var(--pin); }
   .grove__front .sakura { animation: branch 7s ease-in-out infinite alternate, rise-sakura 1ms linear both; animation-timeline: auto, scroll(root); animation-range: normal, 0 100svh; }
   .grove .hero-card { animation: hero-out 1ms linear both; animation-timeline: scroll(root); animation-range: 6svh 62svh; }
@@ -242,7 +247,6 @@ html:not(.js) .grove .g-near.g-r { translate: 85% 0; }
 @keyframes part-far-r { from { translate: 0 0; animation-timing-function: cubic-bezier(.42, 0, .34, 1); } to { translate: 76% 0; } }
 @keyframes drift-far { to { transform: translateY(-30%); } }
 @keyframes drift-hills { to { transform: translateY(-20%); } }
-@keyframes drift-sky { to { transform: translateY(-5%); } }
 @keyframes drift-clouds { to { transform: translateY(-8vh); } }
 @keyframes rise-sakura { to { translate: 0 -34vh; } }
 @keyframes hero-out { to { opacity: 0; translate: 0 -10vh; } }
@@ -273,7 +277,7 @@ main, .site-footer { position: relative; z-index: 1; }
     linear-gradient(180deg, #e3eeed, #dde9e9);
 }
 .pond-bg.is-idle { visibility: hidden; }
-.pond-bg:not(.is-live) .pond-caustics, .pond-bg:not(.is-live) .pond-caustics::after { animation-play-state: paused; }
+.pond-bg:not(.is-live) .caustic { animation-play-state: paused; }
 .pond-area { position: relative; padding: 0 0 10vh; }
 
 /* big seal kanji drifting behind each section, at their own pace */

@@ -78,6 +78,7 @@ ${pages.map(([, , p, pr, cf]) => `  <url><loc>${SITE_URL}/${p}</loc><lastmod>${t
 
   cpSync(join(ROOT, "assets"), join(OUT, "assets"), { recursive: true });
 
+  const EMPTY_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"/>`;
   // painted scenery, pre-rendered as static SVG images
   const scene = {
     "sky-plain": skySvg(true),
@@ -91,6 +92,14 @@ ${pages.map(([, , p, pr, cf]) => `  <url><loc>${SITE_URL}/${p}</loc><lastmod>${t
     "tall-near-b-l": curtainSvg("l", "near-b", 2600),
     "tall-near-a-r": curtainSvg("r", "near-a", 2600),
     "tall-near-b-r": curtainSvg("r", "near-b", 2600),
+    // phone versions: just the inner edge of each half, and the two front layers merged into
+    // one (the second layer is hidden on phones and gets an empty image)
+    "tall-back-l-m": curtainSvg("l", "back", 1500, 320),
+    "tall-back-r-m": curtainSvg("r", "back", 1500, 320),
+    "tall-near-a-l-m": curtainSvg("l", "near", 2600, 320),
+    "tall-near-b-l-m": EMPTY_SVG,
+    "tall-near-a-r-m": curtainSvg("r", "near", 2600, 320),
+    "tall-near-b-r-m": EMPTY_SVG,
     sakura: sakuraSvg(),
     shore: shoreSvg(),
   };

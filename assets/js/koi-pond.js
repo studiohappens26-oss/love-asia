@@ -587,6 +587,7 @@
       W = contained ? canvas.parentElement.clientWidth : window.innerWidth;
       H = (canvas.parentElement && canvas.parentElement.clientHeight) || window.innerHeight;
       prevBoxes = [];
+      if (causticEl) buildCaustics();
       for (const c of [canvas, layer]) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
       canvas.style.width = W + "px"; canvas.style.height = H + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -754,12 +755,37 @@
       if (running && !once) raf = requestAnimationFrame(frame);
     }
 
+    // Water shimmer: the pattern is painted once into two small canvases at 1× (it's soft
+    // anyway) that the compositor slides around. Phones keep only a few MB of texture and
+    // nothing is ever re-rasterised, unlike a huge CSS background layer at 3× density.
+    let causticTile = null, causticW = 0;
+    function buildCaustics() {
+      if (!causticTile) return;
+      const w = causticEl.clientWidth || window.innerWidth, h = causticEl.clientHeight || window.innerHeight;
+      if (Math.abs(w - causticW) < 2 && causticEl.firstChild) return;
+      causticW = w;
+      causticEl.textContent = "";
+      for (const [size, cls] of [[320, "a"], [480, "b"]]) {
+        const c = document.createElement("canvas");
+        c.className = "caustic caustic--" + cls;
+        const cw = Math.ceil(w + size), ch = Math.ceil(h + size);
+        c.width = cw; c.height = ch;
+        c.style.width = cw + "px"; c.style.height = ch + "px";
+        const g = c.getContext("2d");
+        const pat = g.createPattern(causticTile, "repeat");
+        if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(size / causticTile.width));
+        g.fillStyle = pat;
+        g.fillRect(0, 0, cw, ch);
+        causticEl.appendChild(c);
+      }
+    }
+
     // heavy one-off setup; called while the guest is still on the landing page
     function prepare() {
       if (prepared) return;
       prepared = true;
       if (causticEl) {
-        try { causticEl.style.setProperty("--caustic", `url(${makeCausticTile(160).toDataURL()})`); } catch (e) { /* decorative */ }
+        try { causticTile = makeCausticTile(160); buildCaustics(); } catch (e) { /* decorative */ }
       }
       resize();
     }
