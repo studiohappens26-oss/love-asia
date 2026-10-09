@@ -1,5 +1,5 @@
 /*
- * Home page.
+ * The garden scenery shared by the home and events pages.
  *  - The grove's parting and parallax are CSS scroll-driven animations. Where the
  *    browser doesn't support those yet, the same motion is set here on scroll
  *    (only `translate`/`transform`/`opacity`, so it stays on the GPU).
@@ -11,6 +11,7 @@
   "use strict";
 
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const KOI_SRC = document.currentScript.src.replace(/garden\.js.*$/, "koi-pond.js");
   const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
@@ -26,16 +27,19 @@
       const nearL = q(".g-near.g-l"), nearR = q(".g-near.g-r"), farL = q(".g-far.g-l"), farR = q(".g-far.g-r");
       const hills = q(".g-hills"), sky = q(".g-sky"), cloudsEl = q(".jp-clouds"), sakura = q(".grove__front .sakura");
       const hero = document.getElementById("hero"), reveal = document.getElementById("reveal");
+      // grove lengths in screen heights (the same numbers as the CSS custom properties)
+      const num = (k, d) => parseFloat(grove.dataset[k]) || d;
+      const PART = num("part", 1.15), PIN = num("pin", 1.45), LEN = num("len", 2.45);
       let vh = window.innerHeight, lastY = -1, ticking = false;
 
       const update = () => {
         ticking = false;
-        const y = Math.min(window.scrollY, vh * 2.45);
+        const y = Math.min(window.scrollY, vh * LEN);
         if (y === lastY) return;
         lastY = y;
         const p = y / vh; // progress in screen heights
-        const part = ease(clamp(p / 1.15));
-        const drift = clamp(p / 1.45);
+        const part = ease(clamp(p / PART));
+        const drift = clamp(p / PIN);
         nearL.style.translate = `${(-part * 85).toFixed(2)}% 0`;
         nearR.style.translate = `${(part * 85).toFixed(2)}% 0`;
         farL.style.translate = `${(-part * 76).toFixed(2)}% 0`;
@@ -45,6 +49,7 @@
         sky.style.transform = `translateY(${(-drift * 5).toFixed(2)}%)`;
         cloudsEl.style.transform = `translateY(${(-drift * 8 * vh / 100).toFixed(1)}px)`;
         if (sakura) sakura.style.translate = `0 ${(-clamp(p) * 34 * vh / 100).toFixed(1)}px`;
+        if (!reveal) return; // (events page: the hero card simply scrolls away)
         const h = clamp((p - 0.06) / 0.56);
         hero.style.opacity = (1 - h).toFixed(3);
         hero.style.translate = `0 ${(-h * vh * 0.1).toFixed(1)}px`;
@@ -79,7 +84,7 @@
       loading = true;
       if (window.KoiPond) return boot();
       const s = document.createElement("script");
-      s.src = "assets/js/koi-pond.js";
+      s.src = KOI_SRC;
       s.onload = boot;
       document.head.appendChild(s);
     };

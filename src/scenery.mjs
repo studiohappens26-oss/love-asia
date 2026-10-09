@@ -162,19 +162,3 @@ export function sakuraSvg() {
 
 export const PETAL = "M0 0C-7 -6 -7 -15 0 -19C2 -16 4 -16 6 -19C13 -15 13 -6 0 0Z";
 export const LEAF_PATH = LEAF;
-
-/* The ground where the bamboo is planted: soft watercolour washes, no cartoon tufts. */
-export function groundSvg() {
-  const r = rng(7);
-  let mounds = "";
-  for (let i = 0; i < 7; i++) {
-    const x = r() * 1200, w = 120 + r() * 160;
-    mounds += `<ellipse cx="${f1(x)}" cy="${f1(70 + r() * 30)}" rx="${f1(w)}" ry="${f1(18 + r() * 12)}" fill="#cfdcc0" fill-opacity="${(0.35 + r() * 0.25).toFixed(2)}"/>`;
-  }
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 200" preserveAspectRatio="none">
-<defs><linearGradient id="gw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2e9d5"/><stop offset=".55" stop-color="#e6ecdb"/><stop offset="1" stop-color="#e9edde"/></linearGradient></defs>
-<path d="M0 46C120 30 220 52 340 40C470 27 560 50 690 38C820 26 930 48 1050 36C1110 30 1160 34 1200 38V200H0Z" fill="#d6e1c8" fill-opacity=".7"/>
-<path d="M0 62C140 48 250 70 380 58C520 45 610 68 740 56C880 44 990 66 1200 54V200H0Z" fill="url(#gw)"/>
-${mounds}
-</svg>`;
-}

@@ -53,21 +53,6 @@ export function groveFront(root, { hero, reveal }) {
     <div class="hero-wrap">${hero}</div>`;
 }
 
-/* A shorter, already-parted grove that frames a panel (events page). */
-export function groveLayers(root) {
-  return `
-    ${img(root, "sky", "g-sky", ' fetchpriority="high"')}
-    ${clouds(root)}
-    <div class="g-curtain g-far g-l"><div class="g-sway g-sway--back">${img(root, "curtain-back-l", "g-img")}</div></div>
-    <div class="g-curtain g-far g-r"><div class="g-sway g-sway--back">${img(root, "curtain-back-r", "g-img")}</div></div>
-    <div class="jp-mist"></div>
-    <div class="g-curtain g-near g-l"><div class="g-sway g-sway--a">${img(root, "curtain-near-a-l", "g-img", ' fetchpriority="high"')}</div><div class="g-sway g-sway--b">${img(root, "curtain-near-b-l", "g-img")}</div></div>
-    <div class="g-curtain g-near g-r"><div class="g-sway g-sway--a">${img(root, "curtain-near-a-r", "g-img", ' fetchpriority="high"')}</div><div class="g-sway g-sway--b">${img(root, "curtain-near-b-r", "g-img")}</div></div>
-    <img class="sakura sakura--right" src="${root}assets/img/scene/sakura.svg" alt="" width="320" height="180" decoding="async" />
-    <img class="g-ground" src="${root}assets/img/scene/ground.svg" alt="" width="1200" height="200" decoding="async" />
-    ${petals(12)}`;
-}
-
 export function shore(root) {
   return `<div class="shore" aria-hidden="true"><img src="${root}assets/img/scene/shore.svg" alt="" width="1600" height="440" loading="lazy" decoding="async" /></div>`;
 }

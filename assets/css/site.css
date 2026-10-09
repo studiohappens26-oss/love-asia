@@ -21,7 +21,7 @@ body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
   padding: var(--safe-top) 12px 0 12px;
   transition: background-color .3s var(--ease), box-shadow .3s var(--ease);
 }
-.site-header.is-scrolled, .page-events .site-header, .page-404 .site-header {
+.site-header.is-scrolled, .page-404 .site-header {
   background: rgba(251, 249, 244, .97);
   box-shadow: 0 1px 0 var(--hair-2), 0 10px 30px -24px rgba(60, 45, 30, .5);
 }
@@ -124,7 +124,9 @@ body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
    stalks while they part. Everything moves at its own speed for depth.
    The parting and drift are CSS scroll-driven animations (run by the compositor);
    home.js does the same with a few lines of JS where those aren't supported. */
-.grove { position: relative; height: 245vh; height: 245svh; background: #f3efe6; }
+.grove { --part: 115svh; --pin: 145svh; position: relative; height: 245vh; height: 245svh; background: #f3efe6; }
+/* events page: just the hero card, so a shorter walk through the grove */
+.grove--short { --part: 70svh; --pin: 60svh; height: 160vh; height: 160svh; }
 .grove__back { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; contain: layout paint; }
 .grove__front { position: absolute; inset: 0; overflow: hidden; overflow: clip; }
 .g-sky { position: absolute; left: 0; top: 0; width: 100%; height: 106%; object-fit: cover; object-position: 50% 62%; }
@@ -153,7 +155,6 @@ body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
 .g-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .g-l .g-img { object-position: right bottom; }
 .g-r .g-img { object-position: left bottom; }
-.g-ground { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 9vh; height: 9svh; object-fit: fill; }
 .grove__front .sakura { top: calc(var(--safe-top) + 64px); width: min(64vw, 380px); height: auto; }
 
 .hero-wrap, .reveal-wrap {
@@ -204,21 +205,35 @@ html.js .reveal-card { opacity: 0; }
 .reveal__seal { width: 46px; height: 46px; font-size: 26px; margin-bottom: 14px; }
 .reveal-card p { margin: 0; color: #3a3732; font-size: 1.02rem; line-height: 1.75; }
 @media (max-height: 640px) { .hero__logo .logo { height: 76px; } .hero__lede { display: none; } }
+.hero-card--events { padding: 28px 22px 24px; }
+.hero-card--events .seal { margin: 0 auto 14px; }
+.hero-card--events h1 {
+  margin: 0 0 12px;
+  font-family: var(--font-serif);
+  font-size: clamp(1.7rem, 6.4vw, 2.5rem);
+  font-weight: 500;
+  letter-spacing: .01em;
+  text-transform: none;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.hero-card--events .lede { margin: 0 auto; max-width: 32em; color: #3a3732; font-size: 1.02rem; line-height: 1.7; }
 /* without JS, show the grove already parted */
 html:not(.js) .grove .g-near.g-l { translate: -85% 0; }
 html:not(.js) .grove .g-near.g-r { translate: 85% 0; }
 
 @supports (animation-timeline: scroll()) {
   /* (the timeline/range longhands must come after the shorthand, which resets them) */
-  .grove .g-near.g-l { animation: part-near-l 1ms linear both; animation-timeline: scroll(root); animation-range: 0 115svh; }
-  .grove .g-near.g-r { animation: part-near-r 1ms linear both; animation-timeline: scroll(root); animation-range: 0 115svh; }
-  .grove .g-far.g-l { animation: part-far-l 1ms linear both, drift-far 1ms linear both; animation-timeline: scroll(root), scroll(root); animation-range: 0 115svh, 0 145svh; }
-  .grove .g-far.g-r { animation: part-far-r 1ms linear both, drift-far 1ms linear both; animation-timeline: scroll(root), scroll(root); animation-range: 0 115svh, 0 145svh; }
-  .grove .g-hills { animation: drift-hills 1ms linear both; animation-timeline: scroll(root); animation-range: 0 145svh; }
-  .grove .g-sky { animation: drift-sky 1ms linear both; animation-timeline: scroll(root); animation-range: 0 145svh; }
-  .grove .jp-clouds { animation: drift-clouds 1ms linear both; animation-timeline: scroll(root); animation-range: 0 145svh; }
+  .grove .g-near.g-l { animation: part-near-l 1ms linear both; animation-timeline: scroll(root); animation-range: 0 var(--part); }
+  .grove .g-near.g-r { animation: part-near-r 1ms linear both; animation-timeline: scroll(root); animation-range: 0 var(--part); }
+  .grove .g-far.g-l { animation: part-far-l 1ms linear both, drift-far 1ms linear both; animation-timeline: scroll(root), scroll(root); animation-range: 0 var(--part), 0 var(--pin); }
+  .grove .g-far.g-r { animation: part-far-r 1ms linear both, drift-far 1ms linear both; animation-timeline: scroll(root), scroll(root); animation-range: 0 var(--part), 0 var(--pin); }
+  .grove .g-hills { animation: drift-hills 1ms linear both; animation-timeline: scroll(root); animation-range: 0 var(--pin); }
+  .grove .g-sky { animation: drift-sky 1ms linear both; animation-timeline: scroll(root); animation-range: 0 var(--pin); }
+  .grove .jp-clouds { animation: drift-clouds 1ms linear both; animation-timeline: scroll(root); animation-range: 0 var(--pin); }
   .grove__front .sakura { animation: branch 7s ease-in-out infinite alternate, rise-sakura 1ms linear both; animation-timeline: auto, scroll(root); animation-range: normal, 0 100svh; }
   .grove .hero-card { animation: hero-out 1ms linear both; animation-timeline: scroll(root); animation-range: 6svh 62svh; }
+  .grove--short .hero-card { animation: none; }
   .grove .reveal-card { animation: reveal-in 1ms linear both; animation-timeline: view(); animation-range: entry 20% contain 15%; }
 }
 @keyframes part-near-l { from { translate: 0 0; animation-timing-function: cubic-bezier(.42, 0, .34, 1); } to { translate: -85% 0; } }
@@ -430,26 +445,6 @@ main, .site-footer { position: relative; z-index: 1; }
 .site-footer__fine { max-width: 960px; margin: 26px auto 0 !important; padding-top: 16px; border-top: 1px solid var(--hair-2); font-size: .8rem !important; color: #5f594f !important; }
 
 /* ------------------------------ events & sub pages ------------------------------ */
-.frame-hero {
-  position: relative;
-  display: grid;
-  place-items: center;
-  min-height: 92vh;
-  min-height: 92svh;
-  padding: calc(84px + var(--safe-top)) 16px 10vh;
-  overflow: hidden;
-  background: #f7f4ec;
-}
-.frame-hero__scene { position: absolute; inset: 0; }
-.frame-hero .g-sky { height: 100%; }
-.frame-hero .sakura { top: calc(var(--safe-top) + 64px); width: min(64vw, 380px); height: auto; }
-.frame-hero .jp-clouds { position: absolute; inset: 0; }
-.frame-hero .g-near.g-l { translate: -82% 0; }
-.frame-hero .g-near.g-r { translate: 82% 0; }
-.frame-hero .g-far.g-l { translate: -66% 0; }
-.frame-hero .g-far.g-r { translate: 66% 0; }
-.frame-hero .g-ground { height: 10%; }
-.frame-hero .panel { z-index: 1; }
 .sub-main { padding-top: calc(64px + var(--safe-top)); }
 .sub-hero { padding: 8vh 16px 4vh; }
 .panel--hero { text-align: left; }

@@ -1,4 +1,4 @@
-import { groveLayers } from "./scene.mjs";
+import { groveBack, groveFront, shore } from "./scene.mjs";
 import { BUSINESS, esc, head, siteHeader, siteFooter, restaurantSchema, breadcrumbSchema, faqSchema, faqHtml, waLink, ICON, fullAddress } from "../site.mjs";
 
 export const EVENTS_FAQ = [
@@ -22,6 +22,16 @@ export function eventsPage() {
   const root = "../";
   const path = "events/";
   const b = BUSINESS;
+  const heroCard = `<div class="hero-card hero-card--events" id="hero">
+        <span class="seal" aria-hidden="true">宴</span>
+        <p class="eyebrow">Events &amp; parties</p>
+        <h1 id="ev-title">Birthday parties &amp; events in Hennur, Bengaluru</h1>
+        <p class="lede">Have your party by the koi pond. We can seat 100+ guests at the same time, inside in the air-conditioned dining room or out in the open air, with a buffet or à la carte.</p>
+        <div class="cta-row">
+          <a class="btn btn--ink" href="#enquire">Enquire now ${ICON.arrow}</a>
+          <a class="btn" href="tel:${b.phoneE164}">${ICON.phone} ${esc(b.phone)}</a>
+        </div>
+      </div>`;
   return `${head({
     title: "Birthday Party & Event Venue in Hennur, Bengaluru | Love Asia",
     description: "Birthday parties, kids' parties and corporate lunches at Love Asia, Hennur. Seats 100+ guests at once, AC and open-air, buffet or à la carte.",
@@ -31,31 +41,37 @@ export function eventsPage() {
     schema: [restaurantSchema(), breadcrumbSchema([{ name: "Home", path: "" }, { name: "Events & Parties", path }]), faqSchema(EVENTS_FAQ)],
   })}
 <body class="page-events">
+<!-- the live koi pond behind every water section (only drawn while you're in the water) -->
+<div class="pond-bg" id="pond-bg" aria-hidden="true"><div class="pond-caustics" id="caustics"></div><canvas id="pond"></canvas></div>
 
 ${siteHeader({ root, current: "events" })}
 
-<main id="main" class="sub-main">
-  <section class="frame-hero" aria-labelledby="ev-title">
-    <div class="frame-hero__scene" aria-hidden="true">${groveLayers(root)}</div>
-    <div class="panel panel--hero">
-      <span class="seal" aria-hidden="true">宴</span>
-      <p class="eyebrow">Events &amp; parties</p>
-      <h1 id="ev-title">Birthday parties &amp; events in Hennur, Bengaluru</h1>
-      <p class="lede">Have your party by the koi pond. We can seat 100+ guests at the same time, inside in the air-conditioned dining room or out in the open air, with a buffet or à la carte.</p>
-      <ul class="facts">
-        <li><b>100+</b><span>guests at once</span></li>
-        <li><b>Buffet</b><span>or à la carte</span></li>
-        <li><b>Veg</b><span>&amp; non-veg</span></li>
-        <li><b>AC</b><span>&amp; open-air</span></li>
-      </ul>
-      <div class="cta-row">
-        <a class="btn btn--ink" href="#enquire">Enquire now ${ICON.arrow}</a>
-        <a class="btn" href="tel:${b.phoneE164}">${ICON.phone} ${esc(b.phone)}</a>
-      </div>
-    </div>
+<main id="main">
+  <!-- the same grove as the home page, shorter: the bamboo parts as you scroll down to the pond -->
+  <section class="grove grove--short" id="top" aria-labelledby="ev-title" data-part=".7" data-pin=".6" data-len="1.6">
+    <div class="grove__back" aria-hidden="true">${groveBack(root)}</div>
+    <div class="grove__front">${groveFront(root, { hero: heroCard, reveal: "" })}</div>
   </section>
 
+  <div class="pond-area" id="pond-area">
+    ${shore(root)}
+
+    <section class="block" aria-labelledby="glance-title">
+      <span class="block__kanji" aria-hidden="true" data-k="祝"></span>
+      <div class="panel">
+        <p class="eyebrow">At a glance</p>
+        <h2 id="glance-title">Room for the whole party</h2>
+        <ul class="facts">
+          <li><b>100+</b><span>guests at once</span></li>
+          <li><b>Buffet</b><span>or à la carte</span></li>
+          <li><b>Veg</b><span>&amp; non-veg</span></li>
+          <li><b>AC</b><span>&amp; open-air</span></li>
+        </ul>
+      </div>
+    </section>
+
   <section class="block" aria-labelledby="occ-title">
+      <span class="block__kanji" aria-hidden="true" data-k="誕"></span>
     <div class="panel panel--wide">
       <p class="eyebrow">What we host</p>
       <h2 id="occ-title">Parties big and small</h2>
@@ -66,6 +82,7 @@ ${siteHeader({ root, current: "events" })}
   </section>
 
   <section class="block" aria-labelledby="why-ev">
+      <span class="block__kanji" aria-hidden="true" data-k="愛"></span>
     <div class="panel">
       <p class="eyebrow">Why celebrate here</p>
       <h2 id="why-ev">Why have it here</h2>
@@ -83,6 +100,7 @@ ${siteHeader({ root, current: "events" })}
   </section>
 
   <section class="block" id="enquire" aria-labelledby="enq-title">
+      <span class="block__kanji" aria-hidden="true" data-k="宴"></span>
     <div class="panel">
       <p class="eyebrow">Plan your event</p>
       <h2 id="enq-title">Tell us about your celebration</h2>
@@ -109,6 +127,7 @@ ${siteHeader({ root, current: "events" })}
   </section>
 
   <section class="block" aria-labelledby="ev-faq">
+      <span class="block__kanji" aria-hidden="true" data-k="心"></span>
     <div class="panel">
       <p class="eyebrow">Good to know</p>
       <h2 id="ev-faq">Event FAQs</h2>
@@ -116,12 +135,14 @@ ${siteHeader({ root, current: "events" })}
       <p class="panel__more">${ICON.pin} ${esc(fullAddress())} · <a href="${b.maps}" rel="noopener" target="_blank">Directions</a></p>
     </div>
   </section>
+  </div>
 </main>
 
 ${siteFooter({ root })}
 
 <script src="${root}assets/js/site.js" defer></script>
 <script src="${root}assets/js/smooth.js" defer></script>
+<script src="${root}assets/js/garden.js" defer></script>
 </body>
 </html>`;
 }

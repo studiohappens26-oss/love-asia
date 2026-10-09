@@ -209,7 +209,7 @@ ${siteFooter({ root })}
 
 <script src="assets/js/site.js" defer></script>
 <script src="assets/js/smooth.js" defer></script>
-<script src="assets/js/home.js" defer></script>
+<script src="assets/js/garden.js" defer></script>
 <script src="assets/js/tile-koi.js" defer></script>
 </body>
 </html>`;

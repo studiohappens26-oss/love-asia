@@ -13,7 +13,7 @@ import { homePage } from "./pages/home.mjs";
 import { chooserPage, menuPage } from "./pages/menu.mjs";
 import { eventsPage } from "./pages/events.mjs";
 import { shoreSvg } from "./shore.mjs";
-import { skySvg, hillsSvg, cloudSvg, curtainSvg, groundSvg, sakuraSvg } from "./scenery.mjs";
+import { skySvg, hillsSvg, cloudSvg, curtainSvg, sakuraSvg } from "./scenery.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(ROOT, "dist");
@@ -80,13 +80,6 @@ ${pages.map(([, , p, pr, cf]) => `  <url><loc>${SITE_URL}/${p}</loc><lastmod>${t
 
   // painted scenery, pre-rendered as static SVG images
   const scene = {
-    sky: skySvg(),
-    "curtain-back-l": curtainSvg("l", "back"),
-    "curtain-back-r": curtainSvg("r", "back"),
-    "curtain-near-a-l": curtainSvg("l", "near-a"),
-    "curtain-near-b-l": curtainSvg("l", "near-b"),
-    "curtain-near-a-r": curtainSvg("r", "near-a"),
-    "curtain-near-b-r": curtainSvg("r", "near-b"),
     "sky-plain": skySvg(true),
     hills: hillsSvg(),
     "cloud-a": cloudSvg("a"),
@@ -99,7 +92,6 @@ ${pages.map(([, , p, pr, cf]) => `  <url><loc>${SITE_URL}/${p}</loc><lastmod>${t
     "tall-near-a-r": curtainSvg("r", "near-a", 2600),
     "tall-near-b-r": curtainSvg("r", "near-b", 2600),
     sakura: sakuraSvg(),
-    ground: groundSvg(),
     shore: shoreSvg(),
   };
   for (const [name, svg] of Object.entries(scene)) write(`assets/img/scene/${name}.svg`, svg);
