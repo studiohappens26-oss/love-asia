@@ -35,6 +35,8 @@
   }
 
   /* ---------- faint water texture (tileable Voronoi edges) ---------- */
+  // assets/img/caustic-tile.png is this, pre-rendered
+  const CAUSTIC_SRC = ((document.currentScript && document.currentScript.src) || "").replace(/js\/koi-pond\.js.*$/, "img/caustic-tile.png");
   function makeCausticTile(size) {
     const c = document.createElement("canvas");
     c.width = c.height = size;
@@ -855,7 +857,12 @@
       if (prepared) return;
       prepared = true;
       if (causticEl) {
-        try { causticTile = makeCausticTile(160); buildCaustics(); } catch (e) { /* decorative */ }
+        // the texture ships as a small image (drawing it here took a noticeable moment on
+        // slow phones); it's only computed if the image can't be loaded
+        const img = new Image();
+        img.onload = () => { causticTile = img; causticW = 0; buildCaustics(); };
+        img.onerror = () => { try { causticTile = makeCausticTile(160); buildCaustics(); } catch (e) { /* decorative */ } };
+        img.src = CAUSTIC_SRC;
       }
       resize();
     }
