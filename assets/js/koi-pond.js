@@ -20,10 +20,13 @@
     { body: "#fffaf3", patches: ["#e0472a", "#e0472a", "#d23c22"], fin: "255,250,243" },        // Kohaku
     { body: "#fffaf3", patches: ["#e0472a", "#2a2a2c", "#e0472a"], fin: "255,250,243" },        // Sanke
     { body: "#2c2c2f", patches: ["#e4532a", "#fffaf3", "#e4532a"], fin: "90,90,96", dark: true }, // Showa
-    { body: "#f0a63a", patches: ["#f7c766", "#f7c766"], fin: "250,214,140" },                   // Yamabuki ogon
+    { body: "#a9bcc4", patches: ["#e0592e", "#d9542c"], fin: "214,226,230" },                   // Asagi
     { body: "#ec6b2d", patches: ["#fffaf3", "#f58a4a"], fin: "250,190,150" },                   // Orange
     { body: "#fffaf3", patches: [], head: "#e0472a", fin: "255,250,243" },                      // Tancho
   ];
+
+  // a rarer one that only comes up from the deep at feeding time
+  const VISITOR = { body: "#e2a21d", patches: [], fin: "246,204,104", shine: true };
 
   // body half-width along the spine (t: 0 head → 1 tail root)
   function profile(t) {
@@ -106,7 +109,7 @@
             const d = (f.x - this.x) ** 2 + (f.y - this.y) ** 2;
             if (d < bd) { bd = d; best = f; }
           }
-          if (best && bd < (this.len * 6) ** 2) {
+          if (best && (this.seeksAll || bd < (this.len * 6) ** 2)) {
             desired = Math.atan2(best.y - this.y, best.x - this.x);
             hungry = true;
             if (bd < (this.width * 1.6) ** 2) best.eaten = true;
@@ -211,7 +214,7 @@
       const h = this.height();
       const off = this.len * 0.1 + h * this.len * 0.7;
       ctx.save();
-      ctx.globalAlpha = 1 - h * 0.6;
+      ctx.globalAlpha *= 1 - h * 0.6;
       this.bodyPath(ctx, L, R, off * 0.5, off);
       ctx.fill();
       ctx.restore();
@@ -242,6 +245,7 @@
 
     draw(ctx, L, R) {
       const p = this.pts, n = this.n;
+      const baseA = ctx.globalAlpha; // < 1 while rising from / sinking into the deep
       const dirAt = (i) => Math.atan2(p[i].y - p[i + 1].y, p[i].x - p[i + 1].x);
       const paddle = Math.sin(this.phase * 0.55);
 
@@ -282,6 +286,13 @@
       ctx.restore();
 
       // body
+      if (this.v.shine) { // a soft glow in the water around it
+        this.bodyPath(ctx, L, R, 0, 0);
+        ctx.lineWidth = this.width * 1.3;
+        ctx.strokeStyle = "rgba(255,198,70,0.25)";
+        ctx.lineJoin = "round";
+        ctx.stroke();
+      }
       this.bodyPath(ctx, L, R, 0, 0);
       ctx.fillStyle = this.v.body;
       ctx.fill();
@@ -296,7 +307,7 @@
         const cx = x - Math.sin(ang) * pt.lat * w, cy = y + Math.cos(ang) * pt.lat * w;
         ctx.fillStyle = pt.col;
         for (const [scale, alpha] of [[1.25, 0.3], [1, 0.88]]) {
-          ctx.globalAlpha = alpha;
+          ctx.globalAlpha = alpha * baseA;
           ctx.beginPath();
           for (const [bx, by, br] of pt.blobs) {
             const ox = (Math.cos(ang) * bx - Math.sin(ang) * by) * this.width * pt.r;
@@ -309,11 +320,22 @@
         }
       }
       if (this.v.head) { // tancho: a red crown
-        ctx.globalAlpha = 0.9;
+        ctx.globalAlpha = 0.9 * baseA;
         ctx.fillStyle = this.v.head;
         ctx.beginPath(); ctx.arc(p[1].x, p[1].y, this.width * 0.45, 0, TAU); ctx.fill();
       }
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha = baseA;
+      if (this.v.shine) {
+        // metallic scales: a bright sheen that slides along the body as it swims
+        const sp = 0.25 + 0.5 * (0.5 + 0.5 * Math.sin(this.phase * 0.18));
+        const si = Math.min(n - 2, Math.floor(sp * (n - 1)));
+        const g = ctx.createRadialGradient(p[si].x, p[si].y, 0, p[si].x, p[si].y, this.width * 2.4);
+        g.addColorStop(0, "rgba(255,250,222,0.85)");
+        g.addColorStop(0.5, "rgba(255,226,140,0.35)");
+        g.addColorStop(1, "rgba(255,226,140,0)");
+        ctx.fillStyle = g;
+        ctx.fillRect(p[si].x - this.width * 2.4, p[si].y - this.width * 2.4, this.width * 4.8, this.width * 4.8);
+      }
       // edge shading for volume
       this.bodyPath(ctx, L, R, 0, 0);
       ctx.lineWidth = this.width * 0.7;
@@ -574,6 +596,7 @@
     let W = 0, H = 0, dpr = 1, unit = 100;
     let koi = [], pads = [], petals = [], ripples = [], food = [], drops = [];
     let fly = null, nextFly = 600;
+    let visitor = null, visitorUntil = 0;
     let prepared = false;
     let prevBoxes = [];
     let scrollBusyUntil = 0, skip = 0;
@@ -595,6 +618,7 @@
       const newUnit = opts.unit ? opts.unit(W, H) : contained ? Math.max(70, Math.min(120, Math.min(W, H) * 0.3)) : Math.max(85, Math.min(150, Math.min(W, H) * 0.27));
       if (!koi.length || Math.abs(newUnit - unit) > 20) {
         unit = newUnit;
+        visitor = null;
         const area = W * H;
         koi = Array.from({ length: Math.min(opts.maxKoi || 6, Math.max(3, Math.round(area / 30000))) }, () => new Koi(W, H, unit));
         pads = Array.from({ length: opts.pads != null ? opts.pads : contained ? 3 : W > 700 ? 6 : 4 }, () => new LilyPad(W, H, unit));
@@ -653,8 +677,34 @@
       }
     }
 
+    // a guest scattering food (as opposed to the page calling the koi over)
+    function feed(x, y) {
+      addRipple(x, y, true);
+      summon(x, y);
+    }
+
+    // Feeding time brings up one more fish from the deep: it fades up a few lengths away,
+    // heads for the food, stays a while after the last pinch, then sinks out of sight.
+    function summon(x, y) {
+      if (reduced || contained) return;
+      visitorUntil = t + 620; // ~10 s after the latest feed
+      if (visitor) { if (visitor.state === "sinking") visitor.state = "here"; return; }
+      const k = new Koi(W, H, unit * 1.12);
+      k.v = VISITOR; k.patches = []; k.seeksAll = true; k.special = true;
+      const away = rand(2.4, 3.6) * k.len, dir = rand(0, TAU);
+      k.x = clamp(x + Math.cos(dir) * away, k.len * 0.6, W - k.len * 0.6);
+      k.y = clamp(y + Math.sin(dir) * away, k.len * 0.6, H - k.len * 0.6);
+      k.a = Math.atan2(y - k.y, x - k.x);
+      k.base.forEach((b, i) => { b.x = k.x - Math.cos(k.a) * k.seg * i; b.y = k.y - Math.sin(k.a) * k.seg * i; });
+      k.pts = k.base.map((b) => ({ x: b.x, y: b.y }));
+      k.tailLag = k.a;
+      k.vis = 0; k.state = "rising";
+      visitor = k;
+      koi.push(k);
+    }
+
     function scheduleLeap() {
-      const inside = koi.filter((k) => !k.leap && k.x > W * 0.15 && k.x < W * 0.85 && k.y > H * 0.15 && k.y < H * 0.85);
+      const inside = koi.filter((k) => !k.leap && !k.special && k.x > W * 0.15 && k.x < W * 0.85 && k.y > H * 0.15 && k.y < H * 0.85);
       if (!inside.length) { nextLeap = t + 60; return; }
       const k = pick(inside);
       k.leap = { t: 0, dur: rand(95, 120) };
@@ -681,6 +731,15 @@
 
       if (!once && t > nextLeap) scheduleLeap();
 
+      if (visitor && !once) {
+        if (visitor.state === "rising") { visitor.vis = Math.min(1, visitor.vis + 0.012 * dt); if (visitor.vis >= 1) visitor.state = "here"; }
+        else if (visitor.state === "here" && t > visitorUntil && !food.length) visitor.state = "sinking";
+        else if (visitor.state === "sinking") {
+          visitor.vis -= 0.008 * dt;
+          if (visitor.vis <= 0) { koi = koi.filter((k) => k !== visitor); visitor = null; }
+        }
+      }
+
       const outlines = [];
       for (const k of koi) {
         if (!once) k.update(dt, W, H, food);
@@ -694,11 +753,11 @@
 
       // underwater koi, washed into the water. Only the boxes around the fish are
       // cleared, tinted and copied, instead of three full-screen passes per frame.
-      const boxes = mergeBoxes(koi.map((k, i) => (k.leap ? null : fishBox(k, outlines[i]))).filter(Boolean));
+      const boxes = mergeBoxes(koi.map((k, i) => (k.leap || k.special ? null : fishBox(k, outlines[i]))).filter(Boolean));
       for (const b of prevBoxes.concat(boxes)) lctx.clearRect(b.x, b.y, b.w, b.h);
       lctx.fillStyle = "rgba(70,95,105,0.16)";
-      koi.forEach((k, i) => { if (!k.leap) k.drawShadow(lctx, outlines[i][0], outlines[i][1]); });
-      koi.forEach((k, i) => { if (!k.leap) k.draw(lctx, outlines[i][0], outlines[i][1]); });
+      koi.forEach((k, i) => { if (!k.leap && !k.special) k.drawShadow(lctx, outlines[i][0], outlines[i][1]); });
+      koi.forEach((k, i) => { if (!k.leap && !k.special) k.draw(lctx, outlines[i][0], outlines[i][1]); });
       lctx.save();
       lctx.globalCompositeOperation = "source-atop";
       lctx.fillStyle = "rgba(214,228,232,0.28)";
@@ -709,6 +768,17 @@
       for (const b of boxes) ctx.drawImage(layer, b.x * dpr, b.y * dpr, b.w * dpr, b.h * dpr, b.x, b.y, b.w, b.h);
       ctx.restore();
       prevBoxes = boxes;
+
+      // the feeding-time visitor swims just under the surface, so it keeps its colour
+      koi.forEach((k, i) => {
+        if (!k.special || k.leap) return;
+        ctx.save();
+        ctx.globalAlpha = (k.vis ?? 1) * 0.94;
+        ctx.fillStyle = "rgba(70,95,105,0.16)";
+        k.drawShadow(ctx, outlines[i][0], outlines[i][1]);
+        k.draw(ctx, outlines[i][0], outlines[i][1]);
+        ctx.restore();
+      });
 
       for (const p of pads) { if (!once) p.update(dt, W, H); p.draw(ctx); }
       for (const p of petals) { if (!once) p.update(dt, W, H); p.draw(ctx); }
@@ -817,7 +887,7 @@
       else if (running === "paused") { running = false; start(); }
     });
 
-    return { prepare, start, stop, addRipple, resize, leap: scheduleLeap, splash: (x, y) => splash(x, y, true) };
+    return { prepare, start, stop, addRipple, feed, resize, leap: scheduleLeap, splash: (x, y) => splash(x, y, true) };
   }
 
   window.KoiPond = KoiPond;

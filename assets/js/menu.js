@@ -73,7 +73,7 @@
     else window.addEventListener("load", () => setTimeout(go, 300), { once: true });
     document.addEventListener("pointerdown", (e) => {
       if (e.target.closest("button, a, input, .topbar, .dish, .sheet, .fab")) return;
-      pond.addRipple(e.clientX, e.clientY, true);
+      pond.feed(e.clientX, e.clientY);
     }, { passive: true });
   } else if (mode === "veg" && window.BambooGrove) {
     window.BambooGrove($("#grove")).build();

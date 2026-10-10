@@ -114,7 +114,7 @@
     area.addEventListener("pointerdown", (e) => {
       if (!pond || e.button > 0) return;
       if (e.target.closest("a, button, input, select, textarea, summary, iframe, .panel")) return;
-      pond.addRipple(e.clientX, e.clientY, true);
+      pond.feed(e.clientX, e.clientY);
       fed++;
       if (hint) hint.classList.add("is-hidden");
       if (countEl) countEl.textContent = fed === 1 ? "Here they come!" : `${fed} pinches of food`;
