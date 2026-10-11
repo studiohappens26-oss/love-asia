@@ -276,6 +276,47 @@ html:not(.js) .grove .g-near.g-r { translate: 85% 0; }
 @keyframes pond-zoom { from { transform: scale(var(--pond-from, .3)); } to { transform: none; } }
 @keyframes dive-in { to { transform: scale(var(--dive-scale)); } }
 @keyframes dive-sheen { 0% { opacity: 0; } 55% { opacity: .55; } 100% { opacity: 0; } }
+/* "keep going" prompt for the stretches that can look like the end (garden.js) */
+.scroll-cue {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--safe-bottom) + 22px);
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px 9px 18px;
+  border-radius: 999px;
+  background: rgba(252, 250, 245, .9);
+  box-shadow: 0 12px 28px -16px rgba(40, 50, 45, .55);
+  color: var(--ink-2);
+  font-size: .74rem;
+  font-weight: 500;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  translate: -50% 10px;
+  transition: opacity .45s var(--ease), translate .45s var(--ease);
+}
+.scroll-cue.is-on { opacity: 1; translate: -50% 0; }
+.scroll-cue__arrow { position: relative; width: 10px; height: 14px; }
+.scroll-cue__arrow::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  animation: cue-bob 1.6s ease-in-out infinite;
+}
+@keyframes cue-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 4px; } }
+@media (prefers-reduced-motion: reduce) { .scroll-cue__arrow::before { animation: none; } }
+
 /* the tall bamboo fades into the garden's morning mist at the bottom of the grove */
 .grove__front::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 12vh; height: 12svh; background: linear-gradient(rgba(239, 235, 226, 0), #efebe2); pointer-events: none; }
 /* One live koi pond sits behind every water section: the cards scroll over it. */

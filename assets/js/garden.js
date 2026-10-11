@@ -167,4 +167,43 @@
       onScroll();
     }
   }
+
+  /* ------------------------------ scroll prompt ------------------------------ */
+  // The grove's misty stretch and the pinned garden pond can look like the end of the
+  // page. If someone stops there for a moment, a small prompt invites them to keep going;
+  // it fades the moment they scroll again. (Never on the hero at the very top.)
+  const groveEl = document.querySelector(".grove"), diveEl = document.querySelector(".dive");
+  if (groveEl || diveEl) {
+    const cue = document.createElement("div");
+    cue.className = "scroll-cue";
+    cue.setAttribute("aria-hidden", "true");
+    cue.innerHTML = '<span class="scroll-cue__text"></span><span class="scroll-cue__arrow"></span>';
+    document.body.appendChild(cue);
+    const text = cue.firstChild;
+    let idle = 0;
+    const message = () => {
+      const vh = window.innerHeight;
+      if (diveEl) {
+        const r = diveEl.getBoundingClientRect();
+        // pinned in the garden, before the water has filled the screen
+        if (r.top <= 2 && -r.top < (r.height - vh) * 0.8) return "Scroll to dive in";
+      }
+      if (groveEl) {
+        const r = groveEl.getBoundingClientRect();
+        if (window.scrollY > vh * 0.3 && r.bottom > vh * 1.05) return "Keep scrolling";
+      }
+      return "";
+    };
+    const hide = () => cue.classList.remove("is-on");
+    window.addEventListener("scroll", () => {
+      hide();
+      clearTimeout(idle);
+      idle = setTimeout(() => {
+        const m = message();
+        if (!m) return;
+        text.textContent = m;
+        cue.classList.add("is-on");
+      }, 1400);
+    }, { passive: true });
+  }
 })();
