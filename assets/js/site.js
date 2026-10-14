@@ -25,6 +25,20 @@
     });
   }
 
+  // signature dishes slider: arrow buttons step one card at a time
+  const slider = document.getElementById("sig-slider");
+  if (slider) {
+    const btns = document.querySelectorAll(".sig-nav__btn");
+    const step = () => { const c = slider.querySelector(".sig"); return c ? c.offsetWidth + 12 : slider.clientWidth * 0.8; };
+    const sync = () => {
+      const max = slider.scrollWidth - slider.clientWidth - 2;
+      btns.forEach((b) => { b.disabled = b.dataset.dir === "-1" ? slider.scrollLeft <= 2 : slider.scrollLeft >= max; });
+    };
+    btns.forEach((b) => b.addEventListener("click", () => slider.scrollBy({ left: step() * +b.dataset.dir, behavior: "smooth" })));
+    slider.addEventListener("scroll", sync, { passive: true });
+    sync();
+  }
+
   // party enquiry: compose a WhatsApp message from the form
   const form = document.getElementById("enquiry");
   if (form) {

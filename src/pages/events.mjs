@@ -2,20 +2,20 @@ import { groveBack, groveFront, dive } from "./scene.mjs";
 import { BUSINESS, esc, head, siteHeader, siteFooter, restaurantSchema, breadcrumbSchema, faqSchema, faqHtml, waLink, ICON, fullAddress } from "../site.mjs";
 
 export const EVENTS_FAQ = [
-  { q: "How many guests can Love Asia host?", a: "We can seat 100+ guests at the same time, between the air-conditioned dining room and the open-air seating outside. That's enough for anything from a small birthday dinner to a big family do or an office party." },
-  { q: "Do you offer buffets for parties?", a: "Yes. For parties and group bookings you can have a buffet or order à la carte. Tell us your numbers and budget and we'll help you work out the food." },
+  { q: "How many guests can Love Asia host?", a: "Anything from 15 guests to 100+. We have three floors: open-air seating outside, the air-conditioned Glass Atrium on the first floor, and the Private Lounge on the second floor for smaller, quieter parties. Together they seat 105." },
+  { q: "What food can we have for a party?", a: "Choose a set menu or order à la carte, whichever suits your group. Tell us your numbers and budget and we'll help you work out the food." },
   { q: "Can we have both veg and non-veg food?", a: `Yes. Our <a href="../veg/">vegetarian menu</a> and <a href="../non-veg/">full menu</a> are both available for events, and every dish is marked veg or non-veg.` },
-  { q: "Is Love Asia good for kids' birthday parties?", a: "Yes. There's a play area, and the kids usually spend half the party watching the koi." },
+  { q: "Is Love Asia good for kids' birthday parties?", a: "Yes. There's a dedicated toddler play zone, and the kids usually spend half the party watching the koi." },
   { q: "How do I book a party?", a: `Send us your date, guest count and occasion on <a href="${waLink("Hi Love Asia! I'd like to plan a party.")}" rel="noopener" target="_blank">WhatsApp</a> or call <a href="tel:${BUSINESS.phoneE164}">${esc(BUSINESS.phone)}</a>. Weekends go fast, so book early if you can.` },
 ];
 
 const OCCASIONS = [
   ["Birthday parties", "Big birthdays, small birthdays and surprise dinners, with room for everyone you invite.", "誕"],
-  ["Kids' birthdays", "There's a play area, and the koi pond keeps the little ones busy.", "童"],
+  ["Kids' birthdays", "A toddler play zone, and a koi pond that keeps the little ones busy.", "童"],
   ["Anniversaries", "A quiet table by the pond for two, or a party for the whole family.", "愛"],
   ["Corporate lunches & team dinners", "Air-conditioned dining for team lunches, offsites and client meals.", "宴"],
   ["Family get-togethers", "Reunions, festive lunches and kitty parties over big shared plates.", "家"],
-  ["Festive celebrations", "Book a buffet for your group over the festive season.", "祝"],
+  ["Festive celebrations", "Book a set menu for your group over the festive season.", "祝"],
 ];
 
 export function eventsPage() {
@@ -26,7 +26,7 @@ export function eventsPage() {
         <span class="seal" aria-hidden="true">宴</span>
         <p class="eyebrow">Events &amp; parties</p>
         <h1 id="ev-title">Birthday parties &amp; events in Hennur, Bengaluru</h1>
-        <p class="lede">Have your party by the koi pond. We can seat 100+ guests at the same time, inside in the air-conditioned dining room or out in the open air, with a buffet or à la carte.</p>
+        <p class="lede">A floor for your celebration, from 15 guests to 100+. Choose a set menu or order à la carte. Birthdays, family get-togethers, team events: tell us your date and guest count, and we'll take care of the rest.</p>
         <div class="cta-row">
           <a class="btn btn--ink" href="#enquire">Enquire now ${ICON.arrow}</a>
           <a class="btn" href="tel:${b.phoneE164}">${ICON.phone} ${esc(b.phone)}</a>
@@ -34,7 +34,7 @@ export function eventsPage() {
       </div>`;
   return `${head({
     title: "Birthday Party & Event Venue in Hennur, Bengaluru | Love Asia",
-    description: "Birthday parties, kids' parties and corporate lunches at Love Asia, Hennur. Seats 100+ guests at once, AC and open-air, buffet or à la carte.",
+    description: "Birthday parties, family get-togethers and team events at Love Asia, Kothanur near Hennur. A floor for your celebration, from 15 guests to 100+, with a set menu or à la carte.",
     path,
     root,
     css: ["assets/css/style.css", "assets/css/site.css"],
@@ -62,10 +62,10 @@ ${siteHeader({ root, current: "events" })}
         <p class="eyebrow">At a glance</p>
         <h2 id="glance-title">Room for the whole party</h2>
         <ul class="facts">
-          <li><b>100+</b><span>guests at once</span></li>
-          <li><b>Buffet</b><span>or à la carte</span></li>
+          <li><b>15–100+</b><span>guests</span></li>
+          <li><b>Set menu</b><span>or à la carte</span></li>
           <li><b>Veg</b><span>&amp; non-veg</span></li>
-          <li><b>AC</b><span>&amp; open-air</span></li>
+          <li><b>3</b><span>floors</span></li>
         </ul>
       </div>
     </section>
@@ -87,10 +87,10 @@ ${siteHeader({ root, current: "events" })}
       <p class="eyebrow">Why celebrate here</p>
       <h2 id="why-ev">Why have it here</h2>
       <ul class="ticks">
-        <li><b>Room for everyone.</b> We can seat 100+ guests at the same time.</li>
-        <li><b>Indoors or out.</b> An air-conditioned dining room, and open-air seating in the garden.</li>
+        <li><b>Room for everyone.</b> From 15 guests to 100+, with a whole floor for your party.</li>
+        <li><b>Three moods.</b> Open-air seating, the air-conditioned Glass Atrium and the quiet Private Lounge.</li>
         <li><b>The food.</b> Sushi, dim sum, bao, ramen, Thai curries and noodles.</li>
-        <li><b>Buffet or à la carte.</b> Whichever suits your group.</li>
+        <li><b>Set menu or à la carte.</b> Whichever suits your group.</li>
         <li><b>Veg guests covered.</b> A separate pure-veg menu, with every dish marked.</li>
         <li><b>Mocktails.</b> Kids and grown-ups both order them.</li>
         <li><b>Staff who've done this before.</b> They've run a lot of parties.</li>
@@ -118,7 +118,7 @@ ${siteHeader({ root, current: "events" })}
           <label>Guests<input name="guests" type="number" min="1" max="500" inputmode="numeric" placeholder="e.g. 40" /></label>
         </div>
         <label>Food preference
-          <select name="food"><option>Buffet</option><option>À la carte</option><option>Not sure yet</option></select>
+          <select name="food"><option>Set menu</option><option>À la carte</option><option>Not sure yet</option></select>
         </label>
         <label>Anything else?<textarea name="notes" rows="3" placeholder="Veg / non-veg mix, timing, cake, decor…"></textarea></label>
         <button class="btn btn--ink" type="submit">${ICON.whatsapp} Send on WhatsApp</button>

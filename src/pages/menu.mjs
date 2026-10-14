@@ -211,7 +211,7 @@ ${SVG_DEFS}
     <p class="landing__prompt">How would you like to dine today?</p>
     ${choiceTiles(root, "strong")}
     <p class="landing__more">
-      <a href="${root}events/">Planning a party? See events &amp; buffets</a>
+      <a href="${root}events/">Planning a party? See events &amp; parties</a>
     </p>
   </div>
 </main>
@@ -302,7 +302,7 @@ export function menuPage(DATA, mode) {
       <span><span class="mark mark--nonveg" aria-hidden="true"></span> Non-vegetarian</span>
     </p>
     <p class="fine">Prices in ₹, exclusive of applicable taxes. Please inform your server of any allergies.</p>
-    <p class="fine">${mode === "veg" ? `Looking for chicken, prawn or sushi? <a href="${root}${other}">See the full menu</a>.` : `Vegetarian? <a href="${root}${other}">See the pure-veg menu</a>.`} Hosting a party? <a href="${root}events/">Events &amp; buffets</a>.</p>
+    <p class="fine">${mode === "veg" ? `Looking for chicken, prawn or sushi? <a href="${root}${other}">See the full menu</a>.` : `Vegetarian? <a href="${root}${other}">See the pure-veg menu</a>.`} Hosting a party? <a href="${root}events/">Events &amp; parties</a>.</p>
     <p class="fine"><a href="tel:${BUSINESS.phoneE164}">${esc(BUSINESS.phone)}</a> · ${esc(BUSINESS.hours.label)}</p>
     <a class="footer__logo" href="${root}" aria-label="Love Asia home">${logoSvg()}</a>
   </footer>

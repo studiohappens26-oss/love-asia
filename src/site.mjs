@@ -12,24 +12,30 @@ export const BASE_PATH = new URL(SITE_URL + "/").pathname; // "/love-asia/"
 
 export const BUSINESS = {
   name: "Love Asia",
-  tagline: "Sushi & Pan-Asian Restaurant in Hennur, Bengaluru",
+  tagline: "Modern Pan-Asian Restaurant in Kothanur, North Bengaluru",
   phone: "+91 86603 29719",
   phoneE164: "+918660329719",
   whatsapp: "918660329719",
+  email: "loveasiablr@gmail.com",
+  instagram: { handle: "loveasiablr", url: "https://www.instagram.com/loveasiablr/" },
   address: {
-    street: "1, Phase 2, Anjanappa Layout, Kothanur",
-    area: "Hennur",
+    street: "Phase 2, 1, Anjanappa Layout",
+    area: "Kothanur",
     locality: "Bengaluru",
     region: "Karnataka",
     postal: "560077",
     country: "IN",
   },
+  landmark: "Near Hennur Main Road, 5 minutes from Byg Brewski Hennur",
+  parking: "Parking available (self-park)",
   geo: { lat: 13.0676369, lng: 77.6482515 },
-  hours: { label: "Open daily, 12:00 PM to 11:00 PM", short: "12 PM to 11 PM", days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "12:00", closes: "23:00" },
+  hours: { label: "Open daily, 12 noon to 11 PM", short: "12 noon to 11 PM", days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], opens: "12:00", closes: "23:00" },
   priceRange: "₹₹",
   costForTwo: "₹1,000 for two (approx.)",
-  capacity: 100,
-  cuisines: ["Pan-Asian", "Japanese", "Sushi", "Thai", "Chinese", "Korean", "Malaysian", "Indonesian"],
+  capacity: 105, // seats, across three floors
+  areaSqft: 5000,
+  chargingPoints: 57,
+  cuisines: ["Pan-Asian", "Japanese", "Sushi", "Thai", "Indonesian", "Burmese", "Chinese"],
   google: "https://share.google/MaBbqN2bvV0pP56fA",
   maps: "https://www.google.com/maps/search/?api=1&query=Love%20Asia%2C%20Anjanappa%20Layout%2C%20Kothanur%2C%20Bengaluru%20560077",
   mapsEmbed: "https://maps.google.com/maps?q=13.0676369,77.6482515&z=16&output=embed",
@@ -71,6 +77,9 @@ export const ICON = {
   whatsapp: `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 20l1.2-3.9A8.5 8.5 0 1 1 8.4 19z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.5c0 3 2.5 6.5 6.5 6.5l1-1.6-1.8-1-1 .9c-1.2-.5-2.3-1.6-2.8-2.8l.9-1-1-1.8z" fill="currentColor"/></svg>`,
   pin: `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10" r="2.3" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>`,
   clock: `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  mail: `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`,
+  car: `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 16V12l2-5h10l2 5v4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 12h14" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="16.5" r="1.6" fill="currentColor"/><circle cx="16" cy="16.5" r="1.6" fill="currentColor"/></svg>`,
+  insta: `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.6" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="16.6" cy="7.4" r="1" fill="currentColor"/></svg>`,
   arrow: `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 };
 
@@ -102,7 +111,7 @@ export function head({ title, description, path, root, css = [], schema = [], og
   ${noindex ? '<meta name="robots" content="noindex" />' : '<meta name="robots" content="index, follow, max-image-preview:large" />'}
   <meta name="theme-color" content="#f6f1e7" />
   <meta name="geo.region" content="IN-KA" />
-  <meta name="geo.placename" content="Hennur, Bengaluru" />
+  <meta name="geo.placename" content="Kothanur, Bengaluru" />
   <meta name="geo.position" content="${BUSINESS.geo.lat};${BUSINESS.geo.lng}" />
   <meta property="og:type" content="${ogType}" />
   <meta property="og:site_name" content="${esc(BUSINESS.name)}" />
@@ -113,7 +122,7 @@ export function head({ title, description, path, root, css = [], schema = [], og
   <meta property="og:image" content="${abs(image)}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Love Asia, a sushi and Pan-Asian restaurant in Hennur, Bengaluru" />
+  <meta property="og:image:alt" content="Love Asia, a modern Pan-Asian restaurant in Kothanur, North Bengaluru" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="${esc(title)}" />
   <meta name="twitter:description" content="${esc(description)}" />
@@ -162,12 +171,14 @@ export function siteFooter({ root }) {
     <div>
       <h2>Visit</h2>
       <address>${esc(BUSINESS.name)}<br />${esc(a.street)},<br />${esc(a.area)}, ${esc(a.locality)} ${esc(a.postal)}</address>
+      <p>${esc(BUSINESS.landmark)}.</p>
       <p><a href="${BUSINESS.maps}" rel="noopener" target="_blank">Get directions</a></p>
     </div>
     <div>
       <h2>Hours &amp; contact</h2>
       <p>${esc(BUSINESS.hours.label)}</p>
       <p><a href="tel:${BUSINESS.phoneE164}">${esc(BUSINESS.phone)}</a></p>
+      <p><a href="mailto:${BUSINESS.email}">${esc(BUSINESS.email)}</a></p>
       <p><a href="${waLink("Hi Love Asia! I'd like to make a reservation.")}" rel="noopener" target="_blank">WhatsApp us</a></p>
     </div>
     <div>
@@ -175,6 +186,7 @@ export function siteFooter({ root }) {
       <p><a href="${root}menu/">Menu</a> · <a href="${root}veg/">Veg</a> · <a href="${root}non-veg/">Non-Veg</a></p>
       <p><a href="${root}events/">Birthday parties &amp; events</a></p>
       <p><a href="${BUSINESS.google}" rel="noopener" target="_blank">Love Asia on Google</a></p>
+      <p><a href="${BUSINESS.instagram.url}" rel="noopener" target="_blank">Instagram @${esc(BUSINESS.instagram.handle)}</a></p>
     </div>
   </div>
   <p class="site-footer__fine">© ${new Date().getFullYear()} ${esc(BUSINESS.name)}, ${esc(a.area)}, ${esc(a.locality)}. All rights reserved.</p>
@@ -189,11 +201,12 @@ export function restaurantSchema() {
     "@type": "Restaurant",
     "@id": abs("#restaurant"),
     name: b.name,
-    description: "Sushi and Pan-Asian restaurant in Hennur, Bengaluru with a koi pond, open-air and air-conditioned seating, à la carte and buffet options, and a venue for birthday parties and events.",
+    description: "A modern Pan-Asian restaurant in Kothanur, North Bengaluru, near Hennur Main Road: 5,000 sq ft over three floors with 105 seats, a koi pond, a Buddha waterfall, a glass atrium and a toddler play zone. Japanese, Thai, Indonesian, Burmese and Chinese food, and parties from 15 to 100+ guests.",
     url: abs(""),
     image: [abs("assets/img/og-image.png")],
     logo: abs("assets/img/logo.png"),
     telephone: b.phoneE164,
+    email: b.email,
     priceRange: b.priceRange,
     servesCuisine: b.cuisines,
     acceptsReservations: true,
@@ -201,7 +214,7 @@ export function restaurantSchema() {
     maximumAttendeeCapacity: b.capacity,
     address: {
       "@type": "PostalAddress",
-      streetAddress: a.street,
+      streetAddress: `${a.street}, ${a.area}`,
       addressLocality: a.locality,
       addressRegion: a.region,
       postalCode: a.postal,
@@ -211,8 +224,8 @@ export function restaurantSchema() {
     hasMap: b.maps,
     areaServed: ["Hennur", "Kothanur", "Kalyan Nagar", "HBR Layout", "Horamavu", "North Bengaluru"],
     openingHoursSpecification: [{ "@type": "OpeningHoursSpecification", dayOfWeek: b.hours.days, opens: b.hours.opens, closes: b.hours.closes }],
-    amenityFeature: ["Koi pond", "Open-air seating", "Air-conditioned indoor seating", "Seating for 100+ guests at once", "Kid-friendly", "Buffet", "Birthday parties & events"].map((n) => ({ "@type": "LocationFeatureSpecification", name: n, value: true })),
-    sameAs: [b.google, ...b.listings],
+    amenityFeature: ["Koi pond", "Buddha waterfall", "Open-air seating", "Air-conditioned glass atrium", "Private lounge", "Toddler play zone", "Free Wi-Fi", "Charging points", "Parking", "Birthday parties & events"].map((n) => ({ "@type": "LocationFeatureSpecification", name: n, value: true })),
+    sameAs: [b.google, b.instagram.url, ...b.listings],
   };
 }
 

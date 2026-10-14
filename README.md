@@ -14,7 +14,7 @@ page into plain HTML, so search engines can read all the content and every dish.
 | `/menu/` | The Veg / Non-Veg chooser. |
 | `/non-veg/` | The full menu (veg + non-veg) over the animated koi pond. |
 | `/veg/` | The pure-vegetarian menu in the bamboo grove. |
-| `/events/` | Birthday parties and events, in the same scenery as home: a shorter bamboo grove, the dive into the garden pond, and live koi behind every section. 100+ guests, buffets, and an enquiry form that opens WhatsApp. |
+| `/events/` | Birthday parties and events, in the same scenery as home: a shorter bamboo grove, the dive into the garden pond, and live koi behind every section. parties from 15 to 100+ guests, set menus or à la carte, and an enquiry form that opens WhatsApp. |
 
 Old QR codes that point at `/#veg` or `/#nonveg` still work; they redirect to the new pages.
 

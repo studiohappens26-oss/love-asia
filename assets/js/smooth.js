@@ -20,7 +20,7 @@
       // in-page links (#menu, #visit…) glide too, stopping below the fixed header
       anchors: { offset: -((header && header.offsetHeight) || 64) - 12 },
       // the section sheet, map and form fields scroll on their own
-      prevent: (node) => !!(node.closest && node.closest(".sheet, iframe, textarea, select")),
+      prevent: (node) => !!(node.closest && node.closest(".sheet, .sig-slider, iframe, textarea, select")),
     });
     // Lenis does the smoothing, so the browser's own smooth scroll must be off
     document.documentElement.style.scrollBehavior = "auto";
