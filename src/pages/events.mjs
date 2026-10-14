@@ -4,6 +4,7 @@ import { BUSINESS, esc, head, siteHeader, siteFooter, restaurantSchema, breadcru
 export const EVENTS_FAQ = [
   { q: "How many guests can Love Asia host?", a: "Anything from 15 guests to 100+. We have three floors: open-air seating outside, the air-conditioned Glass Atrium on the first floor, and the Private Lounge on the second floor for smaller, quieter parties. Together they seat 105." },
   { q: "What food can we have for a party?", a: "Choose a set menu or order à la carte, whichever suits your group. Tell us your numbers and budget and we'll help you work out the food." },
+  { q: "Do you do buffets?", a: "Yes, we can arrange a buffet for your party too. Mention it in the enquiry form below, or when you call." },
   { q: "Can we have both veg and non-veg food?", a: `Yes. Our <a href="../veg/">vegetarian menu</a> and <a href="../non-veg/">full menu</a> are both available for events, and every dish is marked veg or non-veg.` },
   { q: "Is Love Asia good for kids' birthday parties?", a: "Yes. There's a dedicated toddler play zone, and the kids usually spend half the party watching the koi." },
   { q: "How do I book a party?", a: `Send us your date, guest count and occasion on <a href="${waLink("Hi Love Asia! I'd like to plan a party.")}" rel="noopener" target="_blank">WhatsApp</a> or call <a href="tel:${BUSINESS.phoneE164}">${esc(BUSINESS.phone)}</a>. Weekends go fast, so book early if you can.` },
@@ -118,7 +119,7 @@ ${siteHeader({ root, current: "events" })}
           <label>Guests<input name="guests" type="number" min="1" max="500" inputmode="numeric" placeholder="e.g. 40" /></label>
         </div>
         <label>Food preference
-          <select name="food"><option>Set menu</option><option>À la carte</option><option>Not sure yet</option></select>
+          <select name="food"><option>Set menu</option><option>À la carte</option><option>Buffet</option><option>Not sure yet</option></select>
         </label>
         <label>Anything else?<textarea name="notes" rows="3" placeholder="Veg / non-veg mix, timing, cake, decor…"></textarea></label>
         <button class="btn btn--ink" type="submit">${ICON.whatsapp} Send on WhatsApp</button>

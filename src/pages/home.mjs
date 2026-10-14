@@ -8,6 +8,7 @@ export const HOME_FAQ = [
   { q: "Where can I sit?", a: "There are three spaces across three floors: open-air seating outside, the air-conditioned Glass Atrium on the first floor, and the quieter Private Lounge on the second floor. Together they seat 105." },
   { q: "Is there a vegetarian menu?", a: `Yes. There's a separate <a href="veg/">pure-veg menu</a> with veg sushi, dim sum, gyoza, bao, Thai curries, ramen, noodles and desserts. The <a href="non-veg/">full menu</a> adds chicken, prawn, fish and seafood sushi.` },
   { q: "Can I host a party or event at Love Asia?", a: `Yes, for anything from 15 guests to 100+. Choose a set menu or order à la carte. Birthdays, family get-togethers and team events: tell us your date and guest count on the <a href="events/">events page</a>.` },
+  { q: "Do you do buffets?", a: `Yes, we can arrange a buffet for parties and group bookings. Just ask when you <a href="events/#enquire">enquire</a> or call us on <a href="tel:${BUSINESS.phoneE164}">${esc(BUSINESS.phone)}</a>.` },
   { q: "Is Love Asia good for kids?", a: "Very. We have a dedicated toddler play zone, so parents can enjoy their meal while the little ones stay busy, and kids love watching the koi." },
   { q: "Can I work from Love Asia?", a: `Yes. There's free Wi-Fi and ${BUSINESS.chargingPoints} charging points, so it's an easy place to work, meet or have a corporate lunch.` },
   { q: "Is there parking?", a: "Yes, parking is available (self-park)." },
