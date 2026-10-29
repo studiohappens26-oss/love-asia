@@ -29,20 +29,26 @@ Old QR codes that point at `/#veg` or `/#nonveg` still work; they redirect to th
 - `sitemap.xml`, `robots.txt` and a friendly 404 page.
 - One H1 per page, semantic sections, descriptive link text, and local keywords (Hennur, Kothanur, Bengaluru).
 - Light pages: CSS inlined, self-hosted font subsets (Shippori Mincho + Zen Kaku Gothic New),
-  scenery pre-rendered at build time into static SVGs (`src/scenery.mjs`), the Google map loads on demand,
+  scenery pre-rendered at build time into static SVGs (`src/scenery.mjs`), the Google map loads as you scroll near it,
   and the koi pond script only loads when you reach it. Lighthouse (mobile): 98 to 100 in every category.
 - Motion: the grove's parting and parallax are CSS scroll-driven animations, run by the compositor, with a
   small JS fallback in `assets/js/garden.js` (shared by the home and events pages). The temples, pagoda, torii, farmhouses, pines and clouds
   are drawn in `src/architecture.mjs`; the garden pond scene is `src/garden-pond.mjs`. On desktop (mouse or trackpad), scrolling is smoothed with
   [Lenis](https://github.com/darkroomengineering/lenis) (`assets/vendor/`, MIT). Phones keep native scrolling,
   and Lenis isn't downloaded there.
+- Auto-dive: scrolling down to the garden fence glides the page (about 2.4s) through the pond zoom to the
+  first section in the water. Any touch, wheel or key stops it. Add `?dive=manual` to the URL to turn it off.
+  If you stay still for 3 seconds, a small "Scroll down" nudge flashes for a second, every 3 seconds.
+- Keyword pages (`src/pages/landing.mjs`): `/sushi-hennur/`, `/family-restaurant-hennur/` and
+  `/date-night-hennur/`, each with its own FAQ and breadcrumb schema. The sushi and dessert lists come
+  straight from `menu-data.js`, so prices stay in sync.
 
 ## Editing
 
 - **Business details** (phone, address, hours, map links): `src/site.mjs` → `BUSINESS`.
 - **Menu dishes and prices**: `assets/js/menu-data.js`.
-- **Home page copy**: `src/pages/home.mjs`. **Events copy**: `src/pages/events.mjs`.
-- **Live URL**: update `SITE_URL` in `src/site.mjs` when you move to a custom domain.
+- **Home page copy**: `src/pages/home.mjs`. **Events copy**: `src/pages/events.mjs`. **Keyword pages**: `src/pages/landing.mjs`.
+- **Live URL**: `SITE_URL` in `src/site.mjs` (currently https://loveasia.in).
 
 ## Build & deploy
 

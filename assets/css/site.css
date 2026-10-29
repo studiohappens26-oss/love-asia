@@ -7,7 +7,7 @@
 
 html { scroll-behavior: smooth; scroll-padding-top: 76px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
+body.page-home, body.page-events, body.page-landing, body.page-404 { background: #fbfaf6; }
 
 /* ------------------------------ header ------------------------------ */
 .site-header {
@@ -21,7 +21,7 @@ body.page-home, body.page-events, body.page-404 { background: #fbfaf6; }
   padding: var(--safe-top) 12px 0 12px;
   transition: background-color .3s var(--ease), box-shadow .3s var(--ease);
 }
-.site-header.is-scrolled, .page-404 .site-header {
+.site-header.is-scrolled, .page-404 .site-header, .page-landing .site-header {
   background: rgba(251, 249, 244, .97);
   box-shadow: 0 1px 0 var(--hair-2), 0 10px 30px -24px rgba(60, 45, 30, .5);
 }
@@ -277,46 +277,48 @@ html:not(.js) .grove .g-near.g-r { translate: 85% 0; }
 @keyframes pond-zoom { from { transform: scale(var(--pond-from, .3)); } to { transform: none; } }
 @keyframes dive-in { to { transform: scale(var(--dive-scale)); } }
 @keyframes dive-sheen { 0% { opacity: 0; } 55% { opacity: .55; } 100% { opacity: 0; } }
-/* "keep going" prompt for the stretches that can look like the end (garden.js) */
+/* tiny "scroll down" nudge that flashes after a few idle seconds (garden.js) */
 .scroll-cue {
   position: fixed;
   left: 50%;
-  bottom: calc(var(--safe-bottom) + 22px);
+  bottom: calc(var(--safe-bottom) + 18px);
   z-index: 15;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 16px 9px 18px;
+  gap: 7px;
+  padding: 6px 12px 6px 14px;
   border-radius: 999px;
-  background: rgba(252, 250, 245, .9);
-  box-shadow: 0 12px 28px -16px rgba(40, 50, 45, .55);
+  background: rgba(252, 250, 245, .92);
+  box-shadow: 0 10px 22px -14px rgba(40, 50, 45, .55);
   color: var(--ink-2);
-  font-size: .74rem;
+  font-size: .64rem;
   font-weight: 500;
   letter-spacing: .2em;
   text-transform: uppercase;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  translate: -50% 10px;
-  transition: opacity .45s var(--ease), translate .45s var(--ease);
+  translate: -50% 6px;
+  transition: opacity .25s var(--ease), translate .25s var(--ease);
 }
 .scroll-cue.is-on { opacity: 1; translate: -50% 0; }
-.scroll-cue__arrow { position: relative; width: 10px; height: 14px; }
+.scroll-cue__arrow { position: relative; width: 8px; height: 11px; }
 .scroll-cue__arrow::before {
   content: "";
   position: absolute;
   left: 1px;
   top: 0;
-  width: 7px;
-  height: 7px;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
+  width: 5px;
+  height: 5px;
+  border-right: 1.4px solid currentColor;
+  border-bottom: 1.4px solid currentColor;
   transform: rotate(45deg);
-  animation: cue-bob 1.6s ease-in-out infinite;
+  animation: cue-bob 1s ease-in-out infinite;
 }
-@keyframes cue-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 4px; } }
+@keyframes cue-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 3px; } }
 @media (prefers-reduced-motion: reduce) { .scroll-cue__arrow::before { animation: none; } }
+/* phones: hold the page still while the auto-dive glides (so a flick can't fight it) */
+html.is-auto-diving, html.is-auto-diving body { overflow: hidden; }
 
 /* the tall bamboo fades into the garden's morning mist at the bottom of the grove */
 .grove__front::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 12vh; height: 12svh; background: linear-gradient(rgba(239, 235, 226, 0), #efebe2); pointer-events: none; }
@@ -573,6 +575,26 @@ main, .site-footer { position: relative; z-index: 1; }
 .panel--hero .seal { margin-bottom: 14px; }
 .panel .lede { font-size: 1.06rem; }
 .page-events .block { padding: 7vh 16px; }
+
+/* ---------------------- keyword landing pages (landing.mjs) ---------------------- */
+.page-landing .eyebrow { color: #4f6046; }
+.page-landing .block { padding: 6vh 16px; }
+.page-landing .landing-hero { padding-top: calc(64px + var(--safe-top) + 6vh); }
+.landing-hero h1 { margin: 6px 0 12px; font-family: var(--font-serif); font-weight: 500; font-size: clamp(1.9rem, 6.4vw, 2.9rem); line-height: 1.15; color: var(--ink); }
+.landing-hero .cta-row { margin-top: 20px; }
+.landing-hero__meta { display: flex; align-items: center; gap: 6px; margin-top: 18px !important; font-size: .86rem !important; color: #5a544c; }
+.landing-hero__meta svg { flex: none; width: 16px; height: 16px; }
+.crumbs { display: flex; gap: 8px; margin-bottom: 14px; font-size: .78rem; letter-spacing: .06em; color: #6d675e; }
+.crumbs a { color: inherit; }
+.dish-group + .dish-group { margin-top: 22px; }
+.dish-group h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 18px 0 6px; font-family: var(--font-serif); font-weight: 500; font-size: 1.2rem; }
+.dish-group h3 small, .dish-list small { font-family: var(--font-sans, inherit); font-size: .8rem; letter-spacing: .04em; color: #6d675e; }
+.dish-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 2px 28px; }
+@media (min-width: 720px) { .dish-list { grid-template-columns: 1fr 1fr; } }
+.dish-list li { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid rgba(80, 70, 55, .1); }
+.dish-list .mark { flex: none; margin-top: 4px; }
+.dish-list b { font-weight: 500; color: var(--ink); }
+.dish-list span { display: block; margin-top: 2px; font-size: .88rem; line-height: 1.45; color: #5a544c; }
 .occasions { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 10px; }
 @media (min-width: 640px) { .occasions { grid-template-columns: 1fr 1fr; } }
 @media (min-width: 900px) { .occasions { grid-template-columns: 1fr 1fr 1fr; } }

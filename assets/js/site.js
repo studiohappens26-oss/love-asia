@@ -13,16 +13,26 @@
     onScroll();
   }
 
-  // the Google map is only loaded when asked for (keeps the page light)
+  // The Google map loads by itself as you scroll near it (it's heavy, so not with the
+  // page); the "Show map" button is a fallback for older browsers or a tap before then.
   const map = document.getElementById("map");
   if (map) {
-    map.querySelector(".map__load").addEventListener("click", () => {
+    let loaded = false;
+    const load = () => {
+      if (loaded) return;
+      loaded = true;
       const f = document.createElement("iframe");
       f.title = "Map showing Love Asia in Kothanur, Hennur, Bengaluru";
       f.src = map.dataset.src;
       f.referrerPolicy = "no-referrer-when-downgrade";
+      f.loading = "lazy";
       map.replaceChildren(f);
-    });
+    };
+    map.querySelector(".map__load").addEventListener("click", load);
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); load(); } }, { rootMargin: "600px 0px" });
+      io.observe(map);
+    }
   }
 
   // signature dishes slider: arrow buttons step one card at a time

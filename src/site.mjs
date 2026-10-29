@@ -7,8 +7,8 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-export const SITE_URL = "https://studiohappens26-oss.github.io/love-asia"; // no trailing slash
-export const BASE_PATH = new URL(SITE_URL + "/").pathname; // "/love-asia/"
+export const SITE_URL = "https://loveasia.in"; // no trailing slash
+export const BASE_PATH = new URL(SITE_URL + "/").pathname; // "/" on loveasia.in
 
 export const BUSINESS = {
   name: "Love Asia",
@@ -185,6 +185,7 @@ export function siteFooter({ root }) {
       <h2>Explore</h2>
       <p><a href="${root}menu/">Menu</a> · <a href="${root}veg/">Veg</a> · <a href="${root}non-veg/">Non-Veg</a></p>
       <p><a href="${root}events/">Birthday parties &amp; events</a></p>
+      <p><a href="${root}sushi-hennur/">Sushi in Hennur</a> · <a href="${root}family-restaurant-hennur/">Family dining</a> · <a href="${root}date-night-hennur/">Date night</a></p>
       <p><a href="${BUSINESS.google}" rel="noopener" target="_blank">Love Asia on Google</a></p>
       <p><a href="${BUSINESS.instagram.url}" rel="noopener" target="_blank">Instagram @${esc(BUSINESS.instagram.handle)}</a></p>
     </div>

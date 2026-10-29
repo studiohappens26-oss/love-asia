@@ -100,7 +100,9 @@
     };
 
     // fetch the pond script a little before you reach the water
-    new IntersectionObserver(([e]) => { if (e.isIntersecting) load(); }, { rootMargin: "100% 0px" }).observe(area);
+    // (on pages that open on the water, wait until the page itself has finished loading)
+    const soon = () => (document.readyState === "complete" ? setTimeout(load, 300) : window.addEventListener("load", () => setTimeout(load, 300), { once: true }));
+    new IntersectionObserver(([e]) => { if (e.isIntersecting) soon(); }, { rootMargin: "100% 0px" }).observe(area);
     // draw (and show the water layer) only while the water is on screen
     new IntersectionObserver(([e]) => {
       inWater = e.isIntersecting;
@@ -165,45 +167,120 @@
       };
       window.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
       onScroll();
+
+      /* ---- auto-dive: reach the fence and the page carries you into the pond ---- */
+      // Scrolling down to the garden's fence starts a short, film-like glide: the zoom
+      // into the pond plays and the page settles on the first section in the water.
+      // Any touch, wheel or key hands control straight back. ?dive=manual turns it off.
+      const auto = !reduced && !/[?&]dive=manual\b/.test(location.search);
+      const next = dive.nextElementSibling;
+      if (auto && next) {
+        const coarse = window.matchMedia("(pointer: coarse)").matches;
+        const easeIO = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+        let armed = true, running = false, touching = false, waiting = false, lastY = window.scrollY, raf2 = 0;
+        const targetY = () => {
+          const el = next.querySelector(".panel") || next;
+          return el.getBoundingClientRect().top + window.scrollY - 84; // just below the header
+        };
+        const finish = () => {
+          if (!running) return;
+          running = false;
+          cancelAnimationFrame(raf2);
+          document.documentElement.classList.remove("is-auto-diving");
+          window.dispatchEvent(new Event("autodive:end"));
+        };
+        const start = () => {
+          const from = window.scrollY, to = targetY();
+          armed = false;
+          if (to <= from + 10) return;
+          running = true;
+          window.dispatchEvent(new Event("autodive:start"));
+          const dur = Math.max(2000, Math.min(2800, ((to - from) / window.innerHeight) * 1250));
+          if (window.smoothScroll) { // desktop: Lenis does the glide
+            window.smoothScroll.scrollTo(to, { duration: dur / 1000, easing: easeIO, onComplete: finish });
+            return;
+          }
+          // phones: hold the page still for the glide so a flick can't fight it
+          if (coarse) document.documentElement.classList.add("is-auto-diving");
+          const t0 = performance.now();
+          const step = (now) => {
+            if (!running) return;
+            const k = Math.min(1, (now - t0) / dur);
+            window.scrollTo({ top: from + (to - from) * easeIO(k), behavior: "instant" });
+            if (k < 1) raf2 = requestAnimationFrame(step); else finish();
+          };
+          raf2 = requestAnimationFrame(step);
+        };
+        window.addEventListener("scroll", () => {
+          const y = window.scrollY, down = y > lastY;
+          lastY = y;
+          if (running) return;
+          const top = dive.getBoundingClientRect().top, vh = window.innerHeight;
+          if (top > vh * 0.6) { armed = true; return; } // back above the garden: ready again
+          // the fence sits near the top of the garden picture: start once it reaches mid-screen
+          // a finger still on the glass: wait for it to lift, then glide
+          if (armed && down && top <= vh * 0.35 && -top < (dive.offsetHeight - vh) * 0.5) { if (touching) waiting = true; else start(); }
+        }, { passive: true });
+        // the visitor takes over: stop gliding
+        const stop = () => {
+          waiting = false;
+          if (!running) return;
+          if (window.smoothScroll) window.smoothScroll.scrollTo(window.scrollY, { immediate: true });
+          finish();
+        };
+        window.addEventListener("touchstart", () => { touching = true; stop(); }, { passive: true });
+        const lift = () => { touching = false; if (waiting) { waiting = false; start(); } };
+        window.addEventListener("touchend", lift, { passive: true });
+        window.addEventListener("touchcancel", lift, { passive: true });
+        for (const ev of ["wheel", "keydown", "mousedown"]) window.addEventListener(ev, stop, { passive: true });
+      }
     }
   }
 
   /* ------------------------------ scroll prompt ------------------------------ */
-  // The grove's misty stretch and the pinned garden pond can look like the end of the
-  // page. If someone stops there for a moment, a small prompt invites them to keep going;
-  // it fades the moment they scroll again. (Never on the hero at the very top.)
-  const groveEl = document.querySelector(".grove"), diveEl = document.querySelector(".dive");
-  if (groveEl || diveEl) {
+  // If someone stays on one spot for 3 seconds, a tiny "Scroll down" nudge flashes at the
+  // bottom for a second, then again every 3 seconds while they stay. Any scroll, touch or
+  // key resets it. Not shown at the end of the page, while typing, or during the auto-dive.
+  if (document.querySelector(".grove, .dive")) {
+    const diveEl = document.querySelector(".dive");
     const cue = document.createElement("div");
     cue.className = "scroll-cue";
     cue.setAttribute("aria-hidden", "true");
     cue.innerHTML = '<span class="scroll-cue__text"></span><span class="scroll-cue__arrow"></span>';
     document.body.appendChild(cue);
     const text = cue.firstChild;
-    let idle = 0;
+    let idle = 0, blink = 0, gliding = false;
     const message = () => {
-      const vh = window.innerHeight;
+      const vh = window.innerHeight, doc = document.documentElement;
+      if (window.scrollY + vh > doc.scrollHeight - vh * 0.8) return ""; // nearly at the end
       if (diveEl) {
         const r = diveEl.getBoundingClientRect();
-        // pinned in the garden, before the water has filled the screen
         if (r.top <= 2 && -r.top < (r.height - vh) * 0.8) return "Scroll to dive in";
       }
-      if (groveEl) {
-        const r = groveEl.getBoundingClientRect();
-        if (window.scrollY > vh * 0.3 && r.bottom > vh * 1.05) return "Keep scrolling";
-      }
-      return "";
+      return "Scroll down";
     };
-    const hide = () => cue.classList.remove("is-on");
-    window.addEventListener("scroll", () => {
-      hide();
-      clearTimeout(idle);
-      idle = setTimeout(() => {
-        const m = message();
-        if (!m) return;
+    const flash = () => {
+      if (gliding || document.hidden) return;
+      const busy = document.activeElement && document.activeElement.closest("input, textarea, select");
+      const m = busy ? "" : message();
+      if (m) {
         text.textContent = m;
         cue.classList.add("is-on");
-      }, 1400);
-    }, { passive: true });
+      }
+      blink = setTimeout(() => {
+        cue.classList.remove("is-on");
+        blink = setTimeout(flash, 3000);
+      }, m ? 1000 : 0);
+    };
+    const reset = () => {
+      cue.classList.remove("is-on");
+      clearTimeout(idle);
+      clearTimeout(blink);
+      idle = setTimeout(flash, 3000);
+    };
+    for (const ev of ["scroll", "touchstart", "wheel", "keydown", "pointerdown"]) window.addEventListener(ev, reset, { passive: true });
+    window.addEventListener("autodive:start", () => { gliding = true; reset(); });
+    window.addEventListener("autodive:end", () => { gliding = false; reset(); });
+    reset();
   }
 })();

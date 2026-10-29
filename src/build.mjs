@@ -12,6 +12,7 @@ import { SITE_URL, BASE_PATH, head, logoSvg, siteHeader, siteFooter } from "./si
 import { homePage } from "./pages/home.mjs";
 import { chooserPage, menuPage } from "./pages/menu.mjs";
 import { eventsPage } from "./pages/events.mjs";
+import { sushiPage, familyPage, datePage } from "./pages/landing.mjs";
 import { gardenSvg } from "./garden-pond.mjs";
 import { skySvg, hillsSvg, cloudSvg, curtainSvg, sakuraSvg } from "./scenery.mjs";
 
@@ -63,6 +64,9 @@ function build() {
     ["non-veg/index.html", menuPage(DATA, "nonveg"), "non-veg/", "0.9", "monthly"],
     ["veg/index.html", menuPage(DATA, "veg"), "veg/", "0.9", "monthly"],
     ["events/index.html", eventsPage(), "events/", "0.8", "monthly"],
+    ["sushi-hennur/index.html", sushiPage(DATA), "sushi-hennur/", "0.7", "monthly"],
+    ["family-restaurant-hennur/index.html", familyPage(DATA), "family-restaurant-hennur/", "0.7", "monthly"],
+    ["date-night-hennur/index.html", datePage(DATA), "date-night-hennur/", "0.7", "monthly"],
   ];
   for (const [file, html] of pages) write(file, html);
   write("404.html", notFoundPage());
