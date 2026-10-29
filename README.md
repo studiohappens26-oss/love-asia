@@ -36,8 +36,10 @@ Old QR codes that point at `/#veg` or `/#nonveg` still work; they redirect to th
   are drawn in `src/architecture.mjs`; the garden pond scene is `src/garden-pond.mjs`. On desktop (mouse or trackpad), scrolling is smoothed with
   [Lenis](https://github.com/darkroomengineering/lenis) (`assets/vendor/`, MIT). Phones keep native scrolling,
   and Lenis isn't downloaded there.
-- Auto-dive: scrolling down to the garden fence glides the page (about 2.4s) through the pond zoom to the
-  first section in the water. Any touch, wheel or key stops it. Add `?dive=manual` to the URL to turn it off.
+- Auto-dive: once the "Step into the grove" heading scrolls off the screen (on the events page, once the
+  garden is two-thirds up the screen), a 1.5s glide carries the page through the pond zoom to the first
+  section in the water. The visitor's own scrolling is held off until it lands, so flicks, trackpad momentum
+  and stacked swipes can't fight it. Links and reloads don't trigger it. Add `?dive=manual` to turn it off.
   If you stay still for 3 seconds, a small "Scroll down" nudge flashes for a second, every 3 seconds.
 - Keyword pages (`src/pages/landing.mjs`): `/sushi-hennur/`, `/family-restaurant-hennur/` and
   `/date-night-hennur/`, each with its own FAQ and breadcrumb schema. The sushi and dessert lists come

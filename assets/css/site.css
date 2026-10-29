@@ -317,8 +317,10 @@ html:not(.js) .grove .g-near.g-r { translate: 85% 0; }
 }
 @keyframes cue-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 3px; } }
 @media (prefers-reduced-motion: reduce) { .scroll-cue__arrow::before { animation: none; } }
-/* phones: hold the page still while the auto-dive glides (so a flick can't fight it) */
-html.is-auto-diving, html.is-auto-diving body { overflow: hidden; }
+/* while the auto-dive glides (garden.js): no smooth-scroll easing on top of ours, and on
+   phones the page is held so a flick's coasting can't fight it */
+html.is-auto-diving { scroll-behavior: auto; }
+html.is-auto-diving--lock, html.is-auto-diving--lock body { overflow: hidden; }
 
 /* the tall bamboo fades into the garden's morning mist at the bottom of the grove */
 .grove__front::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 12vh; height: 12svh; background: linear-gradient(rgba(239, 235, 226, 0), #efebe2); pointer-events: none; }

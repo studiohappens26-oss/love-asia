@@ -25,6 +25,8 @@
       f.title = "Map showing Love Asia in Kothanur, Hennur, Bengaluru";
       f.src = map.dataset.src;
       f.referrerPolicy = "no-referrer-when-downgrade";
+      f.allow = "fullscreen";
+      f.allowFullscreen = true;
       f.loading = "lazy";
       map.replaceChildren(f);
     };
