@@ -37,9 +37,12 @@ Old QR codes that point at `/#veg` or `/#nonveg` still work; they redirect to th
   [Lenis](https://github.com/darkroomengineering/lenis) (`assets/vendor/`, MIT). Phones keep native scrolling,
   and Lenis isn't downloaded there.
 - Auto-dive: once the "Step into the grove" heading scrolls off the screen (on the events page, once the
-  garden is two-thirds up the screen), a 1.5s glide carries the page through the pond zoom to the first
-  section in the water. The visitor's own scrolling is held off until it lands, so flicks, trackpad momentum
-  and stacked swipes can't fight it. Links and reloads don't trigger it. Add `?dive=manual` to turn it off.
+  garden is two-thirds up the screen), a 3s glide carries the page into the pond: a short approach to the
+  fence, a slow steady zoom into the water (it grows by the same factor at every step), then it settles on
+  the first section. The visitor's own scrolling is held off until it lands, so flicks, trackpad momentum and
+  stacked swipes can't fight it; a finger already mid-swipe gets the glide as soon as it lifts. Links and
+  reloads don't trigger it. Add `?dive=manual` to turn it off.
+- Feeding the koi is a tap (a click), so swiping over the water to scroll never counts as feeding.
   If you stay still for 3 seconds, a small "Scroll down" nudge flashes for a second, every 3 seconds.
 - Keyword pages (`src/pages/landing.mjs`): `/sushi-hennur/`, `/family-restaurant-hennur/` and
   `/date-night-hennur/`, each with its own FAQ and breadcrumb schema. The sushi and dessert lists come
