@@ -265,17 +265,36 @@ html:not(.js) .grove .g-near.g-r { translate: 85% 0; }
 /* a soft flash of light on the surface as you go under */
 .dive__sheen { background: radial-gradient(60% 45% at 50% 54%, rgba(255, 255, 255, .75), rgba(255, 255, 255, 0) 70%); opacity: 0; }
 @supports (animation-timeline: view()) {
-  .dive__garden { animation: dive-in 1ms cubic-bezier(.6, 0, .85, .35) both; animation-timeline: --dive; animation-range: contain 0% contain 82%; }
+  .dive__garden { animation: dive-in 1ms linear both; animation-timeline: --dive; animation-range: contain 0% contain 82%; }
   .dive__sheen { animation: dive-sheen 1ms linear both; animation-timeline: --dive; animation-range: contain 40% contain 100%; }
 }
 /* the koi (a transparent canvas over the water) zoom with the garden, so they start
    pond-sized and grow as you go in; the water itself stays put (--pond-from: garden.js) */
 @supports (animation-timeline: view()) and (timeline-scope: --dive) {
   body { timeline-scope: --dive; }
-  .pond-bg #pond { transform-origin: 50% 54.1vh; transform-origin: 50% 54.1svh; animation: pond-zoom 1ms cubic-bezier(.6, 0, .85, .35) both; animation-timeline: --dive; animation-range: contain 0% contain 82%; }
+  .pond-bg #pond { transform-origin: 50% 54.1vh; transform-origin: 50% 54.1svh; animation: pond-zoom 1ms linear both; animation-timeline: --dive; animation-range: contain 0% contain 82%; }
 }
-@keyframes pond-zoom { from { transform: scale(var(--pond-from, .3)); } to { transform: none; } }
-@keyframes dive-in { to { transform: scale(var(--dive-scale)); } }
+/* a steady zoom: every fifth of the way multiplies the scale by the same factor (stops: garden.js) */
+@keyframes pond-zoom {
+  0% { transform: scale(var(--pond-from, .3)); }
+  20% { transform: scale(var(--p1, .4)); }
+  40% { transform: scale(var(--p2, .55)); }
+  60% { transform: scale(var(--p3, .75)); }
+  80% { transform: scale(var(--p4, 1)); }
+  100% { transform: none; }
+}
+@keyframes dive-in {
+  0% { transform: none; }
+  20% { transform: scale(var(--z1, 1.5)); }
+  40% { transform: scale(var(--z2, 2.2)); }
+  60% { transform: scale(var(--z3, 3.2)); }
+  80% { transform: scale(var(--z4, 4.7)); }
+  100% { transform: scale(var(--dive-scale)); }
+}
+/* the light on the water fades in as you go under (garden.js). Only faded out, not
+   hidden: bringing hidden layers back makes the browser redraw them, a hitch mid-dive. */
+.pond-caustics { transition: opacity .7s var(--ease); }
+.pond-bg.is-shallow .pond-caustics { opacity: 0; transition-duration: .4s; }
 @keyframes dive-sheen { 0% { opacity: 0; } 55% { opacity: .55; } 100% { opacity: 0; } }
 /* tiny "scroll down" nudge that flashes after a few idle seconds (garden.js) */
 .scroll-cue {
@@ -318,9 +337,10 @@ html:not(.js) .grove .g-near.g-r { translate: 85% 0; }
 @keyframes cue-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 3px; } }
 @media (prefers-reduced-motion: reduce) { .scroll-cue__arrow::before { animation: none; } }
 /* while the auto-dive glides (garden.js): no smooth-scroll easing on top of ours, and on
-   phones the page is held so a flick's coasting can't fight it */
+   phones new touches can't scroll the page. (Not overflow: hidden, which is the usual way:
+   in Chrome that cuts the garden's zoom loose from the scroll and it jumps to its end.) */
 html.is-auto-diving { scroll-behavior: auto; }
-html.is-auto-diving--lock, html.is-auto-diving--lock body { overflow: hidden; }
+html.is-auto-diving--lock { touch-action: none; overscroll-behavior: none; }
 
 /* the tall bamboo fades into the garden's morning mist at the bottom of the grove */
 .grove__front::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 12vh; height: 12svh; background: linear-gradient(rgba(239, 235, 226, 0), #efebe2); pointer-events: none; }

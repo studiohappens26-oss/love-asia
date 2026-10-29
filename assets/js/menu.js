@@ -71,7 +71,8 @@
     const go = () => { pond.start(); setTimeout(() => pond.leap(), 900); };
     if (document.readyState === "complete") setTimeout(go, 300);
     else window.addEventListener("load", () => setTimeout(go, 300), { once: true });
-    document.addEventListener("pointerdown", (e) => {
+    // a tap feeds them (a click: a swipe to scroll starts with a finger down too)
+    document.addEventListener("click", (e) => {
       if (e.target.closest("button, a, input, .topbar, .dish, .sheet, .fab")) return;
       pond.feed(e.clientX, e.clientY);
     }, { passive: true });

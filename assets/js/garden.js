@@ -124,12 +124,14 @@
     const gardenPond = area.querySelector(":scope > .dive");
     const rest = watch("0px");
     for (const el of area.children) if (el !== gardenPond) rest.observe(el);
-    // (the pond sits a little below the middle of the garden picture)
-    if (gardenPond) watch("0px 0px -38% 0px").observe(gardenPond);
+    // (the pond sits a little below the middle of the garden picture; it wakes just before
+    // the auto-dive would start, so its start-up isn't the glide's first frames)
+    if (gardenPond) watch("0px 0px -28% 0px").observe(gardenPond);
     bg.classList.add("is-idle");
 
-    // tap the open water (not a card, link or button) to drop food
-    area.addEventListener("pointerdown", (e) => {
+    // tap the open water (not a card, link or button) to drop food. A click, not a
+    // pointerdown: every swipe to scroll starts with a finger down on the water too.
+    area.addEventListener("click", (e) => {
       if (!pond || e.button > 0) return;
       if (e.target.closest("a, button, input, select, textarea, summary, iframe, .panel")) return;
       pond.feed(e.clientX, e.clientY);
@@ -150,19 +152,27 @@
       const [, cy, rx, ry, iw, ih] = img.dataset.pond.split(" ").map(Number);
       const OY = cy / ih; // the picture is anchored and zoomed at the pond's centre
       let S = 7;
-      let lastScale = "", lastFrom = "";
+      let lastScale = "";
       const fit = () => {
         const vw = stage.clientWidth, vh = stage.clientHeight;
         const k = Math.max(vw / iw, vh / ih); // object-fit: cover
         // smallest zoom at which the pond's inner ellipse covers the farthest screen corner
         S = Math.hypot(vw / 2 / (rx * k), Math.max(OY, 1 - OY) * vh / (ry * k)) * 1.06;
         // (only written when they change: the address bar sliding in and out fires resizes)
-        const scale = S.toFixed(2), from = (1 / (S * 0.55)).toFixed(3);
-        if (scale !== lastScale) dive.style.setProperty("--dive-scale", scale);
-        // the water starts this much smaller and grows to full size as you go in
-        if (from !== lastFrom) bg.style.setProperty("--pond-from", from);
-        lastScale = scale; lastFrom = from;
+        const scale = S.toFixed(2), from = 1 / (S * 0.55);
+        if (scale === lastScale) return;
+        lastScale = scale;
+        // The zoom grows by the same factor at every step (like a camera moving in at a
+        // steady speed), so the CSS keyframes get the in-between scales: S^0.2, S^0.4...
+        // The koi canvas starts this much smaller and grows with it to full size.
+        dive.style.setProperty("--dive-scale", scale);
+        bg.style.setProperty("--pond-from", from.toFixed(3));
+        for (let k = 1; k <= 4; k++) {
+          dive.style.setProperty("--z" + k, Math.pow(S, k / 5).toFixed(3));
+          bg.style.setProperty("--p" + k, Math.min(1, Math.pow(S, k / 5) * from).toFixed(3));
+        }
       };
+      const zoomAt = (p) => Math.pow(S, p); // the same curve, for browsers without scroll-driven CSS
       fit();
       window.addEventListener("resize", fit);
 
@@ -174,9 +184,12 @@
         // the koi come to the pond as you arrive at it
         if (top > vh) lured = false;
         else if (!lured && top <= 0 && pond) { lured = true; pond.addRipple(stage.clientWidth / 2, OY * stage.clientHeight, true); }
+        // the light on the water only appears once you're going under (until then it would only
+        // show through the little pond in the picture, and costs a lot to draw on phones)
+        bg.classList.toggle("is-shallow", top < vh && -top / (dive.offsetHeight - vh) < 0.5);
         if (!scrollDriven) {
           const p = clamp(-top / ((dive.offsetHeight - vh) * 0.82));
-          const z = 1 + (S - 1) * Math.pow(p, 2.2);
+          const z = zoomAt(p);
           img.style.transform = `scale(${z.toFixed(3)})`;
           const koi = document.getElementById("pond");
           koi.style.transformOrigin = `50% ${(OY * stage.clientHeight).toFixed(0)}px`;
@@ -189,7 +202,7 @@
       onScroll();
 
       /* ---- auto-dive: reach the fence and the page carries you into the pond ---- */
-      // Once the "Step into the grove" heading scrolls off the screen, a 1.5s film-like
+      // Once the "Step into the grove" heading scrolls off the screen, a 3s film-like
       // glide takes over: the garden zooms into the pond and the page settles on the first
       // section in the water. People scroll in every way imaginable (slow drags, hard
       // flicks, trackpad momentum, swipes stacked on swipes), so the glide owns the scroll:
@@ -205,9 +218,11 @@
         const coarse = window.matchMedia("(pointer: coarse)").matches;
         const KEYS = new Set([" ", "PageDown", "PageUp", "ArrowDown", "ArrowUp", "Home", "End"]);
         const cue = document.querySelector("#reveal h2");
-        const GLIDE = 1500;
-        let armed = true, running = false, touching = false, quietUntil = 0;
-        let lastInput = -1e9, raf2 = 0, safety = 0, glideTop = 0, prevY = window.scrollY, down = false;
+        // the glide is paced like a camera move: a short approach to the fence, a slow push
+        // into the pond while the garden zooms, then it settles on the section (ms)
+        const APPROACH = 550, ZOOM = 1750, SETTLE = 700;
+        let armed = true, running = false, touching = false, pending = false, quietUntil = 0;
+        let lastInput = -1e9, raf2 = 0, safety = 0, prevY = window.scrollY, down = false;
         // recent scroll positions, to read your speed and direction
         let samples = [];
         const speed = () => { // px per ms over the last ~120ms (+ is down)
@@ -240,7 +255,7 @@
           window[f]("wheel", block, { passive: false });
           window[f]("keydown", blockKeys);
           root.classList.toggle("is-auto-diving", on);
-          if (coarse) root.classList.toggle("is-auto-diving--lock", on); // also stops a flick's coasting
+          if (coarse) root.classList.toggle("is-auto-diving--lock", on); // new touches don't scroll
         };
         const finish = () => {
           if (!running) return;
@@ -255,15 +270,18 @@
           const from = window.scrollY, to = targetY(), d = to - from;
           armed = false;
           if (d < 40) return;
-          // carry on at the speed you were going, easing to a stop on the section
-          const v0 = Math.max(0, speed()), T = GLIDE;
-          const m = Math.min(3, (v0 * T) / d); // start slope; <= 3 keeps it from overshooting
-          const curve = (t) => (t * t * t - 2 * t * t + t) * m + (3 - 2 * t) * t * t;
+          const path = glidePath(from, to, Math.max(0, speed()));
+          const T = path.T, curve = (k) => (path.at(k * T) - from) / d;
           running = true;
-          glideTop = from;
           hold(true);
           window.dispatchEvent(new Event("autodive:start"));
-          safety = setTimeout(finish, T + 700); // whatever happens, never leave the page held
+          // whatever happens (a phone stalling mid-glide), never leave the page held or half-way
+          safety = setTimeout(() => {
+            if (!running) return;
+            if (window.smoothScroll) window.smoothScroll.scrollTo(to, { immediate: true, force: true });
+            window.scrollTo(0, to);
+            finish();
+          }, T + 2000);
           window.scrollTo(0, from); // stops the page where it is: ends a flick's coasting or a key's scroll animation
           if (window.smoothScroll) { // desktop: Lenis does the glide (and ignores the wheel meanwhile)
             window.smoothScroll.scrollTo(from, { immediate: true, force: true }); // start from where the page really is
@@ -276,18 +294,58 @@
           const step = (now) => {
             if (!running) return;
             const k = Math.min(1, (now - t0) / T);
-            window.scrollTo(0, Math.min(to, Math.max(window.scrollY, glideTop + d * curve(k))));
+            window.scrollTo(0, Math.min(to, Math.max(window.scrollY, path.at(k * T))));
             if (k < 1) raf2 = requestAnimationFrame(step);
             else { window.scrollTo(0, to); finish(); }
           };
           raf2 = requestAnimationFrame(step);
         };
+        // Where the page should be t ms into the glide: a smooth curve through the fence (where
+        // the garden pins), the end of the zoom and the section, with more time on the zoom.
+        // It starts at your own speed and ends at rest, and never goes backwards (a monotone
+        // cubic through those points). If you were already part-way in, the parts you've
+        // passed are skipped and the rest keeps its pace.
+        const glidePath = (from, to, v0) => {
+          const vh = window.innerHeight;
+          const pin = dive.getBoundingClientRect().top + window.scrollY;
+          const zoomEnd = pin + (dive.offsetHeight - vh) * 0.82;
+          const marks = [[pin, APPROACH], [Math.min(zoomEnd, to), ZOOM], [to, SETTLE]];
+          const ys = [from], ts = [0];
+          let prev = pin - vh * 0.65; // where the approach would have started
+          for (const [y, ms] of marks) {
+            const share = (y - Math.max(prev, from)) / Math.max(1, y - prev);
+            if (y > from + 1 && share > 0) { ys.push(y); ts.push(ts[ts.length - 1] + ms * Math.min(1, share)); }
+            prev = y;
+          }
+          if (ys.length < 2) { ys.push(to); ts.push(SETTLE); }
+          const n = ys.length - 1, sec = [], m = [];
+          for (let i = 0; i < n; i++) sec.push((ys[i + 1] - ys[i]) / (ts[i + 1] - ts[i]));
+          m[0] = Math.min(v0, 3 * sec[0]);
+          m[n] = 0;
+          for (let i = 1; i < n; i++) { // Fritsch-Butland: keeps it monotone
+            const h0 = ts[i] - ts[i - 1], h1 = ts[i + 1] - ts[i];
+            m[i] = sec[i - 1] * sec[i] <= 0 ? 0 : (3 * (h0 + h1)) / ((2 * h1 + h0) / sec[i - 1] + (h1 + 2 * h0) / sec[i]);
+          }
+          const T = ts[n];
+          const at = (t) => {
+            if (t >= T) return to;
+            let i = 0;
+            while (i < n - 1 && t > ts[i + 1]) i++;
+            const h = ts[i + 1] - ts[i], u = (t - ts[i]) / h, u2 = u * u, u3 = u2 * u;
+            return (2 * u3 - 3 * u2 + 1) * ys[i] + (u3 - 2 * u2 + u) * h * m[i] + (-2 * u3 + 3 * u2) * ys[i + 1] + (u3 - u2) * h * m[i + 1];
+          };
+          return { T, at };
+        };
         const check = () => {
           if (running) return;
-          if (!passed(-40)) { armed = true; return; } // the heading is back on screen: ready again
+          if (!passed(-40)) { armed = true; pending = false; return; } // the heading is back on screen: ready again
           if (!armed || !userScrolling() || !inZone()) return;
           if (!down) return; // only when heading down
-          start();
+          // A finger already dragging can't be stopped mid-swipe (browsers don't allow it once
+          // the page is moving), so then the glide starts the moment it lets go. New touches
+          // during the glide are blocked.
+          if (touching) pending = true;
+          else start();
         };
         window.addEventListener("scroll", () => {
           const y = window.scrollY;
@@ -300,9 +358,27 @@
         const input = () => { lastInput = performance.now(); };
         window.addEventListener("wheel", input, { passive: true });
         window.addEventListener("keydown", (e) => { if (KEYS.has(e.key)) input(); });
+        // Near the garden, scroll keys move the page in one step instead of the browser's
+        // animated scroll, which would otherwise still be running when the glide takes over.
+        window.addEventListener("keydown", (e) => {
+          if (running || !armed || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+          if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable]")) return;
+          const vh = window.innerHeight, top = dive.getBoundingClientRect().top;
+          if (top > vh * 2 || window.scrollY >= targetY() - vh * 0.25) return;
+          const step = e.key === "ArrowDown" ? 60 : (e.key === "PageDown" || (e.key === " " && !e.shiftKey)) ? vh * 0.85 : 0;
+          if (!step) return;
+          e.preventDefault();
+          root.style.scrollBehavior = "auto";
+          window.scrollTo(0, window.scrollY + step);
+          root.style.scrollBehavior = "";
+        });
         window.addEventListener("touchstart", () => { touching = true; input(); }, { passive: true });
         window.addEventListener("touchmove", input, { passive: true });
-        const lift = () => { touching = false; input(); };
+        const lift = () => {
+          touching = false;
+          input();
+          if (pending && !running) { pending = false; if (inZone()) start(); }
+        };
         window.addEventListener("touchend", lift, { passive: true });
         window.addEventListener("touchcancel", lift, { passive: true });
         // dragging the scrollbar counts as scrolling yourself
